@@ -23,7 +23,7 @@ void Chassis::move(int left, int right) { //uses the pros controller which goes 
         48, 49, 50, 50, 50, 51, 51, 51, 52, 66,
         78, 78, 78, 78, 78, 78, 78, 78, 78, 78,
         86, 86, 86, 86, 86, 86, 86, 86, 86, 86,
-        94, 94, 95, 96, 97, 98, 99,100,100,100,
+        94, 94, 95, 96, 97, 98, 99, 100,100,100,
         100,100,100,100,100,100,100,100
     };
     //getting the sign bit in order to apply the correct direction to the motor
