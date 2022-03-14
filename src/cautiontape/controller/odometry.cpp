@@ -24,7 +24,7 @@ void Odometry::setPose(Pose ipose) {
 }
 
 OdomScales Odometry::calibrate() {
-    
+    return {0, 0, 0, 0};
 }
 
 OdomScales Odometry::getScales() {
@@ -78,7 +78,7 @@ void lamaLib::odometryMain(void* param) {
         }
 
         // Polar coordinates
-        double polarRadius = sqrt(localOffsetX * localOffsetX + localOffsetY * localOffsetY);
+        double polarRadius = sqrt(pow(localOffsetX, 2) + pow(localOffsetY, 2));
         double polarAngle =  atan2(localOffsetY, localOffsetX) - (currPose.theta + delta.theta / 2);
 
         // Global coordinates
