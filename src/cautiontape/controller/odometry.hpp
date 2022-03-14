@@ -99,8 +99,6 @@ class Odometry {
      * @brief Ends the odometry task
      */
     void endOdom();
-    
-    EncoderValues prev {0, 0, 0, 0};
 
     int tpr;
 
@@ -112,7 +110,7 @@ class Odometry {
     Pose pose;
     OdomScales scales;
 
-    task_t odom {};
+    task_t odomTask {};
 };
 
 extern Odometry odom;
@@ -120,5 +118,5 @@ extern Odometry odom;
 /**
  * @brief Main function of odometry
  */
-void Odom(void* param);
+void odometryMain(void* param);
 } // namespace lamaLib
