@@ -5,6 +5,7 @@
 # Executables
 *.bin
 *.elf
+*.idx
 
 # PROS
 bin/

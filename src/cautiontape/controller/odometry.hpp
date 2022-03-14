@@ -120,5 +120,5 @@ extern Odometry odom;
 /**
  * @brief Main function of odometry
  */
-void odometry(void* param);
+void Odom(void* param);
 } // namespace lamaLib

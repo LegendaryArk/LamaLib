@@ -35,13 +35,13 @@ void Odometry::setScales(OdomScales iscales) {
 }
 
 void Odometry::startOdom() {
-    odom = c::task_create(odometry, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "odometry");
+    odom = c::task_create(Odom, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "odometry");
 }
 void Odometry::endOdom() {
     c::task_delete(odom);
 }
 
-void odometry(void* param) {
+void Odom(void* param) {
     Odometry* odom = (Odometry*) param;
 
     OdomScales scales = odom->getScales();
