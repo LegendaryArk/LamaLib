@@ -42,15 +42,12 @@ void Odometry::endOdom() {
 }
 
 void lamaLib::odometryMain(void* param) {
-    // odom = (Odometry*) param;
-
     OdomScales scales = odom.getScales();
 
     double chassisDiameter = scales.leftRadius + scales.rightRadius;
 
     EncoderValues readings = odom.getEncoders();
-    EncoderValues readingsPrev;
-    EncoderValues readingsDiff;
+    EncoderValues readingsPrev = {0, 0, 0, 0};
 
     int tpr = odom.tpr;
 
@@ -58,15 +55,16 @@ void lamaLib::odometryMain(void* param) {
     while (true) {
         Pose currPose = odom.getPose();
 
+        EncoderValues readingsDiff;
         readingsDiff.left = readings.left - readingsPrev.left;
         readingsDiff.right = readings.right - readingsPrev.right;
         readingsDiff.rear = readings.rear - readingsPrev.rear;
         
         // Delta distance
         EncoderValues delta;
-        delta.left = (readingsDiff.left / tpr) * (chassisDiameter * M_PI);
-        delta.right = (readingsDiff.right / tpr) * (chassisDiameter * M_PI);
-        delta.rear = (readingsDiff.rear / tpr) * (chassisDiameter * M_PI);
+        delta.left = (readingsDiff.left / tpr) * (scales.wheelDiameter * M_PI);
+        delta.right = (readingsDiff.right / tpr) * (scales.wheelDiameter * M_PI);
+        delta.rear = (readingsDiff.rear / tpr) * (scales.wheelDiameter * M_PI);
 
         // Delta theta
         delta.theta = (readingsDiff.left - readingsDiff.right) / chassisDiameter;
@@ -76,7 +74,7 @@ void lamaLib::odometryMain(void* param) {
         double localOffsetY = (delta.left + delta.right) / 2;
         if (delta.left != delta.right) {
             localOffsetX = 2 * sin(delta.theta / 2) * (delta.rear / delta.theta + scales.rearRadius);
-            localOffsetY = 2 * sin(delta.theta / 2) * (delta.left / delta.theta + (delta.left > delta.right ? scales.rightRadius : scales.leftRadius));
+            localOffsetY = 2 * sin(delta.theta / 2) * (delta.right / delta.theta + (delta.left > delta.right ? scales.rightRadius : scales.leftRadius));
         }
 
         // Polar coordinates
@@ -96,7 +94,10 @@ void lamaLib::odometryMain(void* param) {
         double globalTheta = currPose.theta + delta.theta;
         odom.setPose({globalX, globalY, globalTheta, pros::millis()});
 
-        std::cout << globalX << " " << globalY << " " << globalTheta << " " << pros::millis() << "\n";
+        pros::lcd::print(1, "\tx: %f", odom.getPose().x / 12);
+        pros::lcd::print(2, "\ty: %f", odom.getPose().y / 12);
+        pros::lcd::print(3, "\ttheta: %f", odom.getPose().theta);
+        pros::lcd::print(4, "\ttime: %d", odom.getPose().time);
 
         readingsPrev = readings;
         readings = odom.getEncoders();

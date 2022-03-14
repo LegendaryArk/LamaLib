@@ -5,7 +5,7 @@ namespace lamaLib {
 using namespace pros;
 
 /**
- * @brief The coordinate position of the robot in inches
+ * @brief The coordinate position of the robot in inches and degrees
  *
  * Includes the time of the position
  */
