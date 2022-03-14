@@ -26,13 +26,23 @@ void Chassis::move(int left, int right) { //uses the pros controller which goes 
         94, 94, 95, 96, 97, 98, 99, 100,100,100,
         100,100,100,100,100,100,100,100
     };
+
+    int aleft = abs(left);
+    int aright = abs(right);
+
+    if (aleft > 127) {
+        aleft = 127;
+    }
+    if (aright > 127) {
+        aright = 127;
+    }
     //getting the sign bit in order to apply the correct direction to the motor
     int signL = (left > 0) - (left < 0);
     int signR = (right > 0) - (right < 0);
 
     //getting an absolute value to use for the joymap
-    int leftV = joyMap[abs(left)] * signL;
-    int rightV = joyMap[abs(right)] * signR;
+    int leftV = joyMap[aleft] * signL;
+    int rightV = joyMap[aright] * signR;
 
     //applying gearbox values
     switch (gearBox) {

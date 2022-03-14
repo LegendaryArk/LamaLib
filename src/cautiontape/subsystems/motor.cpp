@@ -12,5 +12,5 @@ okapi::Motor (
     port, reverse, igearset, encoderUnits
 )
 {
-    
+    Motor::setBrakeMode(AbstractMotor::brakeMode::brake);
 }
