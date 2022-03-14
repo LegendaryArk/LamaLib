@@ -41,7 +41,7 @@ void Odometry::endOdom() {
     c::task_delete(odomTask);
 }
 
-void odometryMain(void* param) {
+void lamaLib::odometryMain(void* param) {
     // odom = (Odometry*) param;
 
     OdomScales scales = odom.getScales();

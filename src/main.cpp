@@ -1,5 +1,7 @@
 #include "main.h"
 
+Odometry lamaLib::odom = {{'A', 'B'}, {'C', 'D'}, {'E', 'F'}, {2.75, 4.25, 4.5, 4}, 360};
+
 /**
  * A callback function for LLEMU's center button.
  *
@@ -28,7 +30,6 @@ void initialize() {
 
 	// pros::lcd::register_btn1_cb(on_center_button);
 	
-	Odometry odometry = {{'A', 'B'}, {'C', 'D'}, {'E', 'F'}, {2.75, 4.25, 4.5, 4}, 360};
 }
 
 /**
