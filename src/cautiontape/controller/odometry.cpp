@@ -43,17 +43,20 @@ void Odometry::endOdom() {
 
 void lamaLib::odometryMain(void* param) {
     OdomScales scales = odom.getScales();
-
     double chassisDiameter = scales.leftRadius + scales.rightRadius;
 
     EncoderValues readings = odom.getEncoders();
     EncoderValues readingsPrev = {0, 0, 0, 0};
 
-    int tpr = odom.tpr;
+    const int tpr = odom.tpr;
+    const double wheelCircumference = scales.wheelDiameter * M_PI;
 
     uint32_t time = pros::millis();
     while (true) {
         Pose currPose = odom.getPose();
+
+        readingsPrev = readings;
+        readings = odom.getEncoders();
 
         EncoderValues readingsDiff;
         readingsDiff.left = readings.left - readingsPrev.left;
@@ -62,9 +65,9 @@ void lamaLib::odometryMain(void* param) {
         
         // Delta distance
         EncoderValues delta;
-        delta.left = (readingsDiff.left / tpr) * (scales.wheelDiameter * M_PI);
-        delta.right = (readingsDiff.right / tpr) * (scales.wheelDiameter * M_PI);
-        delta.rear = (readingsDiff.rear / tpr) * (scales.wheelDiameter * M_PI);
+        delta.left = (readingsDiff.left / tpr) * wheelCircumference;
+        delta.right = (readingsDiff.right / tpr) * wheelCircumference;
+        delta.rear = (readingsDiff.rear / tpr) * wheelCircumference;
 
         // Delta theta
         delta.theta = (readingsDiff.left - readingsDiff.right) / chassisDiameter;
@@ -91,16 +94,13 @@ void lamaLib::odometryMain(void* param) {
 
         double globalX = currPose.x + deltaGlobalX;
         double globalY = currPose.y + deltaGlobalY;
-        double globalTheta = currPose.theta + delta.theta;
+        double globalTheta = currPose.theta + radToDeg(delta.theta);
         odom.setPose({globalX, globalY, globalTheta, pros::millis()});
 
-        pros::lcd::print(1, "\tx: %f", odom.getPose().x / 12);
-        pros::lcd::print(2, "\ty: %f", odom.getPose().y / 12);
-        pros::lcd::print(3, "\ttheta: %f", odom.getPose().theta);
-        pros::lcd::print(4, "\ttime: %d", odom.getPose().time);
-
-        readingsPrev = readings;
-        readings = odom.getEncoders();
+        pros::lcd::print(1, "\tx: %f in", odom.getPose().x / 12);
+        pros::lcd::print(2, "\ty: %f in", odom.getPose().y / 12);
+        pros::lcd::print(3, "\ttheta: %f deg", odom.getPose().theta);
+        pros::lcd::print(4, "\ttime: %d ms", odom.getPose().time);
 
         pros::Task::delay_until(&time, 10);
     }
