@@ -89,7 +89,7 @@ class Odometry {
      *
      * @return OdomScales
      */
-    OdomScales calibrate();
+    OdomScales calibrate(IMU inertial);
 
     /**
      * @brief Starts the odometry task

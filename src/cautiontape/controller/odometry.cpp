@@ -23,7 +23,14 @@ void Odometry::setPose(Pose ipose) {
     pose = ipose;
 }
 
-OdomScales Odometry::calibrate() {
+OdomScales Odometry::calibrate(IMU inertial) {
+    EncoderValues vals = {0, 0, 0, 0};
+    while (inertial.get_rotation() < 3600) {
+        vals.left = getEncoders().left;
+        vals.right = getEncoders().right;
+        vals.rear = getEncoders().rear;
+    }
+
     return {0, 0, 0, 0};
 }
 
@@ -67,10 +74,11 @@ void lamaLib::odometryMain(void* param) {
         EncoderValues delta;
         delta.left = (readingsDiff.left / tpr) * wheelCircumference;
         delta.right = (readingsDiff.right / tpr) * wheelCircumference;
-        delta.rear = (readingsDiff.rear / tpr) * wheelCircumference;
 
         // Delta theta
-        delta.theta = (readingsDiff.left - readingsDiff.right) / chassisDiameter;
+        delta.theta = (delta.left - delta.right) / chassisDiameter;
+
+        delta.rear = ((readingsDiff.rear / tpr) * wheelCircumference) - (delta.theta * scales.rearRadius);
 
         // Local coordinates
         double localOffsetX = delta.rear;
@@ -82,7 +90,7 @@ void lamaLib::odometryMain(void* param) {
 
         // Polar coordinates
         double polarRadius = sqrt(pow(localOffsetX, 2) + pow(localOffsetY, 2));
-        double polarAngle =  atan2(localOffsetY, localOffsetX) - (currPose.theta + delta.theta / 2);
+        double polarAngle =  atan2(localOffsetY, localOffsetX) - (degToRad(currPose.theta) + delta.theta / 2);
 
         // Global coordinates
         double deltaGlobalX = cos(polarAngle) * polarRadius;
@@ -97,11 +105,12 @@ void lamaLib::odometryMain(void* param) {
         double globalTheta = currPose.theta + radToDeg(delta.theta);
         odom.setPose({globalX, globalY, globalTheta, pros::millis()});
 
-        pros::lcd::print(1, "\tx: %f in", odom.getPose().x / 12);
-        pros::lcd::print(2, "\ty: %f in", odom.getPose().y / 12);
-        pros::lcd::print(3, "\ttheta: %f deg", odom.getPose().theta);
-        pros::lcd::print(4, "\ttime: %d ms", odom.getPose().time);
+        lcd::print(0, "x: %.2f in   y: %.2f in", odom.getPose().x, odom.getPose().y);
+        lcd::print(1, "theta: %.2f deg", odom.getPose().theta);
 
-        pros::Task::delay_until(&time, 10);
+        lcd::print(3, "left: %.2f    right: %.2f", readings.left, readings.right);
+        lcd::print(4, "rear: %.2f", readings.rear);
+        
+        Task::delay_until(&time, 10);
     }
 }
