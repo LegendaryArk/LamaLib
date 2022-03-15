@@ -1,5 +1,5 @@
 #include "api.h"
-#include "pros/rtos.h"
+#include "../utilities/mathHelper.hpp"
 
 namespace lamaLib {
 using namespace pros;
