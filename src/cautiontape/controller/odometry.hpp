@@ -1,8 +1,8 @@
 #include "api.h"
+#include "../subsystems/chassis.hpp"
 #include "../utilities/mathHelper.hpp"
 
 namespace lamaLib {
-using namespace pros;
 
 /**
  * @brief The coordinate position of the robot in inches and degrees
@@ -48,7 +48,7 @@ class Odometry {
      * @param rearEncoder The rear encoder sensor
      * @param scales The measurements of the tracking wheels in inches
      */
-    Odometry(ADIEncoder leftEncoder, ADIEncoder rightEncoder, ADIEncoder rearEncoder, OdomScales scales, int tpr);
+    Odometry(pros::ADIEncoder leftEncoder, pros::ADIEncoder rightEncoder, pros::ADIEncoder rearEncoder, OdomScales scales, int tpr);
 
     /**
      * @brief Get the left encoder tick counts
@@ -89,7 +89,7 @@ class Odometry {
      *
      * @return OdomScales
      */
-    OdomScales calibrate(IMU inertial);
+    OdomScales calibrate(Chassis ichassis, pros::Controller controller, pros::IMU iinertial);
 
     /**
      * @brief Starts the odometry task
@@ -103,14 +103,14 @@ class Odometry {
     int tpr;
 
     private:
-    ADIEncoder leftEncoder;
-    ADIEncoder rightEncoder;
-    ADIEncoder rearEncoder;
+    pros::ADIEncoder leftEncoder;
+    pros::ADIEncoder rightEncoder;
+    pros::ADIEncoder rearEncoder;
 
     Pose pose;
     OdomScales scales;
 
-    task_t odomTask {};
+    pros::task_t odomTask {};
 };
 
 extern Odometry odom;
@@ -118,5 +118,5 @@ extern Odometry odom;
 /**
  * @brief Main function of odometry
  */
-void odometryMain(void* param);
+void odometryMain(void* iparam);
 } // namespace lamaLib

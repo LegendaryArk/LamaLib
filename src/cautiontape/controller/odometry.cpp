@@ -1,9 +1,10 @@
 #include "odometry.hpp"
+#include "pros/misc.h"
 #include <math.h>
 
 using namespace lamaLib;
 
-Odometry::Odometry(ADIEncoder leftEncoder, ADIEncoder rightEncoder, ADIEncoder rearEncoder, OdomScales scales, int tpr):
+Odometry::Odometry(pros::ADIEncoder leftEncoder, pros::ADIEncoder rightEncoder, pros::ADIEncoder rearEncoder, OdomScales scales, int tpr):
                     leftEncoder(leftEncoder), rightEncoder(rightEncoder), rearEncoder(rearEncoder), scales(scales), tpr(tpr) {
     // Default coordinate position
     pose = {0, 0, 0, pros::millis()};
@@ -23,15 +24,27 @@ void Odometry::setPose(Pose ipose) {
     pose = ipose;
 }
 
-OdomScales Odometry::calibrate(IMU inertial) {
-    EncoderValues vals = {0, 0, 0, 0};
-    while (inertial.get_rotation() < 3600) {
-        vals.left = getEncoders().left;
-        vals.right = getEncoders().right;
-        vals.rear = getEncoders().rear;
+OdomScales Odometry::calibrate(Chassis ichassis, pros::Controller controller, pros::IMU iinertial) {
+    uint32_t time = pros::millis();
+    while (iinertial.get_rotation() < 3600) {
+        ichassis.move(200, -200);
+
+        pros::Task::delay_until(&time, 10);
     }
 
-    return {0, 0, 0, 0};
+    ichassis.move(0, 0);
+
+    while (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_A)) {
+        pros::Task::delay_until(&time, 10);
+    }
+
+    double leftDiameter = ((getEncoders().left / tpr) * scales.wheelDiameter) / 10;
+    double rightDiameter = ((getEncoders().right / tpr) * scales.wheelDiameter) / 10;
+    double rearDiameter = ((getEncoders().rear / tpr) * scales.wheelDiameter) / 10;
+
+    OdomScales calibratedScales = {scales.wheelDiameter, leftDiameter / 2, rightDiameter / 2, rearDiameter / 2};
+    
+    return calibratedScales;
 }
 
 OdomScales Odometry::getScales() {
@@ -42,13 +55,13 @@ void Odometry::setScales(OdomScales iscales) {
 }
 
 void Odometry::startOdom() {
-    odomTask = c::task_create(odometryMain, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "odometry");
+    odomTask = pros::c::task_create(odometryMain, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "odometry");
 }
 void Odometry::endOdom() {
-    c::task_delete(odomTask);
+    pros::c::task_delete(odomTask);
 }
 
-void lamaLib::odometryMain(void* param) {
+void lamaLib::odometryMain(void* iparam) {
     OdomScales scales = odom.getScales();
     double chassisDiameter = scales.leftRadius + scales.rightRadius;
 
@@ -105,12 +118,12 @@ void lamaLib::odometryMain(void* param) {
         double globalTheta = currPose.theta + radToDeg(delta.theta);
         odom.setPose({globalX, globalY, globalTheta, pros::millis()});
 
-        lcd::print(0, "x: %.2f in   y: %.2f in", odom.getPose().x, odom.getPose().y);
-        lcd::print(1, "theta: %.2f deg", odom.getPose().theta);
+        pros::lcd::print(0, "x: %.2f in   y: %.2f in", odom.getPose().x, odom.getPose().y);
+        pros::lcd::print(1, "theta: %.2f deg", odom.getPose().theta);
 
-        lcd::print(3, "left: %.2f    right: %.2f", readings.left, readings.right);
-        lcd::print(4, "rear: %.2f", readings.rear);
+        pros::lcd::print(3, "left: %.2f    right: %.2f", readings.left, readings.right);
+        pros::lcd::print(4, "rear: %.2f", readings.rear);
         
-        Task::delay_until(&time, 10);
+        pros::Task::delay_until(&time, 10);
     }
 }

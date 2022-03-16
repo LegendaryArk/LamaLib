@@ -1,10 +1,13 @@
 #include "main.h"
 #include "api.h"
 #include "okapi/api.hpp"
-#include "cautiontape/subsystems/chassis.hpp"
 #include "robotconfig.hpp"
 
-lamaLib::Odometry lamaLib::odom = {{'A', 'B'}, {'C', 'D', true}, {'E', 'F', true}, {2.75, 4.25, 4.5, 4}, 360};
+Odometry lamaLib::odom = {
+					{LEFT_TRACKING_UPPER, LEFT_TRACKING_LOWER, true},
+					{RIGHT_TRACKING_UPPER, RIGHT_TRACKING_LOWER, true},
+					{REAR_TRACKING_UPPER, REAR_TRACKING_LOWER, true},
+					{2.75, 4.01042, 4.40573, 4.00354}, 360};
 
 /**
  * A callback function for LLEMU's center button.
@@ -81,7 +84,14 @@ void opcontrol() {
 	bool reverseConfig[4] = {
 		false, false, true, true
 	};
-	lamaLib::Chassis chassis(ports, reverseConfig, AbstractMotor::gearset::green);
+	Chassis chassis(ports, reverseConfig, okapi::AbstractMotor::gearset::green);
+
+	pros::IMU inertial(21);
+	inertial.reset();
+	while (inertial.is_calibrating()) pros::delay(10);
+
+	// OdomScales calibrated = odom.calibrate(chassis, master, inertial);
+	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
 
 	while (true) {
 		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
