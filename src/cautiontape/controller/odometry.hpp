@@ -3,7 +3,6 @@
 #include "../utilities/mathHelper.hpp"
 
 namespace lamaLib {
-
 /**
  * @brief The coordinate position of the robot in inches and degrees
  *
@@ -85,9 +84,18 @@ class Odometry {
     void setScales(OdomScales iscales);
 
     /**
-     * @brief Calibrate the tracking wheels
+     * @brief Calibrate the distance from the tracking wheel to the center of the robot
      *
-     * @return OdomScales
+     * The robot will first turn 10 circles using the inertial sensor. Afterwards, you are to turn the robot yourself to face
+     * 0 degrees (turn the shortest direction). Once that is done, press 'A' on the controller to find the calibrated values
+     * outputted onto the lcd, as well as the terminal
+     *
+     * This process should only be done once unless the tracking wheel positions have changed
+     * 
+     * @param ichassis Used to turn the robot
+     * @param controller Used to determine when the calculations should be done; when the robot is in the correct orientation
+     * @param iinertial Used to do the initial turn
+     * @return OdomScales 
      */
     OdomScales calibrate(Chassis ichassis, pros::Controller controller, pros::IMU iinertial);
 

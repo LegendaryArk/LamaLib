@@ -43,7 +43,9 @@ OdomScales Odometry::calibrate(Chassis ichassis, pros::Controller controller, pr
     double rearDiameter = ((getEncoders().rear / tpr) * scales.wheelDiameter) / 10;
 
     OdomScales calibratedScales = {scales.wheelDiameter, leftDiameter / 2, rightDiameter / 2, rearDiameter / 2};
-    
+    pros::lcd::print(5, "Calibrated radii:");
+    pros::lcd::print(6, "left: %f in   right: %f in", calibratedScales.leftRadius, calibratedScales.rightRadius);
+    pros::lcd::print(7, "rear: %f in", calibratedScales.rearRadius);
     return calibratedScales;
 }
 
@@ -121,8 +123,8 @@ void lamaLib::odometryMain(void* iparam) {
         pros::lcd::print(0, "x: %.2f in   y: %.2f in", odom.getPose().x, odom.getPose().y);
         pros::lcd::print(1, "theta: %.2f deg", odom.getPose().theta);
 
-        pros::lcd::print(3, "left: %.2f    right: %.2f", readings.left, readings.right);
-        pros::lcd::print(4, "rear: %.2f", readings.rear);
+        pros::lcd::print(2, "left: %.2f    right: %.2f", readings.left, readings.right);
+        pros::lcd::print(3, "rear: %.2f", readings.rear);
         
         pros::Task::delay_until(&time, 10);
     }
