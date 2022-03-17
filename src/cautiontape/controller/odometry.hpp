@@ -1,9 +1,8 @@
 #include "api.h"
+#include "../subsystems/chassis.hpp"
 #include "../utilities/mathHelper.hpp"
 
 namespace lamaLib {
-using namespace pros;
-
 /**
  * @brief The coordinate position of the robot in inches and degrees
  *
@@ -48,7 +47,7 @@ class Odometry {
      * @param rearEncoder The rear encoder sensor
      * @param scales The measurements of the tracking wheels in inches
      */
-    Odometry(ADIEncoder leftEncoder, ADIEncoder rightEncoder, ADIEncoder rearEncoder, OdomScales scales, int tpr);
+    Odometry(pros::ADIEncoder leftEncoder, pros::ADIEncoder rightEncoder, pros::ADIEncoder rearEncoder, OdomScales scales, int tpr);
 
     /**
      * @brief Get the left encoder tick counts
@@ -85,11 +84,20 @@ class Odometry {
     void setScales(OdomScales iscales);
 
     /**
-     * @brief Calibrate the tracking wheels
+     * @brief Calibrate the distance from the tracking wheel to the center of the robot
      *
-     * @return OdomScales
+     * The robot will first turn 10 circles using the inertial sensor. Afterwards, you are to turn the robot yourself to face
+     * 0 degrees (turn the shortest direction). Once that is done, press 'A' on the controller to find the calibrated values
+     * outputted onto the lcd, as well as the terminal
+     *
+     * This process should only be done once unless the tracking wheel positions have changed
+     * 
+     * @param ichassis Used to turn the robot
+     * @param controller Used to determine when the calculations should be done; when the robot is in the correct orientation
+     * @param iinertial Used to do the initial turn
+     * @return OdomScales 
      */
-    OdomScales calibrate(IMU inertial);
+    OdomScales calibrate(Chassis ichassis, pros::Controller controller, pros::IMU iinertial);
 
     /**
      * @brief Starts the odometry task
@@ -103,14 +111,14 @@ class Odometry {
     int tpr;
 
     private:
-    ADIEncoder leftEncoder;
-    ADIEncoder rightEncoder;
-    ADIEncoder rearEncoder;
+    pros::ADIEncoder leftEncoder;
+    pros::ADIEncoder rightEncoder;
+    pros::ADIEncoder rearEncoder;
 
     Pose pose;
     OdomScales scales;
 
-    task_t odomTask {};
+    pros::task_t odomTask {};
 };
 
 extern Odometry odom;
@@ -118,5 +126,5 @@ extern Odometry odom;
 /**
  * @brief Main function of odometry
  */
-void odometryMain(void* param);
+void odometryMain(void* iparam);
 } // namespace lamaLib

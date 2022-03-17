@@ -1,13 +1,17 @@
 #include "chassis.hpp"
 using namespace lamaLib;
 
-Chassis::Chassis(int8_t motorPorts[4], bool reverseConfig[4], AbstractMotor::gearset igearset) :
-topLeft(motorPorts[0], reverseConfig[0], igearset, AbstractMotor::encoderUnits::degrees),
-bottomLeft(motorPorts[1], reverseConfig[1], igearset, AbstractMotor::encoderUnits::degrees),
-topRight(motorPorts[2], reverseConfig[2], igearset, AbstractMotor::encoderUnits::degrees),
-bottomRight(motorPorts[3], reverseConfig[3], igearset, AbstractMotor::encoderUnits::degrees)
+Chassis::Chassis(int8_t motorPorts[4], bool reverseConfig[4], okapi::AbstractMotor::gearset igearset) :
+topLeft(motorPorts[0], reverseConfig[0], igearset, okapi::AbstractMotor::encoderUnits::degrees),
+bottomLeft(motorPorts[1], reverseConfig[1], igearset, okapi::AbstractMotor::encoderUnits::degrees),
+topRight(motorPorts[2], reverseConfig[2], igearset, okapi::AbstractMotor::encoderUnits::degrees),
+bottomRight(motorPorts[3], reverseConfig[3], igearset, okapi::AbstractMotor::encoderUnits::degrees)
 {
     gearBox = igearset;
+    topLeft.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+    bottomLeft.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+    topRight.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+    bottomRight.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 }
 
 void Chassis::move(int left, int right) { //uses the pros controller which goes from -127 to 127
@@ -46,11 +50,11 @@ void Chassis::move(int left, int right) { //uses the pros controller which goes 
 
     //applying gearbox values
     switch (gearBox) {
-        case AbstractMotor::gearset::green:
+        case okapi::AbstractMotor::gearset::green:
             leftV *= 2;
             rightV *= 2;
             break;
-        case AbstractMotor::gearset::blue:
+        case okapi::AbstractMotor::gearset::blue:
             leftV *= 6;
             rightV *= 6;
             break;
