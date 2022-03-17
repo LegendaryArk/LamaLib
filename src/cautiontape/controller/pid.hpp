@@ -4,6 +4,7 @@ namespace lamaLib {
             double calculatePID(double current, double target, double leeway);
             void resetPID();
             double integral;
+            double integralCompensation;
             double derivative;
             double prevError;
             double kp;
