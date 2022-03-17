@@ -7,7 +7,7 @@ namespace lamaLib {
             Motor(int8_t port);
             Motor(int8_t port,
                 bool reverse,
-                AbstractMotor::gearset igearset,
-                AbstractMotor::encoderUnits encoderUnits = AbstractMotor::encoderUnits::degrees);
+                okapi::AbstractMotor::gearset igearset,
+                okapi::AbstractMotor::encoderUnits encoderUnits = AbstractMotor::encoderUnits::degrees);
     };
 }
