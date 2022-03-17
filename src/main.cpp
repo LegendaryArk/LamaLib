@@ -1,7 +1,6 @@
 #include "main.h"
 #include "api.h"
 #include "okapi/api.hpp"
-#include "pros/adi.hpp"
 #include "robotconfig.hpp"
 
 /**
