@@ -4,12 +4,6 @@
 #include "pros/adi.hpp"
 #include "robotconfig.hpp"
 
-Odometry lamaLib::odom = {
-					{LEFT_TRACKING_UPPER, LEFT_TRACKING_LOWER, true},
-					{RIGHT_TRACKING_UPPER, RIGHT_TRACKING_LOWER, true},
-					{REAR_TRACKING_UPPER, REAR_TRACKING_LOWER, true},
-					{2.75, 4.01042, 4.40573, 4.00354}, 360};
-
 /**
  * A callback function for LLEMU's center button.
  *

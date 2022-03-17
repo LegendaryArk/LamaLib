@@ -1,3 +1,5 @@
+#pragma once
+
 #include "okapi/api.hpp"
 #include "motor.hpp"
 

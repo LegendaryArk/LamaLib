@@ -41,8 +41,7 @@
  */
 //#include "okapi/api.hpp"
 //#include "pros/api_legacy.h"
-#include "cautiontape/controller/odometry.hpp"
-#include "cautiontape/subsystems/pneumatic.hpp"
+#include "cautiontape/lamaapi.hpp"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do
