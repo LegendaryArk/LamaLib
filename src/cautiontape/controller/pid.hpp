@@ -14,6 +14,6 @@ namespace lamaLib {
             double maximum;
             double difference;
             double count;
-            PIDController(double p, double i, double d, double min, double max);   
+            PIDController(double p, double i, double d, double min, double max, double iComp = 10);   
     };
 }

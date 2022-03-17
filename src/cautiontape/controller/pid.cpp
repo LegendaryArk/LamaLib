@@ -1,13 +1,14 @@
 #include "pid.hpp"
 using namespace lamaLib;
 
-PIDController::PIDController(double p, double i, double d, double min, double max) {
+PIDController::PIDController(double p, double i, double d, double min, double max, double iComp) {
     kp = p;
     ki = i;
     kd = d;
     minimum = min;
     maximum = max;
     difference = max - min;
+    integralCompensation = iComp;
 }
 
 void PIDController::resetPID() {
@@ -40,7 +41,7 @@ double PIDController::calculatePID(double current, double target, double leeway)
     }
 
     derivative = error - prevError;
-    integral = fabs(error) < 10 ? integral + error : 0;
+    integral = fabs(error) < integralCompensation ? integral + error : 0;
     prevError = error;
     return error * kp + integral * ki + derivative * kd;
 }
