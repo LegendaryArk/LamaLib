@@ -83,6 +83,7 @@ void lamaLib::odometryMain(void* param) {
         // Local coordinates
         double localOffsetX = delta.rear;
         double localOffsetY = (delta.left + delta.right) / 2;
+
         if (delta.left != delta.right) {
             localOffsetX = 2 * sin(delta.theta / 2) * (delta.rear / delta.theta + scales.rearRadius);
             localOffsetY = 2 * sin(delta.theta / 2) * (delta.right / delta.theta + (delta.left > delta.right ? scales.rightRadius : scales.leftRadius));

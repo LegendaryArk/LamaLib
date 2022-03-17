@@ -4,7 +4,7 @@
 #include "cautiontape/subsystems/chassis.hpp"
 #include "robotconfig.hpp"
 
-lamaLib::Odometry lamaLib::odom = {{'A', 'B'}, {'C', 'D', true}, {'E', 'F', true}, {2.75, 4.25, 4.5, 4}, 360};
+lamaLib::Odometry lamaLib::odom = {{'A', 'B', true}, {'C', 'D', true}, {'E', 'F', true}, {2.75, 4.46560173254, 4.72828418739, 4}, 360};
 
 /**
  * A callback function for LLEMU's center button.
