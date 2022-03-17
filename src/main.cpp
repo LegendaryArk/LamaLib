@@ -2,6 +2,7 @@
 #include "api.h"
 #include "okapi/api.hpp"
 #include "cautiontape/subsystems/chassis.hpp"
+#include "pros/adi.hpp"
 #include "robotconfig.hpp"
 
 lamaLib::Odometry lamaLib::odom = {{'A', 'B'}, {'C', 'D', true}, {'E', 'F', true}, {2.75, 4.25, 4.5, 4}, 360};
@@ -82,6 +83,19 @@ void opcontrol() {
 		false, false, true, true
 	};
 	lamaLib::Chassis chassis(ports, reverseConfig, AbstractMotor::gearset::green);
+	Pneumatic pneumatic (ADIDigitalOut('A'));
+
+	pneumatic.open();
+	pros::delay(1000);
+	pneumatic.close();
+	pros::delay(1000);
+	pneumatic.setState(true);
+	pros::delay(1000);
+	pneumatic.setState(false);
+	pros::delay(1000);
+	pneumatic.toggle();
+	pros::delay(1000);
+	pneumatic.toggle();
 
 	while (true) {
 		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
