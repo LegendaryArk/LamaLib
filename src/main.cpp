@@ -1,6 +1,8 @@
 #include "main.h"
 #include "api.h"
 #include "okapi/api.hpp"
+#include "cautiontape/subsystems/chassis.hpp"
+#include "pros/adi.hpp"
 #include "robotconfig.hpp"
 
 Odometry lamaLib::odom = {
