@@ -80,9 +80,8 @@ void opcontrol() {
 	};
 	Chassis chassis(ports, reverseConfig, okapi::AbstractMotor::gearset::green);
 
-	pros::IMU inertial(21);
-	inertial.reset();
-	while (inertial.is_calibrating()) pros::delay(10);
+	Inertial inertial(21);
+	inertial.calibrate();
 
 	// OdomScales calibrated = odom.calibrate(chassis, master, inertial);
 	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
