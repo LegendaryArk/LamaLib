@@ -10,6 +10,12 @@ namespace lamalib {
         //See: https://pros.cs.purdue.edu/v5/tutorials/topical/vision.html#setting-signatures
     }
 
+    void visionSensor::setSignatures(pros::vision_signature_s_t inputSigs[]){
+        for(int i = 0; i<7; i++){
+            vSensor.set_signature(i+1, &inputSigs[i]);
+        }
+}
+
     int visionSensor::getMiddle(int signature){
         //Gets the middle coordinate of the largest object with the specified colour signature
         //Returns coordinate out of 312(?) total camera resolution, e.g. middle coordinate would be 156

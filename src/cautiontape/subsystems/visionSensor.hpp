@@ -21,6 +21,12 @@ namespace lamalib {
     * @param vPort
     * @param inputSigs 
     **/
+    void setSignatures(pros::vision_signature_s_t inputSigs[]);
+    /**
+     * @brief Sets signatures in vision sensor memory to the signatures in the brain memory.
+     * 
+     * @param signature
+     */
     int getMiddle(int signature);
     /**
      * @brief Gets the middle coordinate of the largest object with the specified colour signature. 

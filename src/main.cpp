@@ -68,6 +68,7 @@ void autonomous() {
     pros::Vision::signature_from_utility(7, 0, 0, 0, 0, 0, 0, 3.000, 0)
   };
   lamalib::visionSensor visSensor(1, inputs);
+  visSensor.setSignatures(inputs);
   double xScale =
       480.0 / 310; // Scaling the vision sensor range to the V5 Brain Screen
   double yScale = 240.0 / 212;
@@ -76,14 +77,14 @@ void autonomous() {
   int xr;
   int yr;
   while (true) {
-    pros::vision_object_s_t rtn = visSensor.vSensor.get_by_sig(0, 2);
+    pros::vision_object_s_t rtn = visSensor.vSensor.get_by_sig(0, 3);
     xl = rtn.left_coord;
     yl = rtn.top_coord;
     xr = rtn.left_coord + rtn.width;
     yr = rtn.top_coord - rtn.height;
     pros::screen::set_eraser(COLOR_WHITE);
     pros::screen::erase_rect(0, 0, 480, 240);
-    pros::screen::set_eraser(COLOR_BLUE);
+    pros::screen::set_eraser(COLOR_RED);
     pros::screen::erase_rect(xl * xScale, yl * yScale, xr * xScale,
                              yr * yScale);
     // cout << visSensor.getMiddle(2)<< "\n";
