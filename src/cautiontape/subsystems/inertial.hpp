@@ -1,23 +1,45 @@
 #pragma once
 
 #include "api.h"
+#include "pros/imu.h"
+#include "pros/rtos.h"
 
 namespace lamaLib {
-class Inertial {
-    public:
-    Inertial(pros::IMU inertial);
 
-    void reset();
+typedef struct {
+    double x;
+    double y;
+    double z;
+} Angles;
+
+class Inertial : pros::IMU {
+    public:
+    Inertial(int port);
+
+    void resetAll();
+
+    pros::c::imu_gyro_s_t getDeltaAngles();
+
+    double getRoll();
+    void setRoll(double iangle);
+
+    double getPitch();
+    void setPitch(double iangle);
 
     double getHeading();
-    void setHeading(double ingle);
+    void setHeading(double iangle);
 
-    void calibrate();
+    Angles calibrate();
     bool isCalibrating();
 
-    private:
-    pros::IMU inertial;
+    void startTask();
+    void endTask();
 
-    double correction;
+    private:
+    pros::task_t inertialTask;
 };
+
+extern Inertial inertial;
+
+void driftCompensation(void* iparam);
 } // namespace lamaLib

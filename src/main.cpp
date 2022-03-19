@@ -15,6 +15,8 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
+
+Inertial lamaLib::inertial(20);
 void initialize() {
 	pros::lcd::initialize();
 	// pros::lcd::set_text(1, "Hello PROS User!");
@@ -80,8 +82,12 @@ void opcontrol() {
 	};
 	Chassis chassis(ports, reverseConfig, okapi::AbstractMotor::gearset::green);
 
-	Inertial inertial(21);
 	inertial.calibrate();
+
+	while (true) {
+		//cout << inertial.getGyroRate().x << " " << inertial.getGyroRate().y << " " << inertial.getGyroRate().z << "\n";
+		cout << inertial.getHeading() << "\n";
+	}
 
 	// OdomScales calibrated = odom.calibrate(chassis, master, inertial);
 	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";

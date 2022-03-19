@@ -1,39 +1,113 @@
 #include "inertial.hpp"
+#include "pros/imu.h"
+#include "pros/rtos.h"
 
 using namespace lamaLib;
 
-void Inertial::reset() {
-    inertial.tare();
+Inertial::Inertial(int iport) : pros::IMU(iport) {
+    startTask();
+}
+
+void Inertial::resetAll() {
+    this->tare();
+}
+
+pros::c::imu_gyro_s_t Inertial::getDeltaAngles() {
+    return this->get_gyro_rate();
+}
+
+double Inertial::getRoll() {
+    return this->get_roll();
+}
+void Inertial::setRoll(double iangle) {
+    this->set_roll(iangle);
+}
+
+double Inertial::getPitch() {
+    return this->get_pitch();
+}
+void Inertial::setPitch(double iangle) {
+    this->set_pitch(iangle);
 }
 
 double Inertial::getHeading() {
-    int time = pros::millis();
-    return inertial.get_heading() - (correction * time);
+    return this->get_heading();
 }
 void Inertial::setHeading(double iangle) {
-    inertial.set_heading(iangle);
+    this->set_heading(iangle);
 }
 
-void Inertial::calibrate() {
-    inertial.reset();
+Angles Inertial::calibrate() {
+    this->reset();
 
     int count = 0;
-    while (isCalibrating() && count < 50) {
+    Angles maxDrift {0, 0, 0};
+    while (count < 100) {
+        double deltaRoll = getDeltaAngles().x;
+        double deltaPitch = getDeltaAngles().y;
+        double deltaYaw = getDeltaAngles().z;
+        
+        if (deltaRoll > maxDrift.x)
+            maxDrift.x = deltaRoll;
+        if (deltaPitch > maxDrift.y)
+            maxDrift.y = deltaPitch;
+        if (deltaYaw > maxDrift.z) 
+            maxDrift.z = deltaYaw;
+
         pros::delay(100);
         count++;
-
-        if (count > 50) {
-            std::cout << "Inertial calibration failed; please restart program\n";
-            pros::lcd::print(3, "Inertial calibration failed; please restart program");
-        }
     }
-    pros::delay(2000);
+    if (maxDrift.x > 0.5)
+        maxDrift.x = 0.5;
+    if (maxDrift.y > 0.5)
+        maxDrift.y = 0.5;
+    if (maxDrift.z > 0.5)
+        maxDrift.z = 0.5;
 
-    double val1 = getHeading();
-    pros::delay(10000);
-    double val2 = getHeading();
-    correction = ((val1 - val2) / 10) / 1000;
+    return maxDrift;
 }
 bool Inertial::isCalibrating() {
-    return inertial.is_calibrating();
+    return this->is_calibrating();
+}
+
+void Inertial::startTask() {
+    inertialTask = pros::c::task_create(driftCompensation, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "inertial");
+}
+void Inertial::endTask() {
+    pros::c::task_delete(inertialTask);
+}
+
+void lamaLib::driftCompensation(void* iparam) {
+    Angles maxDrift = inertial.calibrate();
+
+    while (true) {
+        Angles angles = {inertial.getRoll(), inertial.getPitch(), inertial.getHeading()};
+
+        Angles prev;
+
+        Angles delta = {inertial.getDeltaAngles().x, inertial.getDeltaAngles().y, inertial.getDeltaAngles().z};
+
+        Angles errors;
+
+        if (delta.x < maxDrift.x) {
+            if (angles.x != prev.x)
+                errors.x = prev.x - angles.x;
+        }
+        if (delta.y < maxDrift.y) {
+            if (angles.y != prev.y)
+                errors.y = prev.y - angles.y;
+        }
+        if (delta.z < maxDrift.z) {
+            if (angles.z != prev.z)
+                errors.z = prev.z - angles.z;
+        }
+
+        prev = angles;
+
+        inertial.setRoll(angles.x + errors.x);
+        inertial.setPitch(angles.y + errors.y);
+        inertial.setHeading(angles.z + errors.z);
+
+        pros::delay(10);
+    }
 }
