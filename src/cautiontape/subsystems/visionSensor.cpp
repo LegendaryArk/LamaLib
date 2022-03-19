@@ -1,17 +1,29 @@
-#include "vision.hpp"
+#include "visionSensor.hpp"
 #include "pros/vision.h"
 #include "pros/vision.hpp"
+#include <iterator>
 
 namespace lamalib {
-    visionSensor::visionSensor(pros::Vision vSensor) : vSensor (pros::Vision(1)) {
+    visionSensor::visionSensor(int vPort, pros::vision_signature_s_t inputSigs[7]) : vSensor(vPort) {
         //Configures colour signatures
         //See: https://pros.cs.purdue.edu/v5/tutorials/topical/vision.html#setting-signatures
-    pros::vision_signature_s_t YELLOW_SIG =
-        pros::Vision::signature_from_utility(1, 2495, 2875, 2684, -3881, -3593, -3738, 3.000, 0);
-    pros::vision_signature_s_t BLUE_SIG =
-        pros::Vision::signature_from_utility(2, -3111, -2329, -2720, 7769, 12829, 10300, 3.100, 0);
-    pros::vision_signature_s_t RED_SIG =
-        pros::Vision::signature_from_utility(3, 9997, 10649, 10324, -1157, -797, -978, 6.200, 0);
+    SIG_1 =
+        inputSigs[0];
+        //pros::Vision::signature_from_utility(1, 2495, 2875, 2684, -3881, -3593, -3738, 3.000, 0); //Yellow
+    SIG_2 =
+        inputSigs[1];
+        //pros::Vision::signature_from_utility(2, -3111, -2329, -2720, 7769, 12829, 10300, 3.100, 0); //Blue
+    SIG_3 =
+        inputSigs[2];
+        //pros::Vision::signature_from_utility(3, 9997, 10649, 10324, -1157, -797, -978, 6.200, 0); //Red
+    SIG_4 = 
+        inputSigs[3];
+    SIG_5 = 
+        inputSigs[4];
+    SIG_6 = 
+        inputSigs[5];
+    SIG_7 = 
+        inputSigs[6];
     }
 
     int visionSensor::getMiddle(int signature){

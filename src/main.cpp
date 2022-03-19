@@ -1,6 +1,9 @@
 #include "main.h"
 #include "api.h"
 #include "okapi/api.hpp"
+#include "pros/rtos.hpp"
+#include "pros/vision.h"
+#include "pros/vision.hpp"
 #include "robotconfig.hpp"
 
 /**
@@ -52,7 +55,26 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+	pros::vision_signature_s_t inputs[7]{
+		pros::Vision::signature_from_utility(1, 2495, 2875, 2684, -3881, -3593, -3738, 3.000, 0),
+		pros::Vision::signature_from_utility(2, -3111, -2329, -2720, 7769, 12829, 10300, 3.100, 0),
+		pros::Vision::signature_from_utility(3, 9997, 10649, 10324, -1157, -797, -978, 6.200, 0),
+		pros::Vision::signature_from_utility(4, 0, 0, 0, 0, 0, 0, 3, 0),
+		pros::Vision::signature_from_utility(5, 0, 0, 0, 0, 0, 0, 3, 0),
+		pros::Vision::signature_from_utility(6, 0, 0, 0, 0, 0, 0, 3, 0),
+		pros::Vision::signature_from_utility(7, 0, 0, 0, 0, 0, 0, 3, 0),
+	};
+	lamalib::visionSensor visSensor(1, inputs);
+	while (true) {
+		pros::vision_object_s_t rtn = visSensor.vSensor.get_by_sig(0, 2);
+		
+		pros::lcd::print(1, "%d", rtn.signature);
+		cout << visSensor.SIG_2;
+		//cout << visSensor.getMiddle(2)<< "\n";
+		pros::delay(20);
+	}
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
