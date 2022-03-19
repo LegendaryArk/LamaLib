@@ -19,11 +19,10 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
-	// pros::lcd::set_text(1, "Hello PROS User!");
+  pros::lcd::initialize();
+  // pros::lcd::set_text(1, "Hello PROS User!");
 
-	// pros::lcd::register_btn1_cb(on_center_button);
-	
+  // pros::lcd::register_btn1_cb(on_center_button);
 }
 
 /**
@@ -56,24 +55,40 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	pros::vision_signature_s_t inputs[7]{
-		pros::Vision::signature_from_utility(1, 2495, 2875, 2684, -3881, -3593, -3738, 3.000, 0),
-		pros::Vision::signature_from_utility(2, -3111, -2329, -2720, 7769, 12829, 10300, 3.100, 0),
-		pros::Vision::signature_from_utility(3, 9997, 10649, 10324, -1157, -797, -978, 6.200, 0),
-		pros::Vision::signature_from_utility(4, 0, 0, 0, 0, 0, 0, 3, 0),
-		pros::Vision::signature_from_utility(5, 0, 0, 0, 0, 0, 0, 3, 0),
-		pros::Vision::signature_from_utility(6, 0, 0, 0, 0, 0, 0, 3, 0),
-		pros::Vision::signature_from_utility(7, 0, 0, 0, 0, 0, 0, 3, 0),
-	};
-	lamalib::visionSensor visSensor(1, inputs);
-	while (true) {
-		pros::vision_object_s_t rtn = visSensor.vSensor.get_by_sig(0, 2);
-		
-		pros::lcd::print(1, "%d", rtn.signature);
-		cout << visSensor.SIG_2;
-		//cout << visSensor.getMiddle(2)<< "\n";
-		pros::delay(20);
-	}
+  pros::vision_signature_s_t inputs[7] {
+    pros::Vision::signature_from_utility(1, 1599, 3341, 2470, -4265, -3981,
+                                         -4123, 2.900, 0),
+    pros::Vision::signature_from_utility(2, -2231, -1643, -1937, 7951, 9405,
+                                         8678, 3.000, 0),
+    pros::Vision::signature_from_utility(3, 5611, 8165, 6888, -1395, -979,
+                                         -1187, 3.000, 0),
+    pros::Vision::signature_from_utility(4, 0, 0, 0, 0, 0, 0, 3.000, 0),
+    pros::Vision::signature_from_utility(5, 0, 0, 0, 0, 0, 0, 3.000, 0),
+    pros::Vision::signature_from_utility(6, 0, 0, 0, 0, 0, 0, 3.000, 0),
+    pros::Vision::signature_from_utility(7, 0, 0, 0, 0, 0, 0, 3.000, 0)
+  };
+  lamalib::visionSensor visSensor(1, inputs);
+  double xScale =
+      480.0 / 310; // Scaling the vision sensor range to the V5 Brain Screen
+  double yScale = 240.0 / 212;
+  int xl;
+  int yl;
+  int xr;
+  int yr;
+  while (true) {
+    pros::vision_object_s_t rtn = visSensor.vSensor.get_by_sig(0, 2);
+    xl = rtn.left_coord;
+    yl = rtn.top_coord;
+    xr = rtn.left_coord + rtn.width;
+    yr = rtn.top_coord - rtn.height;
+    pros::screen::set_eraser(COLOR_WHITE);
+    pros::screen::erase_rect(0, 0, 480, 240);
+    pros::screen::set_eraser(COLOR_BLUE);
+    pros::screen::erase_rect(xl * xScale, yl * yScale, xr * xScale,
+                             yr * yScale);
+    // cout << visSensor.getMiddle(2)<< "\n";
+    pros::delay(20);
+  }
 }
 
 /**
@@ -90,30 +105,26 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	int8_t ports[4] = {
-		TOP_LEFT_CHASSIS,
-		BOTTOM_LEFT_CHASSIS,
-		TOP_RIGHT_CHASSIS,
-		BOTTOM_RIGHT_CHASSIS
-	};
-	bool reverseConfig[4] = {
-		false, false, true, true
-	};
-	Chassis chassis(ports, reverseConfig, okapi::AbstractMotor::gearset::green);
+  pros::Controller master(pros::E_CONTROLLER_MASTER);
+  int8_t ports[4] = {TOP_LEFT_CHASSIS, BOTTOM_LEFT_CHASSIS, TOP_RIGHT_CHASSIS,
+                     BOTTOM_RIGHT_CHASSIS};
+  bool reverseConfig[4] = {false, false, true, true};
+  Chassis chassis(ports, reverseConfig, okapi::AbstractMotor::gearset::green);
 
-	pros::IMU inertial(21);
-	inertial.reset();
-	while (inertial.is_calibrating()) pros::delay(10);
+  pros::IMU inertial(21);
+  inertial.reset();
+  while (inertial.is_calibrating())
+    pros::delay(10);
 
-	// OdomScales calibrated = odom.calibrate(chassis, master, inertial);
-	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
+  // OdomScales calibrated = odom.calibrate(chassis, master, inertial);
+  // cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " <<
+  // calibrated.rearRadius << "\n";
 
-	while (true) {
-		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+  while (true) {
+    int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+    int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
-		chassis.move(joyY + joyX, joyY - joyX);
-		pros::delay(20);
-	}
+    chassis.move(joyY + joyX, joyY - joyX);
+    pros::delay(20);
+  }
 }
