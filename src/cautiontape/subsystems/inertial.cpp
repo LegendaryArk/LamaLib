@@ -5,7 +5,9 @@
 using namespace lamaLib;
 
 Inertial::Inertial(int iport) : pros::IMU(iport) {
-    startTask();
+    calibrating = false;
+
+    startCorrection();
 }
 
 void Inertial::resetAll() {
@@ -41,16 +43,17 @@ Angles Inertial::calibrate() {
     if (calibrating) return {0, 0, 0};
 
     calibrating = true;
-    endTask();
+    pros::lcd::print(1, "Calibrating...");
 
     this->reset();
+    pros::delay(2500);
 
     int count = 0;
     Angles maxDrift {0, 0, 0};
     while (count < 100) {
-        double deltaRoll = getDeltaAngles().x;
-        double deltaPitch = getDeltaAngles().y;
-        double deltaYaw = getDeltaAngles().z;
+        double deltaRoll = fabs(getDeltaAngles().x);
+        double deltaPitch = fabs(getDeltaAngles().y);
+        double deltaYaw = fabs(getDeltaAngles().z);
         
         if (deltaRoll > maxDrift.x)
             maxDrift.x = deltaRoll;
@@ -70,17 +73,17 @@ Angles Inertial::calibrate() {
         maxDrift.z = 0.5;
 
     calibrating = false;
-    startTask();
+    pros::lcd::print(1, "Calibration Complete");
     return maxDrift;
 }
 bool Inertial::isCalibrating() {
     return calibrating;
 }
 
-void Inertial::startTask() {
+void Inertial::startCorrection() {
     inertialTask = pros::c::task_create(driftCompensation, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "inertial");
 }
-void Inertial::endTask() {
+void Inertial::endCorrection() {
     pros::c::task_delete(inertialTask);
 }
 
@@ -88,36 +91,31 @@ void lamaLib::driftCompensation(void* iparam) {
     Angles maxDrift = inertial.calibrate();
 
     while (true) {
-        std::cout << "Max Drift: " << maxDrift.x << ", " << maxDrift.y << ", " << maxDrift.z << "\n";
-        
         Angles angles = {inertial.getRoll(), inertial.getPitch(), inertial.getHeading()};
-
-        Angles prev;
-
+        Angles prev = angles;
         Angles delta = {inertial.getDeltaAngles().x, inertial.getDeltaAngles().y, inertial.getDeltaAngles().z};
-
         Angles errors;
 
-        if (delta.x < maxDrift.x) {
+        if (delta.x > maxDrift.x) {
             if (angles.x != prev.x)
                 errors.x = prev.x - angles.x;
         }
-        if (delta.y < maxDrift.y) {
+        if (delta.y > maxDrift.y) {
             if (angles.y != prev.y)
                 errors.y = prev.y - angles.y;
         }
-        if (delta.z < maxDrift.z) {
+        if (delta.z > maxDrift.z) {
             if (angles.z != prev.z)
                 errors.z = prev.z - angles.z;
         }
-
-        std::cout << "Delta: " << angles.x << ", " << angles.y << ", " << angles.z << "\n";
 
         prev = angles;
 
         inertial.setRoll(angles.x + errors.x);
         inertial.setPitch(angles.y + errors.y);
         inertial.setHeading(angles.z + errors.z);
+
+        std::cout << "x: " << inertial.getRoll() << "\ty: " << inertial.getPitch() << "\tz: " << inertial.getHeading() << "\n";
 
         pros::delay(10);
     }

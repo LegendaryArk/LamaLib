@@ -16,7 +16,7 @@
  * to keep execution time for this mode under a few seconds.
  */
 
-Inertial lamaLib::inertial(20);
+Inertial lamaLib::inertial(21);
 void initialize() {
 	pros::lcd::initialize();
 	// pros::lcd::set_text(1, "Hello PROS User!");
@@ -81,8 +81,6 @@ void opcontrol() {
 		false, false, true, true
 	};
 	Chassis chassis(ports, reverseConfig, okapi::AbstractMotor::gearset::green);
-
-	inertial.calibrate();
 
 	// OdomScales calibrated = odom.calibrate(chassis, master, inertial);
 	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";

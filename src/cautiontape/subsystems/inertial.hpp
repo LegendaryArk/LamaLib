@@ -32,11 +32,12 @@ class Inertial : pros::IMU {
     Angles calibrate();
     bool isCalibrating();
 
-    void startTask();
-    void endTask();
+    void startCorrection();
+    void endCorrection();
 
     private:
-    pros::task_t inertialTask;
+    pros::task_t inertialTask {};
+
     bool calibrating;
 };
 
