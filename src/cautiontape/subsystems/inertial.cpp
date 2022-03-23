@@ -38,6 +38,11 @@ void Inertial::setHeading(double iangle) {
 }
 
 Angles Inertial::calibrate() {
+    if (calibrating) return {0, 0, 0};
+
+    calibrating = true;
+    endTask();
+
     this->reset();
 
     int count = 0;
@@ -64,10 +69,12 @@ Angles Inertial::calibrate() {
     if (maxDrift.z > 0.5)
         maxDrift.z = 0.5;
 
+    calibrating = false;
+    startTask();
     return maxDrift;
 }
 bool Inertial::isCalibrating() {
-    return this->is_calibrating();
+    return calibrating;
 }
 
 void Inertial::startTask() {
@@ -81,6 +88,8 @@ void lamaLib::driftCompensation(void* iparam) {
     Angles maxDrift = inertial.calibrate();
 
     while (true) {
+        std::cout << "Max Drift: " << maxDrift.x << ", " << maxDrift.y << ", " << maxDrift.z << "\n";
+        
         Angles angles = {inertial.getRoll(), inertial.getPitch(), inertial.getHeading()};
 
         Angles prev;
@@ -101,6 +110,8 @@ void lamaLib::driftCompensation(void* iparam) {
             if (angles.z != prev.z)
                 errors.z = prev.z - angles.z;
         }
+
+        std::cout << "Delta: " << angles.x << ", " << angles.y << ", " << angles.z << "\n";
 
         prev = angles;
 

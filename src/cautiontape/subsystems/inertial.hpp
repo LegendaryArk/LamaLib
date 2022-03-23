@@ -37,6 +37,7 @@ class Inertial : pros::IMU {
 
     private:
     pros::task_t inertialTask;
+    bool calibrating;
 };
 
 extern Inertial inertial;

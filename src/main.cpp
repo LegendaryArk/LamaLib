@@ -84,11 +84,6 @@ void opcontrol() {
 
 	inertial.calibrate();
 
-	while (true) {
-		//cout << inertial.getGyroRate().x << " " << inertial.getGyroRate().y << " " << inertial.getGyroRate().z << "\n";
-		cout << inertial.getHeading() << "\n";
-	}
-
 	// OdomScales calibrated = odom.calibrate(chassis, master, inertial);
 	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
 
