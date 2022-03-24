@@ -32,6 +32,12 @@ void Inertial::setPitch(double iangle) {
     this->set_pitch(iangle);
 }
 
+double Inertial::getYaw() {
+    return this->get_yaw();
+}
+void Inertial::setYaw(double iangle) {
+    this->set_yaw(iangle);
+}
 double Inertial::getHeading() {
     return this->get_heading();
 }
@@ -91,7 +97,7 @@ void lamaLib::driftCompensation(void* iparam) {
     Angles maxDrift = inertial.calibrate();
 
     while (true) {
-        Angles angles = {inertial.getRoll(), inertial.getPitch(), inertial.getHeading()};
+        Angles angles = {inertial.getRoll(), inertial.getPitch(), inertial.getYaw()};
         Angles prev = angles;
         Angles delta = {inertial.getDeltaAngles().x, inertial.getDeltaAngles().y, inertial.getDeltaAngles().z};
         Angles errors;
@@ -113,7 +119,7 @@ void lamaLib::driftCompensation(void* iparam) {
 
         inertial.setRoll(angles.x + errors.x);
         inertial.setPitch(angles.y + errors.y);
-        inertial.setHeading(angles.z + errors.z);
+        inertial.setYaw(angles.z + errors.z);
 
         std::cout << "x: " << inertial.getRoll() << "\ty: " << inertial.getPitch() << "\tz: " << inertial.getHeading() << "\n";
 
