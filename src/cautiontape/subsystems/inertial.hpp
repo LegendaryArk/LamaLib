@@ -79,7 +79,7 @@ class Inertial : pros::IMU {
      */
     void setYaw(double iangle);
     /**
-     * @brief Gets the yaw, or the orientation about the z axis in degrees
+     * @brief Gets the yaw, or the orientation about the z axis in degrees, clamped between 0 and 360
      *
      * Better known as the heading
      * 
@@ -87,7 +87,7 @@ class Inertial : pros::IMU {
      */
     double getHeading();
     /**
-     * @brief Sets the yaw, or the orientation about the z axis in degrees
+     * @brief Sets the yaw, or the orientation about the z axis in degrees, clamped between 0 and 360
      *
      * Better known as the heading
      * 
