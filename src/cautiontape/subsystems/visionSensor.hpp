@@ -14,7 +14,7 @@ namespace lamalib {
     pros::vision_signature_s_t SIG_6;
     pros::vision_signature_s_t SIG_7;
 
-    visionSensor(int vPort);
+    visionSensor(int vPort, pros::vision_signature_s_t inputSigs[7]);
     /**
     * @brief Input the vision sensor port number and an array of seven utility colour signatures.
     *
@@ -24,8 +24,7 @@ namespace lamalib {
     void setSignatures(pros::vision_signature_s_t inputSigs[]);
     /**
      * @brief Sets signatures in vision sensor memory to the signatures in the brain memory.
-     * See:https://pros.cs.purdue.edu/v5/tutorials/topical/vision.html#setting-signatures
-     *
+     * 
      * @param signature
      */
     int getMiddle(int signature);

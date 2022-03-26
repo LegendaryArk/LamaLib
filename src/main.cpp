@@ -54,9 +54,8 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-
- /*
-pros::vision_signature_s_t inputs[7] {
+void autonomous() {
+  pros::vision_signature_s_t inputs[7] {
     pros::Vision::signature_from_utility(1, 1599, 3341, 2470, -4265, -3981,
                                          -4123, 2.900, 0),
     pros::Vision::signature_from_utility(2, -2231, -1643, -1937, 7951, 9405,
@@ -68,11 +67,30 @@ pros::vision_signature_s_t inputs[7] {
     pros::Vision::signature_from_utility(6, 0, 0, 0, 0, 0, 0, 3.000, 0),
     pros::Vision::signature_from_utility(7, 0, 0, 0, 0, 0, 0, 3.000, 0)
   };
-  lamalib::visionSensor visSensor(1);
+  lamalib::visionSensor visSensor(1, inputs);
   visSensor.setSignatures(inputs);
-*/
-
-void autonomous() {}
+  double xScale =
+      480.0 / 310; // Scaling the vision sensor range to the V5 Brain Screen
+  double yScale = 240.0 / 212;
+  int xl;
+  int yl;
+  int xr;
+  int yr;
+  while (true) {
+    pros::vision_object_s_t rtn = visSensor.vSensor.get_by_sig(0, 3);
+    xl = rtn.left_coord;
+    yl = rtn.top_coord;
+    xr = rtn.left_coord + rtn.width;
+    yr = rtn.top_coord - rtn.height;
+    pros::screen::set_eraser(COLOR_WHITE);
+    pros::screen::erase_rect(0, 0, 480, 240);
+    pros::screen::set_eraser(COLOR_RED);
+    pros::screen::erase_rect(xl * xScale, yl * yScale, xr * xScale,
+                             yr * yScale);
+    // cout << visSensor.getMiddle(2)<< "\n";
+    pros::delay(20);
+  }
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task

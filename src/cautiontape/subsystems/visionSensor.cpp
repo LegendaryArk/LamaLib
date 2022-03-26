@@ -4,7 +4,8 @@
 #include <iterator>
 
 namespace lamalib {
-    visionSensor::visionSensor(int vPort) : vSensor(vPort){
+    visionSensor::visionSensor(int vPort, pros::vision_signature_s_t inputSigs[7]) : vSensor(vPort), SIG_1(inputSigs[0]), SIG_2(inputSigs[1]),
+                                SIG_3(inputSigs[2]), SIG_4(inputSigs[3]), SIG_5(inputSigs[4]), SIG_6(inputSigs[5]), SIG_7(inputSigs[6]) {
         //Configures colour signatures
         //See: https://pros.cs.purdue.edu/v5/tutorials/topical/vision.html#setting-signatures
     }
