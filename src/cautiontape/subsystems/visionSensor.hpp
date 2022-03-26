@@ -13,20 +13,18 @@ namespace lamalib {
     pros::vision_signature_s_t SIG_5;
     pros::vision_signature_s_t SIG_6;
     pros::vision_signature_s_t SIG_7;
-
-    visionSensor(int vPort);
     /**
     * @brief Input the vision sensor port number.
     *
     * @param vPort
     **/
-    void setSignatures(pros::vision_signature_s_t inputSigs[]);
+    visionSensor(int vPort);
     /**
      * @brief Sets signatures in vision sensor memory to the signatures in the brain memory.
      * 
      * @param signature
      */
-    int getMiddle(int signature);
+    void setSignatures(pros::vision_signature_s_t inputSigs[]);
     /**
      * @brief Gets the middle coordinate of the largest object with the specified colour signature. 
      * Returns coordinate out of 312(?) total camera resolution, e.g. middle coordinate would be 156
@@ -34,12 +32,13 @@ namespace lamalib {
      * @param signature 
      * @return int 
      */
-    int getWidth(int signature);
+    int getMiddle(int signature);
     /**
      * @brief Returns the width of the largest object with the specified colour signature.
      * 
      * @param signature
      * @return int
      */
+    int getWidth(int signature);
     };
 }
