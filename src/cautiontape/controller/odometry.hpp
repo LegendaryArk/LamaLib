@@ -10,34 +10,34 @@ namespace lamaLib {
  *
  * Includes the time of the position
  */
-typedef struct {
+struct Pose {
     double x;
     double y;
     double theta;
     uint time;
-} Pose;
+};
 
 /**
  * @brief The encoder values of all 3 tracking wheels in ticks
  */
-typedef struct {
+struct EncoderValues {
     double left;
     double right;
     double rear;
     double theta;
-} EncoderValues;
+};
 
 /**
  * @brief The measurements of the tracking wheels in inches
  * 
  * Left and right are separate in the case that they are different
  */
-typedef struct {
+struct OdomScales {
     double wheelDiameter;
     double leftRadius;
     double rightRadius;
     double rearRadius;
-} OdomScales;
+};
 
 class Odometry {
     public:

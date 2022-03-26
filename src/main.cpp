@@ -68,8 +68,6 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	lamaLib::generateTrapezoid({0, 5, 1}, 50);
-	
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	int8_t ports[4] = {
 		TOP_LEFT_CHASSIS,
@@ -81,6 +79,15 @@ void opcontrol() {
 		false, false, true, true
 	};
 	Chassis chassis(ports, reverseConfig, okapi::AbstractMotor::gearset::green);
+	
+	MotionProfile trapezoid = lamaLib::generateTrapezoid({0, 5, 2}, 1);
+	for (MotionData movement : trapezoid.profile) {
+		double rpm = movement.velocity * 60 / (PI * 0.1016);
+		chassis.getLeftMotors().moveVelocity(rpm);
+		chassis.getRightMotors().moveVelocity(rpm);
+		cout << chassis.getLeftMotors().getActualVelocity() << ", " << chassis.getRightMotors().getActualVelocity() << ", " << rpm << "\n";
+		pros::delay(20);
+	}
 
 	pros::IMU inertial(21);
 	inertial.reset();

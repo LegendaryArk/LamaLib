@@ -14,11 +14,8 @@ void MotorGroup::moveVoltage(int ivolt) {
         motor.moveVoltage(ivolt);
 }
 
-MotorVels MotorGroup::getActualVelocity() {
-    MotorVels motorVels;
-    for (int i = 0; i < motors.size(); i++)
-        motorVels.motorVels[i] = motors.at(i).getActualVelocity();
-    return motorVels;
+double MotorGroup::getActualVelocity() {
+    return motors.at(0).getActualVelocity();
 }
 
 void MotorGroup::setBrakeMode(okapi::AbstractMotor::brakeMode ibrakeMode) {

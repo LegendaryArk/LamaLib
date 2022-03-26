@@ -1,9 +1,10 @@
 #pragma once
 
 #include "odometry.hpp"
+#include "../utilities/mathHelper.hpp"
 
 namespace lamaLib {
-typedef struct {
+struct MotionData {
 	/*
 	* Position  X, Y, Heading
 	* Velocity
@@ -15,17 +16,17 @@ typedef struct {
 	double velocity;
 	double acceleration;
 	double jerk;
-} MotionData;
+};
 
-typedef struct {
+struct MotionProfile {
 	std::vector<MotionData> profile;
-} MotionProfile;
+};
 
-typedef struct {
+struct MotionLimit {
 	double startVelocity;
 	double maxVelocity;
 	double maxAcceleration;
-} MotionLimit;
+};
 
-MotionProfile generateTrapezoid (MotionLimit imotionLimit, double idistance);
+MotionProfile generateTrapezoid(MotionLimit imotionLimit, double idistance);
 } // namespace lamaLib
