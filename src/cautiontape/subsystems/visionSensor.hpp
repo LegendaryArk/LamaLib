@@ -19,7 +19,6 @@ namespace lamalib {
     * @brief Input the vision sensor port number.
     *
     * @param vPort
-    * @param inputSigs 
     **/
     void setSignatures(pros::vision_signature_s_t inputSigs[]);
     /**
