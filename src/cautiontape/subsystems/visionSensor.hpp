@@ -14,9 +14,9 @@ namespace lamalib {
     pros::vision_signature_s_t SIG_6;
     pros::vision_signature_s_t SIG_7;
 
-    visionSensor(int vPort, pros::vision_signature_s_t inputSigs[7]);
+    visionSensor(int vPort);
     /**
-    * @brief Input the vision sensor port number and an array of seven utility colour signatures.
+    * @brief Input the vision sensor port number.
     *
     * @param vPort
     * @param inputSigs 
