@@ -68,6 +68,8 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+	lamaLib::generateTrapezoid({0, 5, 1}, 50);
+	
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	int8_t ports[4] = {
 		TOP_LEFT_CHASSIS,
