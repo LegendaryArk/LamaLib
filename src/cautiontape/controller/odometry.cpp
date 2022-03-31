@@ -7,7 +7,7 @@ using namespace lamaLib;
 Odometry::Odometry(pros::ADIEncoder leftEncoder, pros::ADIEncoder rightEncoder, pros::ADIEncoder rearEncoder, OdomScales scales, int tpr):
                     leftEncoder(leftEncoder), rightEncoder(rightEncoder), rearEncoder(rearEncoder), scales(scales), tpr(tpr) {
     // Default coordinate position
-    pose = {0, 0, 0, pros::millis()};
+    pose = {0, 0, 0, (double) pros::millis()};
 
     // Start odometry task
     startOdom();
@@ -119,7 +119,7 @@ void lamaLib::odometryMain(void* iparam) {
         double globalX = currPose.x + deltaGlobalX;
         double globalY = currPose.y + deltaGlobalY;
         double globalTheta = currPose.theta + radToDeg(delta.theta);
-        odom.setPose({globalX, globalY, globalTheta, pros::millis()});
+        odom.setPose({globalX, globalY, globalTheta, (double) pros::millis()});
 
         pros::lcd::print(0, "x: %.2f in   y: %.2f in", odom.getPose().x, odom.getPose().y);
         pros::lcd::print(1, "theta: %.2f deg", odom.getPose().theta);

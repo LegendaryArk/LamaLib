@@ -7,6 +7,6 @@ double radToDeg(double rad) {
     return rad * (180 / M_PI);
 }
 
-int sign(int n) {
+int sign(double n) {
     return (n > 0) - (n < 0);
 }

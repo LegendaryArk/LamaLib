@@ -1,32 +1,40 @@
 #include "motionprofiling.hpp"
 
 using namespace lamaLib;
+using namespace std;
 
-MotionProfile lamaLib::generateTrapezoid(MotionLimit imotionLimit, double idistance) {
+MotionProfile lamaLib::generateTrapezoid(MotionLimit imotionLimit, MotionData istart, MotionData iend) {
 	MotionProfile trapezoid = {};
 	trapezoid.profile = std::vector<MotionData>();
+
+	double cutoffStartTime = fabs(istart.velocity / imotionLimit.maxAcceleration);
+	double cutoffStartDist = 0.5 * imotionLimit.maxAcceleration * cutoffStartTime * cutoffStartTime;
+
+	double cutoffEndTime = fabs(iend.velocity / imotionLimit.maxAcceleration);
+	double cutoffEndDist = 0.5 * imotionLimit.maxAcceleration * cutoffEndTime * cutoffEndTime;
 
 	// Acceleration t = v/d
 	double accelTime = imotionLimit.maxVelocity / imotionLimit.maxAcceleration;
 	// Acceleration distance = 1/2at^2
 	double accelDist = 0.5 * imotionLimit.maxAcceleration * accelTime * accelTime;
-	double maxDist = idistance - 2 * accelDist;
+	double trapezoidDist = cutoffStartDist + iend.distance - istart.distance + cutoffEndDist;
+	double maxDist = trapezoidDist - 2 * accelDist;
 
 	// When max speed is not able to be reached
 	if (maxDist < 0) {
-		accelTime = sqrt(idistance / imotionLimit.maxAcceleration);
+		accelTime = sqrt(iend.distance / imotionLimit.maxAcceleration);
 		maxDist = 0;
 	}
 
-	double endAccel = accelTime;
+	double endAccel = accelTime - cutoffStartTime;
 	// maxDistance time = (distance / maxVel) - endAccel
-    double endMax = accelTime + maxDist / imotionLimit.maxVelocity;
+    double endMax = endAccel + fabs(maxDist / imotionLimit.maxVelocity);
 	// endDecel = maxDistance + endAccel
-	double endDecel = endMax + accelTime;
+	double endDecel = endMax + accelTime - cutoffEndTime;
 
-	std::cout << endAccel << "\t" << endMax << "\t" << endDecel << "\n";
+	cout << endAccel << "\t" << endMax << "\t" << endDecel << "\t" << accelTime << "\t" << cutoffStartTime << "\t" << cutoffEndTime << "\n";
 
-	int direction = sign(idistance);
+	int direction = sign(iend.distance);
 	imotionLimit.maxVelocity *= direction;
 	imotionLimit.maxAcceleration *= direction;
 
@@ -34,28 +42,30 @@ MotionProfile lamaLib::generateTrapezoid(MotionLimit imotionLimit, double idista
 	double prevTime = 0;
 
 	std::cout << "velocity,distance,time\n";
-	while (time < endDecel) {
-		MotionData data = {};
+	while (time <= endDecel) {
+		MotionData movement;
 
 		double deltaTime = time - prevTime;
 
 		if (time < endAccel) {
-			data.velocity = imotionLimit.startVelocity + (imotionLimit.maxAcceleration * time);
-			data.distance = 0.5 * imotionLimit.maxAcceleration * time * time;
+			movement.velocity = istart.velocity + imotionLimit.maxAcceleration * time;
+			movement.distance = istart.distance + istart.velocity * time + 0.5 * imotionLimit.maxAcceleration * time * time;
 		} else if (time < endMax){
-            data.velocity = imotionLimit.maxVelocity;
-            data.distance = (0.5 * imotionLimit.maxAcceleration * accelTime * accelTime) + (imotionLimit.maxVelocity * (time - endAccel));
+            movement.velocity = imotionLimit.maxVelocity;
+            movement.distance = istart.distance + (istart.velocity * time + 0.5 * imotionLimit.maxAcceleration * accelTime * accelTime) + (imotionLimit.maxVelocity * (time - endAccel));
         } else if (time <= endDecel) {
             double timeLeft = endDecel - time;
-            data.velocity = imotionLimit.startVelocity + (imotionLimit.maxAcceleration * timeLeft);
-            data.distance = idistance - (0.5 * imotionLimit.maxAcceleration * timeLeft * timeLeft);
+            movement.velocity = iend.velocity + imotionLimit.maxAcceleration * timeLeft;
+            movement.distance = iend.distance - (0.5 * imotionLimit.maxAcceleration * timeLeft * timeLeft);
         } else {
-			data.velocity = 0;
+			movement.velocity = 0;
 		}
 
-		trapezoid.profile.emplace_back(data);
+		movement.position.time = istart.position.time + time;
 
-		std::cout << data.velocity << "," << data.distance << "," << time << "\n";
+		trapezoid.profile.emplace_back(movement);
+
+		std::cout << movement.velocity << "," << movement.distance << "," << movement.position.time << "\n";
 
 		prevTime = time;
 		time += 0.02;

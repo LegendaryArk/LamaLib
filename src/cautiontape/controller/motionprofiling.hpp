@@ -5,17 +5,18 @@
 
 namespace lamaLib {
 struct MotionData {
-	/*
-	* Position  X, Y, Heading
+	/**
+	* Distance
 	* Velocity
 	* Acceleration
 	* Jerk
+	* Position  X, Y, Heading
 	*/
-	Pose position;
-	double distance;
-	double velocity;
-	double acceleration;
-	double jerk;
+	double distance {0};
+	double velocity {0};
+	double acceleration {0};
+	double jerk {0};
+	Pose position {0};
 };
 
 struct MotionProfile {
@@ -23,10 +24,9 @@ struct MotionProfile {
 };
 
 struct MotionLimit {
-	double startVelocity;
 	double maxVelocity;
 	double maxAcceleration;
 };
 
-MotionProfile generateTrapezoid(MotionLimit imotionLimit, double idistance);
+MotionProfile generateTrapezoid(MotionLimit imotionLimit, MotionData istart, MotionData iend);
 } // namespace lamaLib

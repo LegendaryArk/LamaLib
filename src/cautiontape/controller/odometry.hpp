@@ -14,7 +14,7 @@ struct Pose {
     double x;
     double y;
     double theta;
-    uint time;
+    double time;
 };
 
 /**
