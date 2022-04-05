@@ -79,6 +79,24 @@ void opcontrol() {
 		false, false, true, true
 	};
 	Chassis chassis(ports, reverseConfig, okapi::AbstractMotor::gearset::green);
+	
+	MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
+	MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});
+	
+	for (MotionData movement : trapezoid.profile) {
+		double rpm = movement.velocity * 60 / (PI * 0.1016);
+		chassis.getLeftMotors().moveVelocity(rpm);
+		chassis.getRightMotors().moveVelocity(rpm);
+		cout << chassis.getLeftMotors().getActualVelocity() << ", " << chassis.getRightMotors().getActualVelocity() << ", " << rpm << "\n";
+		pros::delay(20);
+	}
+	for (MotionData movement : trapezoid2.profile) {
+		double rpm = movement.velocity * 60 / (PI * 0.1016);
+		chassis.getLeftMotors().moveVelocity(rpm);
+		chassis.getRightMotors().moveVelocity(rpm);
+		cout << chassis.getLeftMotors().getActualVelocity() << ", " << chassis.getRightMotors().getActualVelocity() << ", " << rpm << "\n";
+		pros::delay(20);
+	}
 
 	pros::IMU inertial(21);
 	inertial.reset();

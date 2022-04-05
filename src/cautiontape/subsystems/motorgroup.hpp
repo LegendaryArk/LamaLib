@@ -1,14 +1,9 @@
 #pragma once
 
 #include "motor.hpp"
+#include <cmath>
 
 namespace lamaLib {
-/**
- * @brief A structure to assist in returning the motor velocities
- */
-typedef struct {
-    double motorVels[];
-} MotorVels;
 class MotorGroup {
     public:
     /**
@@ -32,11 +27,11 @@ class MotorGroup {
     void moveVoltage(int ivolt);
 
     /**
-     * @brief Gets the Actual Velocity of the motors in an array
+     * @brief Gets the actual velocity of the motors in an array
      * 
      * @return MotorVels 
      */
-    MotorVels getActualVelocity();
+    double getActualVelocity();
 
     /**
      * @brief Sets the brake mode of the motors

@@ -1,4 +1,5 @@
 #include "chassis.hpp"
+
 using namespace lamaLib;
 
 Chassis::Chassis(int8_t motorPorts[4], bool reverseConfig[4], okapi::AbstractMotor::gearset igearset) :
@@ -6,7 +7,7 @@ Chassis::Chassis(int8_t motorPorts[4], bool reverseConfig[4], okapi::AbstractMot
                 {motorPorts[1], reverseConfig[1], igearset, okapi::AbstractMotor::encoderUnits::counts}}), 
     rightMotors({{motorPorts[2], reverseConfig[2], igearset, okapi::AbstractMotor::encoderUnits::counts},
                 {motorPorts[3], reverseConfig[3], igearset, okapi::AbstractMotor::encoderUnits::counts}}) {
-                    
+    
     gearBox = igearset;
 
     leftMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
@@ -23,13 +24,10 @@ void Chassis::move(int left, int right) { //uses the pros controller which goes 
     if (aright > 127) {
         aright = 127;
     }
-    //getting the sign bit in order to apply the correct direction to the motor
-    int signL = (left > 0) - (left < 0);
-    int signR = (right > 0) - (right < 0);
 
     //getting an absolute value to use for the joymap
-    int leftV = joyMap[aleft] * signL;
-    int rightV = joyMap[aright] * signR;
+    int leftV = joyMap[aleft] * sign(left);
+    int rightV = joyMap[aright] * sign(right);
 
     //applying gearbox values
     switch (gearBox) {
@@ -52,4 +50,11 @@ void Chassis::move(int left, int right) { //uses the pros controller which goes 
     //send these values to the motors to move
     leftMotors.moveVelocity(leftV);
     rightMotors.moveVelocity(rightV);
+}
+
+MotorGroup Chassis::getLeftMotors() {
+    return leftMotors;
+}
+MotorGroup Chassis::getRightMotors() {
+    return rightMotors;
 }

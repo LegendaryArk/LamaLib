@@ -2,6 +2,7 @@
 
 #include "okapi/api.hpp"
 #include "motorgroup.hpp"
+#include "../utilities/mathHelper.hpp"
 
 using namespace std;
 namespace lamaLib {
@@ -26,6 +27,9 @@ class Chassis {
     public:
     Chassis(int8_t motorPorts[4], bool reverseConfig[4], okapi::AbstractMotor::gearset igearset);
     void move(int left, int right);
+
+    MotorGroup getLeftMotors();
+    MotorGroup getRightMotors();
     
     private:
     lamaLib::MotorGroup leftMotors;
