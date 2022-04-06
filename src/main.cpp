@@ -69,16 +69,16 @@ void autonomous() {}
  */
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	int8_t ports[4] = {
-		TOP_LEFT_CHASSIS,
-		BOTTOM_LEFT_CHASSIS,
-		TOP_RIGHT_CHASSIS,
-		BOTTOM_RIGHT_CHASSIS
-	};
-	bool reverseConfig[4] = {
-		false, false, true, true
-	};
-	Chassis chassis(ports, reverseConfig, okapi::AbstractMotor::gearset::green);
+
+	MotorGroup a ({{TOP_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
+	{BOTTOM_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}});
+	
+	Chassis chassis
+		({{TOP_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
+		{BOTTOM_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}},
+		{{TOP_RIGHT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
+		{BOTTOM_RIGHT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}},
+		1);
 	
 	MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
 	MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});

@@ -1,6 +1,4 @@
 #include "odometry.hpp"
-#include "pros/misc.h"
-#include <math.h>
 
 using namespace lamaLib;
 
@@ -38,11 +36,11 @@ OdomScales Odometry::calibrate(Chassis ichassis, pros::Controller controller, pr
         pros::Task::delay_until(&time, 10);
     }
 
-    double leftDiameter = ((getEncoders().left / tpr) * scales.wheelDiameter) / 10;
-    double rightDiameter = ((getEncoders().right / tpr) * scales.wheelDiameter) / 10;
-    double rearDiameter = ((getEncoders().rear / tpr) * scales.wheelDiameter) / 10;
+    double leftDiameter = ((odom.getEncoders().left / odom.tpr) * odom.getScales().wheelDiameter) / 10;
+    double rightDiameter = ((odom.getEncoders().right / odom.tpr) * odom.getScales().wheelDiameter) / 10;
+    double rearDiameter = ((odom.getEncoders().rear / odom.tpr) * odom.getScales().wheelDiameter) / 10;
 
-    OdomScales calibratedScales = {scales.wheelDiameter, leftDiameter / 2, rightDiameter / 2, rearDiameter / 2};
+    OdomScales calibratedScales = {odom.getScales().wheelDiameter, leftDiameter / 2, rightDiameter / 2, rearDiameter / 2};
     pros::lcd::print(5, "Calibrated radii:");
     pros::lcd::print(6, "left: %f in   right: %f in", calibratedScales.leftRadius, calibratedScales.rightRadius);
     pros::lcd::print(7, "rear: %f in", calibratedScales.rearRadius);

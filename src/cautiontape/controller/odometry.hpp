@@ -6,18 +6,6 @@
 
 namespace lamaLib {
 /**
- * @brief The coordinate position of the robot in inches and degrees
- *
- * Includes the time of the position
- */
-struct Pose {
-    double x;
-    double y;
-    double theta;
-    uint time;
-};
-
-/**
  * @brief The encoder values of all 3 tracking wheels in ticks
  */
 struct EncoderValues {
@@ -117,7 +105,7 @@ class Odometry {
     pros::ADIEncoder rightEncoder;
     pros::ADIEncoder rearEncoder;
 
-    Pose pose;
+    Pose pose {0, 0, 0, 0};
     OdomScales scales;
 
     pros::task_t odomTask {};

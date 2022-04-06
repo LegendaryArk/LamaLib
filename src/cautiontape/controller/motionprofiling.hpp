@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api.h"
+#include "../utilities/pose.hpp"
 #include "../utilities/mathHelper.hpp"
 
 namespace lamaLib {
@@ -20,9 +21,7 @@ struct MotionData {
 	double acceleration {0};
 	double jerk {0};
 	double time {0};
-	double x {0};
-	double y {0};
-	double heading {0};
+	Pose position {0, 0, 0};
 };
 /**
  * @brief The motion profile

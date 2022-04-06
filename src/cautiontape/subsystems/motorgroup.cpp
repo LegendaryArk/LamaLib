@@ -1,9 +1,10 @@
 #include "motorgroup.hpp"
 #include "okapi/api/device/motor/abstractMotor.hpp"
 
+using namespace std;
 using namespace lamaLib;
 
-MotorGroup::MotorGroup(std::vector<Motor> motors) : motors(motors) {}
+MotorGroup::MotorGroup(vector<Motor> imotors) : motors(imotors) {}
 
 void MotorGroup::moveVelocity(int ivel) {
     for (Motor motor : motors)
@@ -24,4 +25,12 @@ void MotorGroup::setBrakeMode(okapi::AbstractMotor::brakeMode ibrakeMode) {
 }
 okapi::AbstractMotor::brakeMode MotorGroup::getBrakeMode() {
     return motors.at(0).getBrakeMode();
+}
+
+void MotorGroup::setGearing(okapi::AbstractMotor::gearset igearset) {
+    for (Motor motor : motors)
+        motor.setGearing(igearset);
+}
+okapi::AbstractMotor::gearset MotorGroup::getGearing() {
+    return motors.at(0).getGearing();
 }
