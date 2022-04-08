@@ -6,6 +6,7 @@ Pneumatic::Pneumatic(pros::ADIDigitalOut pneumatic) : pneumatic(pneumatic) {}
 
 void Pneumatic::setState(bool istate) {
     pneumatic.set_value(istate);
+    state = istate;
 }
 void Pneumatic::open() {
     setState(true);

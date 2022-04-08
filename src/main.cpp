@@ -68,35 +68,42 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+	Pneumatic pneumatic(pros::ADIDigitalOut('A'));
+	pneumatic.close();
+	pros::delay(1000);
+	pneumatic.open();
+	pros::delay(1000);
+	pneumatic.toggle();
+
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-	MotorGroup a ({{TOP_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
-	{BOTTOM_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}});
+	MotorGroup leftMotors({
+		{TOP_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
+		{BOTTOM_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
+	});
+	MotorGroup rightMotors({
+		{TOP_RIGHT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
+		{BOTTOM_RIGHT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
+	});
+	Chassis chassis(leftMotors, rightMotors, 1);
 	
-	Chassis chassis
-		({{TOP_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
-		{BOTTOM_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}},
-		{{TOP_RIGHT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
-		{BOTTOM_RIGHT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}},
-		1);
+	// MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
+	// MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});
 	
-	MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
-	MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});
-	
-	for (MotionData movement : trapezoid.profile) {
-		double rpm = movement.velocity * 60 / (PI * 0.1016);
-		chassis.getLeftMotors().moveVelocity(rpm);
-		chassis.getRightMotors().moveVelocity(rpm);
-		cout << chassis.getLeftMotors().getActualVelocity() << ", " << chassis.getRightMotors().getActualVelocity() << ", " << rpm << "\n";
-		pros::delay(20);
-	}
-	for (MotionData movement : trapezoid2.profile) {
-		double rpm = movement.velocity * 60 / (PI * 0.1016);
-		chassis.getLeftMotors().moveVelocity(rpm);
-		chassis.getRightMotors().moveVelocity(rpm);
-		cout << chassis.getLeftMotors().getActualVelocity() << ", " << chassis.getRightMotors().getActualVelocity() << ", " << rpm << "\n";
-		pros::delay(20);
-	}
+	// for (MotionData movement : trapezoid.profile) {
+	// 	double rpm = movement.velocity * 60 / (PI * 0.1016);
+	// 	chassis.getLeftMotors().moveVelocity(rpm);
+	// 	chassis.getRightMotors().moveVelocity(rpm);
+	// 	cout << chassis.getLeftMotors().getActualVelocity() << ", " << chassis.getRightMotors().getActualVelocity() << ", " << rpm << "\n";
+	// 	pros::delay(20);
+	// }
+	// for (MotionData movement : trapezoid2.profile) {
+	// 	double rpm = movement.velocity * 60 / (PI * 0.1016);
+	// 	chassis.getLeftMotors().moveVelocity(rpm);
+	// 	chassis.getRightMotors().moveVelocity(rpm);
+	// 	cout << chassis.getLeftMotors().getActualVelocity() << ", " << chassis.getRightMotors().getActualVelocity() << ", " << rpm << "\n";
+	// 	pros::delay(20);
+	// }
 
 	pros::IMU inertial(21);
 	inertial.reset();

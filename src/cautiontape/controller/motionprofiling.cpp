@@ -3,6 +3,11 @@
 using namespace std;
 using namespace lamaLib;
 
+void MotionProfile::operator+=(MotionProfile rhs) {
+	for (MotionData data : rhs.profile)
+		profile.emplace_back(data);
+}
+
 MotionProfile lamaLib::generateTrapezoid(MotionLimit imotionLimit, CutoffPoint istart, CutoffPoint iend) {
 	MotionProfile trapezoid = {};
 	trapezoid.profile = vector<MotionData>();

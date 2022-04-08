@@ -2,7 +2,7 @@
 
 #include "api.h"
 #include "../utilities/pose.hpp"
-#include "../utilities/mathHelper.hpp"
+#include "../utilities/mathhelper.hpp"
 
 namespace lamaLib {
 /**
@@ -28,6 +28,13 @@ struct MotionData {
  */
 struct MotionProfile {
 	std::vector<MotionData> profile;
+
+	/**
+	 * @brief Combines 2 motion profiles
+	 * 
+	 * @param rhs The profile that is added on to the end of this profile
+	 */
+	void operator+=(MotionProfile rhs);
 };
 
 /**

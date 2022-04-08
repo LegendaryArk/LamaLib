@@ -1,4 +1,4 @@
-#include "mathHelper.hpp"
+#include "mathhelper.hpp"
 
 double degToRad(double deg) {
     return deg * (M_PI / 180);
