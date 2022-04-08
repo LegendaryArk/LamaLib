@@ -51,16 +51,15 @@ void Chassis::moveDistance(vector<Pose> itargets, vector<MotionLimit> imaxes, ve
         return;
     }
 
-    double dist;
+    double dist = getPose().distTo(itargets.at(0));
     double prevDists = dist;
     MotionProfile profile = lamaLib::generateTrapezoid(imaxes.at(0), {0}, {dist, iends.at(0).maxVelocity});
     for (int i = 1; i < itargets.size(); i++) {
-        dist;
+        dist = getPose().distTo(itargets.at(i));
 
         profile += lamaLib::generateTrapezoid(imaxes.at(i), {prevDists, iends.at(i - 1).maxVelocity, profile.profile.at(i - 1).time}, {dist, iends.at(i).maxVelocity});
 
         prevDists += dist;
-        pros::delay(20);
     }
 
     for (MotionData vel : profile.profile) {
@@ -68,6 +67,8 @@ void Chassis::moveDistance(vector<Pose> itargets, vector<MotionLimit> imaxes, ve
 
         leftMotors.moveVelocity(rpm);
         rightMotors.moveVelocity(rpm);
+        
+        pros::delay(20);
     }
 }
 
