@@ -4,7 +4,7 @@
 #include "pros/vision.h"
 #include "pros/vision.hpp"
 
-namespace lamalib {
+namespace lamaLib {
     class visionSensor{
     public:
     pros::Vision vSensor;

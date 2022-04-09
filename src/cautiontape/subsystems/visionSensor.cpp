@@ -3,7 +3,7 @@
 #include "pros/vision.hpp"
 #include <iterator>
 
-namespace lamalib {
+namespace lamaLib {
     visionSensor::visionSensor(int vPort) : vSensor(vPort) {
         //Configures colour signatures
         //See: https://pros.cs.purdue.edu/v5/tutorials/topical/vision.html#setting-signatures
