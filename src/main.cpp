@@ -75,11 +75,11 @@ void opcontrol() {
 
 	MotorGroup leftMotors({
 		{TOP_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
-		{BOTTOM_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
+		{BOTTOM_LEFT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
 	});
 	MotorGroup rightMotors({
 		{TOP_RIGHT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
-		{BOTTOM_RIGHT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
+		{BOTTOM_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
 	});
 	Chassis chassis(leftMotors, rightMotors, 0.1016, 1);
 
@@ -90,8 +90,8 @@ void opcontrol() {
 	Motor backArm(BACK_ARM, false, okapi::AbstractMotor::gearset::red);
 	Motor conveyor(CONVEYOR, false, okapi::AbstractMotor::gearset::blue);
 
-	Pneumatic frontClaw(pros::ADIDigitalOut({1, FRONT_CLAW}));
-	Pneumatic backClaw(pros::ADIDigitalOut({1, BACK_CLAW}));
+	Pneumatic frontClaw(pros::ADIDigitalOut({FRONT_CLAW}));
+	Pneumatic backClaw(pros::ADIDigitalOut({BACK_CLAW}));
 
 	// chassis.moveDistance({1}, {{1.5, 1}}, {{0, 0}});
 	
@@ -127,15 +127,25 @@ void opcontrol() {
 
 		chassis.move(joyY + joyX, joyY - joyX);
 
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
-			frontClaw.toggle();
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B))
-			backClaw.toggle();
-
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X))
-			conveyorDir = 1;
-		else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y))
-			conveyorDir = -1;
+		//if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
+		//	frontClaw.toggle();
+		//if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B))
+		//	backClaw.toggle();
+		
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
+			if(conveyorDir == 0)
+				conveyorDir = 1;
+			else
+				conveyorDir = 0;
+		}
+		else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
+			if(conveyorDir == 0)
+				conveyorDir = -1;
+			else
+				conveyorDir = 0;
+		}
+		//else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B))
+			
 		conveyor.moveVelocity(600 * conveyorDir);
 
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
