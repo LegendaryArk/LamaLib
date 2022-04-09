@@ -68,13 +68,6 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	Pneumatic pneumatic(pros::ADIDigitalOut('A'));
-	pneumatic.close();
-	pros::delay(1000);
-	pneumatic.open();
-	pros::delay(1000);
-	pneumatic.toggle();
-
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 
 	MotorGroup leftMotors({
@@ -85,7 +78,9 @@ void opcontrol() {
 		{TOP_RIGHT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
 		{BOTTOM_RIGHT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
 	});
-	Chassis chassis(leftMotors, rightMotors, 1);
+	Chassis chassis(leftMotors, rightMotors, 0.1016, 1);
+
+	// chassis.moveDistance({1}, {{1.5, 1}}, {{0, 0}});
 	
 	// MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
 	// MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});

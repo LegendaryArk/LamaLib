@@ -3,7 +3,7 @@
 using namespace std;
 using namespace lamaLib;
 
-Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightmotors, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightmotors), gearset(leftMotors.getGearing(), igearRatio) {
+Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightmotors, double iwheelCircumference, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightmotors), wheelCircumference(iwheelCircumference), gearset(leftMotors.getGearing(), igearRatio) {
     leftMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
     rightMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 }
@@ -45,25 +45,20 @@ void Chassis::move(int left, int right) { //uses the pros controller which goes 
     rightMotors.moveVelocity(rightV);
 }
 
-void Chassis::moveDistance(vector<Pose> itargets, vector<MotionLimit> imaxes, vector<MotionLimit> iends) {
-    if (itargets.size() != imaxes.size() || itargets.size() != iends.size()) {
+void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<MotionLimit> iends) {
+    if (idistances.size() != imaxes.size() || idistances.size() != iends.size()) {
         cerr << "Incorrect input sizes, vectors too large\n";
         return;
     }
 
-    double dist = getPose().distTo(itargets.at(0));
-    double prevDists = dist;
-    MotionProfile profile = lamaLib::generateTrapezoid(imaxes.at(0), {0}, {dist, iends.at(0).maxVelocity});
-    for (int i = 1; i < itargets.size(); i++) {
-        dist = getPose().distTo(itargets.at(i));
-
-        profile += lamaLib::generateTrapezoid(imaxes.at(i), {prevDists, iends.at(i - 1).maxVelocity, profile.profile.at(i - 1).time}, {dist, iends.at(i).maxVelocity});
-
-        prevDists += dist;
+    MotionProfile profile = lamaLib::generateTrapezoid(imaxes.at(0), {0}, {idistances.at(0), iends.at(0).maxVelocity});
+    for (int i = 1; i < idistances.size(); i++) {
+        profile += lamaLib::generateTrapezoid(imaxes.at(i), {idistances.at(i - 1), iends.at(i - 1).maxVelocity, profile.profile.at(i - 1).time}, {idistances.at(i), iends.at(i).maxVelocity});
     }
 
     for (MotionData vel : profile.profile) {
-        double rpm = vel.velocity * 60 / (PI);
+        double rpm = vel.velocity * 60 / (PI * wheelCircumference);
+        cout << rpm << "\n";
 
         leftMotors.moveVelocity(rpm);
         rightMotors.moveVelocity(rpm);
@@ -106,7 +101,7 @@ void Chassis::setPose(Pose ipose) {
     pose = ipose;
 }
 
-RobotScales Chassis::calibrate(Chassis ichassis, pros::Controller controller, pros::IMU iinertial) {
+RobotScales Chassis::calibrateOdom(Chassis ichassis, pros::Controller controller, pros::IMU iinertial) {
     uint32_t time = pros::millis();
     while (iinertial.get_rotation() < 3600) {
         ichassis.move(200, -200);

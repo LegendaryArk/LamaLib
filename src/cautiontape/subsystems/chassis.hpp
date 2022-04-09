@@ -49,7 +49,7 @@ class Chassis {
      * @param irightMotors Right motors
      * @param igearRatio The external gear ratio of the chasssis
      */
-    Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double igearRatio = 1);
+    Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double wheelCircumference, double igearRatio = 1);
 
     /**
      * @brief Moves the left and right motors when using the controller. The power that is given to the motors are according to the joyMap
@@ -59,9 +59,11 @@ class Chassis {
      */
     void move(int ileft, int iright);
 
-    void moveDistance(vector<Pose> itargets, vector<MotionLimit> imaxes, vector<MotionLimit> iends);
+    void moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<MotionLimit> iends);
 
     void turnAbsolute(double itarget, double imaxVel, double kp, double ki, double kd, double kf);
+
+    void moveToPose(vector<Pose> itargets, vector<MotionLimit> imaxes, vector<MotionLimit> iends, bool backwards = false);
 
     /**
      * @brief Gets the left motors
@@ -131,7 +133,7 @@ class Chassis {
      * @param iinertial Used to do the initial turn
      * @return The new measurements; the only updated should be the radii 
      */
-    RobotScales calibrate(Chassis ichassis, pros::Controller controller, pros::IMU iinertial);
+    RobotScales calibrateOdom(Chassis ichassis, pros::Controller controller, pros::IMU iinertial);
 
     /**
      * @brief Starts the odometry task
@@ -145,6 +147,8 @@ class Chassis {
     private:
     lamaLib::MotorGroup leftMotors;
     lamaLib::MotorGroup rightMotors;
+
+    double wheelCircumference;
 
     okapi::AbstractMotor::GearsetRatioPair gearset {okapi::AbstractMotor::gearset::green, 1};
 
