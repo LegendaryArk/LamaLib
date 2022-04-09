@@ -1,6 +1,9 @@
 #include "main.h"
 #include "api.h"
 #include "okapi/api.hpp"
+#include "okapi/api/device/motor/abstractMotor.hpp"
+#include "pros/adi.hpp"
+#include "pros/misc.h"
 #include "robotconfig.hpp"
 
 /**
@@ -80,6 +83,16 @@ void opcontrol() {
 	});
 	Chassis chassis(leftMotors, rightMotors, 0.1016, 1);
 
+	MotorGroup frontArm(
+		{{FRONT_LEFT_ARM, true, okapi::AbstractMotor::gearset::red},
+		{FRONT_RIGHT_ARM, false, okapi::AbstractMotor::gearset::red}}
+	);
+	Motor backArm(BACK_ARM, false, okapi::AbstractMotor::gearset::red);
+	Motor conveyor(CONVEYOR, false, okapi::AbstractMotor::gearset::blue);
+
+	Pneumatic frontClaw(pros::ADIDigitalOut({1, FRONT_CLAW}));
+	Pneumatic backClaw(pros::ADIDigitalOut({1, BACK_CLAW}));
+
 	// chassis.moveDistance({1}, {{1.5, 1}}, {{0, 0}});
 	
 	// MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
@@ -100,9 +113,9 @@ void opcontrol() {
 	// 	pros::delay(20);
 	// }
 
-	pros::IMU inertial(21);
-	inertial.reset();
-	while (inertial.is_calibrating()) pros::delay(10);
+	// pros::IMU inertial(21);
+	// inertial.reset();
+	// while (inertial.is_calibrating()) pros::delay(10);
 
 	// OdomScales calibrated = odom.calibrate(chassis, master, inertial);
 	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
@@ -112,6 +125,38 @@ void opcontrol() {
 		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
 		chassis.move(joyY + joyX, joyY - joyX);
+
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+			frontClaw.toggle();
+		}
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
+			backClaw.toggle();
+		}
+
+		int conveyorDir = 0;
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+			conveyorDir = 1;
+		} else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
+			conveyorDir = -1;
+		} else {
+			conveyorDir = 0;
+		}
+		conveyor.moveVelocity(600 * conveyorDir);
+
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+			frontArm.moveVelocity(100);
+		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+			frontArm.moveVelocity(-100);
+		} else {
+			frontArm.moveVelocity(0);
+		}
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+			backArm.moveVelocity(100);
+		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+			backArm.moveVelocity(-100);
+		} else {
+			backArm.moveVelocity(0);
+		}
 		pros::delay(20);
 	}
 }
