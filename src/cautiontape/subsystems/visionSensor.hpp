@@ -1,3 +1,5 @@
+#pragma once
+
 #include "api.h"
 #include "pros/vision.h"
 #include "pros/vision.hpp"
