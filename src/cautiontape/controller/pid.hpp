@@ -1,3 +1,7 @@
+#pragma once
+
+#include <math.h>
+
 namespace lamaLib {
     class PIDController {
          public:

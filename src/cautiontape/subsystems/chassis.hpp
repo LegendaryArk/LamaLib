@@ -1,6 +1,5 @@
 #pragma once
 
-#include "okapi/api/device/rotarysensor/continuousRotarySensor.hpp"
 #include "pros/adi.hpp"
 #include "motorgroup.hpp"
 #include "../controller/motionprofiling.hpp"
@@ -61,6 +60,8 @@ class Chassis {
     void move(int ileft, int iright);
 
     void moveDistance(vector<Pose> itargets, vector<MotionLimit> imaxes, vector<MotionLimit> iends);
+
+    void turnAbsolute(double itarget, double imaxVel, double kp, double ki, double kd, double kf);
 
     /**
      * @brief Gets the left motors

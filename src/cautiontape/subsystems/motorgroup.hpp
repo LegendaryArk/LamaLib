@@ -1,7 +1,6 @@
 #pragma once
 
 #include "motor.hpp"
-#include <cmath>
 
 namespace lamaLib {
 class MotorGroup {

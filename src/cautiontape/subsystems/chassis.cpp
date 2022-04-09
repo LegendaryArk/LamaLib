@@ -72,6 +72,19 @@ void Chassis::moveDistance(vector<Pose> itargets, vector<MotionLimit> imaxes, ve
     }
 }
 
+void Chassis::turnAbsolute(double itarget, double imaxVel, double kp, double ki, double kd, double kf) {
+    PIDController pidControl({kp, ki, kd, -100, 100});
+    while (fabs(itarget - chassis.getPose().theta) > 2) {
+        double pid = pidControl.calculatePID(chassis.getPose().theta, itarget, 2);
+
+        double rpm = imaxVel * pid;
+        leftMotors.moveVelocity(rpm);
+        rightMotors.moveVelocity(-rpm);
+
+        pros::delay(10);
+    }
+}
+
 MotorGroup Chassis::getLeftMotors() {
     return leftMotors;
 }

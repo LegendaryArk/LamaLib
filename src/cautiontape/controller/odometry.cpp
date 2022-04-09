@@ -5,9 +5,9 @@ using namespace lamaLib;
 Odometry::Odometry() {}
 
 Pose Odometry::updatePose(Pose icurrPose, RobotScales iscales, Encoders iencoders, OdomValues ireadingsDiff) {
-    const double wheelCircumference = iscales.wheelDiameter * M_PI;
+    double wheelCircumference = iscales.wheelDiameter * M_PI;
     double chassisDiameter = iscales.leftRadius + iscales.rightRadius;
-        
+    
     // Delta distance
     OdomValues delta;
     delta.left = (ireadingsDiff.left / iencoders.leftTPR) * wheelCircumference;

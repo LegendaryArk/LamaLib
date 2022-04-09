@@ -8,7 +8,3 @@ Motor::Motor(int8_t port, bool reverse, okapi::AbstractMotor::gearset igearset, 
 okapi::Motor (port, reverse, igearset, encoderUnits) {
     Motor::setBrakeMode(AbstractMotor::brakeMode::brake);
 }
-
-double Motor::getTick() {
-    return this->getEncoder()->get();
-};

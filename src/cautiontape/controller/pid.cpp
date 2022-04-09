@@ -1,4 +1,5 @@
 #include "pid.hpp"
+
 using namespace lamaLib;
 
 PIDController::PIDController(double p, double i, double d, double min, double max, double iComp) {
@@ -16,10 +17,6 @@ void PIDController::resetPID() {
     derivative = 0;
     prevError = 0;
     count = 0;
-}
-
-int fabs(double val) {
-    return ((val > 0) - (val < 0)) * val;
 }
 
 double PIDController::calculatePID(double current, double target, double leeway) {
