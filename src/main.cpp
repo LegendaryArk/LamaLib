@@ -120,43 +120,38 @@ void opcontrol() {
 	// OdomScales calibrated = odom.calibrate(chassis, master, inertial);
 	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
 
+	int conveyorDir = 0;
 	while (true) {
 		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
 		chassis.move(joyY + joyX, joyY - joyX);
 
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
 			frontClaw.toggle();
-		}
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B))
 			backClaw.toggle();
-		}
 
-		int conveyorDir = 0;
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X))
 			conveyorDir = 1;
-		} else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
+		else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y))
 			conveyorDir = -1;
-		} else {
-			conveyorDir = 0;
-		}
 		conveyor.moveVelocity(600 * conveyorDir);
 
-		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
 			frontArm.moveVelocity(100);
-		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
 			frontArm.moveVelocity(-100);
-		} else {
+		else
 			frontArm.moveVelocity(0);
-		}
-		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
 			backArm.moveVelocity(100);
-		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
 			backArm.moveVelocity(-100);
-		} else {
+		else
 			backArm.moveVelocity(0);
-		}
+		
 		pros::delay(20);
 	}
 }
