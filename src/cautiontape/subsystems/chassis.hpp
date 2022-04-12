@@ -149,7 +149,7 @@ class Chassis {
     /**
      * @brief Set the tracking wheel measurements with new measurements
      * 
-     * @param iscales the new measurements of the tracking wheel
+     * @param iscales The new measurements of the tracking wheel
      */
     void setScales(RobotScales iscales);
 
@@ -200,5 +200,10 @@ class Chassis {
 
 extern Chassis chassis;
 
+/**
+ * @brief The main odometry loop
+ * 
+ * @param iparam 
+ */
 void odometryMain(void *iparam);
 } // namespace lamaLib

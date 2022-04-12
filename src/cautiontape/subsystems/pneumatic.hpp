@@ -29,8 +29,8 @@ class Pneumatic {
     /**
      * @brief Gets the state of the pneumatic
      * 
-     * @return true 
-     * @return false 
+     * @return true for open
+     * @return false for closed
      */
     bool getState();
 

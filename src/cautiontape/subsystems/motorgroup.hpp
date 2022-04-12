@@ -35,7 +35,7 @@ class MotorGroup {
     /**
      * @brief Sets the brake mode of the motors
      * 
-     * @param brakeMode The new brake mode value from okapi that is to be set to the motors
+     * @param ibrakeMode The new brake mode value from okapi that is to be set to the motors
      */
     void setBrakeMode(okapi::AbstractMotor::brakeMode ibrakeMode);
     /**

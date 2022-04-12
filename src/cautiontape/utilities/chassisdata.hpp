@@ -4,7 +4,7 @@
 
 namespace lamaLib {
 /**
- * @brief Tracking wheels that are used in odom
+ * @brief Tracking wheels that are used in odom and their TPR
  */
 struct Encoders {
     okapi::ContinuousRotarySensor *left;
