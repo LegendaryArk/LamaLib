@@ -5,6 +5,7 @@
 #include "../controller/motionprofiling.hpp"
 #include "../controller/odometry.hpp"
 #include "../controller/pid.hpp"
+#include "../subsystems/inertial.hpp"
 #include "../utilities/chassisdata.hpp"
 #include "../utilities/mathhelper.hpp"
 #include "../utilities/pose.hpp"
@@ -59,9 +60,42 @@ class Chassis {
      */
     void move(int ileft, int iright);
 
-    void moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<MotionLimit> iends);
+    /**
+     * @brief Moves the robot forward a certain distance in meters.
+     *
+     * Has cutoff implemented
+     * 
+     * @param idistances The distances where cutoff is; the last one should be the total distance; accumulative
+     * @param imaxes The different max velocities and max accelerations for each cutoff segment
+     * @param iends The different end velocities for each cutoff segment
+     */
+    void moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<double> iends);
 
-    void turnAbsolute(double itarget, double imaxVel, double kp, double ki, double kd, double kf);
+    /**
+     * @brief Turns the robot relative to the starting heading at the beginning of the program
+     *
+     * Uses odometry heading
+     * 
+     * @param itarget The target angle
+     * @param imaxVel The max velocity
+     * @param kp The Kp used for the PID; default is 0
+     * @param ki The Ki used for the PID; default is 0
+     * @param kd The Kd used for the PID; default is 0
+     * @param kf The Kf used for the PID; default is 0
+     */
+    void turnAbsolute(double itarget, double imaxVel, double kp = 0, double ki = 0, double kd = 0, double kf = 0);
+
+    /**
+     * @brief Turns the robot relative to the current heading
+     * 
+     * @param itarget The target angle
+     * @param imaxVel The max velocity
+     * @param kp The Kp used for the PID; default is 0
+     * @param ki The Ki used for the PID; default is 0
+     * @param kd The Kd used for the PID; default is 0
+     * @param kf The Kf used for the PID; default is 0
+     */
+    void turnRelative(double itarget, double imaxVel, double kp = 0, double ki = 0, double kd = 0, double kf = 0);
 
     void moveToPose(vector<Pose> itargets, vector<MotionLimit> imaxes, vector<MotionLimit> iends, bool backwards = false);
 
@@ -96,7 +130,7 @@ class Chassis {
     /**
      * @brief Get the current coordinates
      * 
-     * @return Pose 
+     * @return The current position coordinates
      */
     Pose getPose();
     /**
@@ -109,7 +143,7 @@ class Chassis {
     /**
      * @brief Get the current tracking wheel measurements
      * 
-     * @return OdomScales 
+     * @return The tracking wheel measurements
      */
     RobotScales getScales();
     /**
@@ -128,12 +162,11 @@ class Chassis {
      *
      * This process should only be done once unless the tracking wheel positions have changed
      * 
-     * @param ichassis Used to turn the robot
      * @param controller Used to determine when the calculations should be done; when the robot is in the correct orientation
      * @param iinertial Used to do the initial turn
      * @return The new measurements; the only updated should be the radii 
      */
-    RobotScales calibrateOdom(Chassis ichassis, pros::Controller controller, pros::IMU iinertial);
+    RobotScales calibrateOdom(pros::Controller controller, Inertial iinertial);
 
     /**
      * @brief Starts the odometry task

@@ -8,7 +8,7 @@
 namespace lamaLib {
 
 /**
- * @brief 
+ * @brief Some values used for odom for organization purposes.
  */
 struct OdomValues {
     double left;
@@ -24,6 +24,15 @@ class Odometry {
      */
     Odometry();
 
+    /**
+     * @brief Updates the position coordinates in chassis
+     * 
+     * @param icurrentPose The current coordinate
+     * @param iscales The robot measurements (wheel diameter, robot radii to the center of the robot, etc.)
+     * @param iencoders The encoder wheels, only used to access their TPR
+     * @param ireadingsDiff The difference in the readings since the last update
+     * @return The updated position coordinate
+     */
     Pose updatePose(Pose icurrentPose, RobotScales iscales, Encoders iencoders, OdomValues ireadingsDiff);
 
     private:

@@ -45,16 +45,15 @@ void Chassis::move(int left, int right) { //uses the pros controller which goes 
     rightMotors.moveVelocity(rightV);
 }
 
-void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<MotionLimit> iends) {
+void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<double> iends) {
     if (idistances.size() != imaxes.size() || idistances.size() != iends.size()) {
         cerr << "Incorrect input sizes, vectors too large\n";
         return;
     }
 
-    MotionProfile profile = lamaLib::generateTrapezoid(imaxes.at(0), {0}, {idistances.at(0), iends.at(0).maxVelocity});
-    for (int i = 1; i < idistances.size(); i++) {
-        profile += lamaLib::generateTrapezoid(imaxes.at(i), {idistances.at(i - 1), iends.at(i - 1).maxVelocity, profile.profile.at(i - 1).time}, {idistances.at(i), iends.at(i).maxVelocity});
-    }
+    MotionProfile profile = lamaLib::generateTrapezoid(imaxes.at(0), {0}, {idistances.at(0), iends.at(0)});
+    for (int i = 1; i < idistances.size(); i++)
+        profile += lamaLib::generateTrapezoid(imaxes.at(i), {idistances.at(i - 1), iends.at(i - 1), profile.profile.at(i - 1).time}, {idistances.at(i), iends.at(i)});
 
     for (MotionData vel : profile.profile) {
         double rpm = vel.velocity * 60 / (PI * wheelCircumference);
@@ -69,8 +68,8 @@ void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes
 
 void Chassis::turnAbsolute(double itarget, double imaxVel, double kp, double ki, double kd, double kf) {
     PIDController pidControl({kp, ki, kd, -100, 100});
-    while (fabs(itarget - chassis.getPose().theta) > 2) {
-        double pid = pidControl.calculatePID(chassis.getPose().theta, itarget, 2);
+    while (fabs(itarget - pose.theta) > 2) {
+        double pid = pidControl.calculatePID(pose.theta, itarget, 2);
 
         double rpm = imaxVel * pid;
         leftMotors.moveVelocity(rpm);
@@ -78,6 +77,10 @@ void Chassis::turnAbsolute(double itarget, double imaxVel, double kp, double ki,
 
         pros::delay(10);
     }
+}
+
+void Chassis::turnRelative(double itarget, double imaxVel, double kp, double ki, double kd, double kf) {
+    turnAbsolute(pose.theta + itarget, imaxVel, kp, ki, kd, kf);
 }
 
 MotorGroup Chassis::getLeftMotors() {
@@ -101,15 +104,22 @@ void Chassis::setPose(Pose ipose) {
     pose = ipose;
 }
 
-RobotScales Chassis::calibrateOdom(Chassis ichassis, pros::Controller controller, pros::IMU iinertial) {
+RobotScales Chassis::getScales() {
+    return scales;
+}
+void Chassis::setScales(RobotScales iscales) {
+    scales = iscales;
+}
+
+RobotScales Chassis::calibrateOdom(pros::Controller controller, Inertial iinertial) {
     uint32_t time = pros::millis();
-    while (iinertial.get_rotation() < 3600) {
-        ichassis.move(200, -200);
+    while (iinertial.getYaw() < 3600) {
+        move(200, -200);
 
         pros::Task::delay_until(&time, 10);
     }
 
-    ichassis.move(0, 0);
+    move(0, 0);
 
     while (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_A)) {
         pros::Task::delay_until(&time, 10);
@@ -124,13 +134,6 @@ RobotScales Chassis::calibrateOdom(Chassis ichassis, pros::Controller controller
     pros::lcd::print(6, "left: %f in   right: %f in", calibratedScales.leftRadius, calibratedScales.rightRadius);
     pros::lcd::print(7, "rear: %f in", calibratedScales.rearRadius);
     return calibratedScales;
-}
-
-RobotScales Chassis::getScales() {
-    return scales;
-}
-void Chassis::setScales(RobotScales iscales) {
-    scales = iscales;
 }
 
 void Chassis::startOdom() {
