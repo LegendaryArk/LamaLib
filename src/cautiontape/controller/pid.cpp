@@ -22,13 +22,12 @@ double PIDController::calculatePID(double current, double target, double leeway)
     prevError = error;
 
     double signal = error * kp + integral * ki + derivative * kd + kf;
-    if (signal > max) {
+    if (signal > max)
         signal = max;
-    } else if (signal < -max) {
+    else if (signal < -max)
         signal = -max;
-    } else {
+    else
         integral = newIntegral;
-    }
 
     return signal;
 }
