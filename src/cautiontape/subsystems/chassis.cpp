@@ -67,7 +67,7 @@ void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes
 }
 
 void Chassis::turnAbsolute(double itarget, double imaxVel, double kp, double ki, double kd, double kf) {
-    PIDController pidControl({kp, ki, kd, -100, 100});
+    PIDController pidControl({kp, ki, kd, kf, 1});
     while (fabs(itarget - pose.theta) > 2) {
         double pid = pidControl.calculatePID(pose.theta, itarget, 2);
 
@@ -81,6 +81,19 @@ void Chassis::turnAbsolute(double itarget, double imaxVel, double kp, double ki,
 
 void Chassis::turnRelative(double itarget, double imaxVel, double kp, double ki, double kd, double kf) {
     turnAbsolute(pose.theta + itarget, imaxVel, kp, ki, kd, kf);
+}
+
+void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, bool reverse) {
+    double angle = reverse ? pose.angleTo(itarget) + 180 : pose.angleTo(itarget);
+    turnRelative(angle, turnVel);
+
+    double totalDist = pose.distTo(itarget);
+    cutoffDists.emplace_back(totalDist);
+    if (reverse) {
+        for (int i = 0; i < cutoffDists.size(); i++)
+            cutoffDists.at(i) = -cutoffDists.at(i);
+    }
+    moveDistance(cutoffDists, imaxes, iends);
 }
 
 MotorGroup Chassis::getLeftMotors() {

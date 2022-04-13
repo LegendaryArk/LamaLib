@@ -18,7 +18,7 @@ double degToRad(double deg);
 double radToDeg(double rad);
 
 /**
- * @brief Returns the sign of the number
+ * @brief Returns the sign of the given number
  * 
  * @param n The number
  * @return 1 for positive, -1 for negative, 0 if n is 0

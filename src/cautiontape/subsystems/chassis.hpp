@@ -97,7 +97,17 @@ class Chassis {
      */
     void turnRelative(double itarget, double imaxVel, double kp = 0, double ki = 0, double kd = 0, double kf = 0);
 
-    void moveToPose(vector<Pose> itargets, vector<MotionLimit> imaxes, vector<MotionLimit> iends, bool backwards = false);
+    /**
+     * @brief Turns the robot to face a given coordinate and moves to that point
+     * 
+     * @param itarget The target point/coordinate
+     * @param turnVel The turn velocity
+     * @param cutoffDists The distances where a cutoff happens, excluding the final point
+     * @param imaxes The max velocities for each profiling segment
+     * @param iends The end velocities for each profiling segment
+     * @param reverse Whether the robot should move forward or backwards to the point. True = backwards, false = forwards
+     */
+    void moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, bool reverse = false);
 
     /**
      * @brief Gets the left motors
