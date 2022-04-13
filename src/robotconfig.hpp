@@ -8,8 +8,9 @@
 #define BACK_ARM 12
 #define CONVEYOR 5
 
-#define FRONT_CLAW 'A'
-#define BACK_CLAW 'B'
+#define FRONT_CLAW 'D'
+#define BACK_BOTTOM_CLAW 'A'
+#define BACK_MAIN_CLAW 'C'
 
 #define LEFT_TRACKING_UPPER 'A'
 #define LEFT_TRACKING_LOWER 'B'

@@ -4,8 +4,8 @@ using namespace std;
 using namespace lamaLib;
 
 Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightmotors, double iwheelCircumference, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightmotors), wheelCircumference(iwheelCircumference), gearset(leftMotors.getGearing(), igearRatio) {
-    leftMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
-    rightMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+    leftMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+    rightMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 }
 
 void Chassis::move(int left, int right) { //uses the pros controller which goes from -127 to 127
