@@ -82,7 +82,7 @@ void opcontrol() {
 		{BOTTOM_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
 	});
 	Encoders trackingWheels {leftMotors.getMotors().at(0).getEncoder(), rightMotors.getMotors().at(0).getEncoder(), {REAR_TRACKING_UPPER, REAR_TRACKING_LOWER}, 900, 900, 360};
-	Chassis chassis(leftMotors, rightMotors, 0.1016, trackingWheels, 5.0 / 3.0);
+	Chassis chassis(leftMotors, rightMotors, 0.1016, trackingWheels, 1);
 
 	MotorGroup frontArm({{FRONT_ARM_LEFT, false, okapi::AbstractMotor::gearset::red},
 						{FRONT_ARM_RIGHT, false, okapi::AbstractMotor::gearset::red}});

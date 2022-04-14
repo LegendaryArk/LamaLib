@@ -9,6 +9,7 @@
 #include "../utilities/chassisdata.hpp"
 #include "../utilities/mathhelper.hpp"
 #include "../utilities/pose.hpp"
+#include <cmath>
 
 namespace lamaLib {
 /**
@@ -53,6 +54,7 @@ class Chassis {
      * @param igearRatio The external gear ratio of the chasssis
      */
     Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double wheelDiameter, Encoders iencoders, double igearRatio = 1);
+    Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double wheelDiameter);
 
     /**
      * @brief Moves the left and right motors when using the controller. The power that is given to the motors are according to the joyMap
