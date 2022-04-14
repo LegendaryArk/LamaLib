@@ -1,6 +1,7 @@
 #pragma once
 
 #include "motor.hpp"
+#include <vector>
 
 namespace lamaLib {
 class MotorGroup {

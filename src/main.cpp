@@ -1,6 +1,6 @@
 #include "main.h"
-#include "api.h"
-#include "okapi/api.hpp"
+//#include "api.h"
+//#include "okapi/api.hpp"
 #include "robotconfig.hpp"
 #include <memory>
 
@@ -81,7 +81,7 @@ void opcontrol() {
 		{TOP_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
 		{BOTTOM_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
 	});
-	Encoders trackingWheels {leftMotors.getMotors().at(0).getEncoder().get(), rightMotors.getMotors().at(0).getEncoder().get(), {REAR_TRACKING_UPPER, REAR_TRACKING_LOWER}, 900, 900, 360};
+	Encoders trackingWheels {leftMotors.getMotors().at(0).getEncoder(), rightMotors.getMotors().at(0).getEncoder(), {REAR_TRACKING_UPPER, REAR_TRACKING_LOWER}, 900, 900, 360};
 	Chassis chassis(leftMotors, rightMotors, 0.1016, trackingWheels, 5.0 / 3.0);
 
 	MotorGroup frontArm({{FRONT_ARM_LEFT, false, okapi::AbstractMotor::gearset::red},
@@ -122,7 +122,7 @@ void opcontrol() {
 		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 		cout << "joycons\n";
-		chassis.move(joyY + joyX, joyY - joyX);
+		//chassis.move(joyY + joyX, joyY - joyX);
 		cout << "move\n";
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
 			if(conveyorDir == 0)
