@@ -2,6 +2,7 @@
 #include "api.h"
 #include "okapi/api.hpp"
 #include "robotconfig.hpp"
+#include <memory>
 
 /**
  * A callback function for LLEMU's center button.
@@ -73,14 +74,24 @@ void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 
 	MotorGroup leftMotors({
-		{TOP_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
-		{BOTTOM_LEFT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
+		{TOP_LEFT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
+		{BOTTOM_LEFT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
 	});
 	MotorGroup rightMotors({
-		{TOP_RIGHT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
-		{BOTTOM_RIGHT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
+		{TOP_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
+		{BOTTOM_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
 	});
-	Chassis chassis(leftMotors, rightMotors, 0.1016, 1);
+	Encoders trackingWheels {leftMotors.getMotors().at(0).getEncoder().get(), rightMotors.getMotors().at(0).getEncoder().get(), {REAR_TRACKING_UPPER, REAR_TRACKING_LOWER}, 900, 900, 360};
+	Chassis chassis(leftMotors, rightMotors, 0.1016, trackingWheels, 5.0 / 3.0);
+
+	MotorGroup frontArm({{FRONT_ARM_LEFT, false, okapi::AbstractMotor::gearset::red},
+						{FRONT_ARM_RIGHT, false, okapi::AbstractMotor::gearset::red}});
+
+	Motor conveyor(CONVEYOR, false, okapi::AbstractMotor::gearset::blue);
+
+	Motor backClaw(BACK_CLAW, false, okapi::AbstractMotor::gearset::red);
+
+	// Pneumatic frontClaw(pros::ADIDigitalOut(FRONT_CLAW));
 
 	// chassis.moveDistance({1}, {{1.5, 1}}, {{0, 0}});
 	
@@ -105,11 +116,42 @@ void opcontrol() {
 	// OdomScales calibrated = odom.calibrate(chassis, master, inertial);
 	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
 
+	int conveyorDir = 0;
 	while (true) {
+		cout << "Op control start\n";
 		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-
+		cout << "joycons\n";
 		chassis.move(joyY + joyX, joyY - joyX);
+		cout << "move\n";
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
+			if(conveyorDir == 0)
+				conveyorDir = 1;
+			else
+				conveyorDir = 0;
+		}
+		else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
+			if(conveyorDir == 0)
+				conveyorDir = -1;
+			else
+				conveyorDir = 0;
+		}
+		conveyor.moveVelocity(600 * conveyorDir);
+		cout << "conveyor\n";
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
+			frontArm.moveVelocity(100);
+		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
+			frontArm.moveVelocity(-100);
+		else
+			frontArm.moveVelocity(0);
+		cout << "front arm\n";
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+			backClaw.moveVelocity(100);
+		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+			backClaw.moveVelocity(-100);
+		else
+			backClaw.moveVelocity(0);
+		cout << "back claw\n";
 		pros::delay(20);
 	}
 }

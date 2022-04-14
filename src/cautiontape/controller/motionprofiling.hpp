@@ -43,6 +43,21 @@ struct MotionProfile {
 struct MotionLimit {
 	double maxVelocity;
 	double maxAcceleration;
+	
+	/**
+	 * @brief Multiplies the max velocities and max accelerations by a factor
+	 * 
+	 * @param rhs The factor
+	 * @return The new MotionLimit with the products
+	 */
+	MotionLimit operator*(double rhs);
+	/**
+	 * @brief Divides the max velocities and max acceleration by a divisor
+	 * 
+	 * @param rhs The divisor
+	 * @return The new MotionLimit with the quotients
+	 */
+	MotionLimit operator/(double rhs);
 };
 
 /**

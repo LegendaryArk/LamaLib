@@ -1,6 +1,8 @@
 #pragma once
 
-#include "okapi/api.hpp"
+#include "okapi/api/device/rotarysensor/continuousRotarySensor.hpp"
+
+using namespace std;
 
 namespace lamaLib {
 /**
@@ -9,7 +11,7 @@ namespace lamaLib {
 struct Encoders {
     okapi::ContinuousRotarySensor *left;
     okapi::ContinuousRotarySensor *right;
-    okapi::ContinuousRotarySensor *rear;
+    pros::ADIEncoder rear;
     double leftTPR;
     double rightTPR;
     double rearTPR;

@@ -15,6 +15,10 @@ void MotorGroup::moveVoltage(int ivolt) {
         motor.moveVoltage(ivolt);
 }
 
+vector<Motor> MotorGroup::getMotors() {
+    return motors;
+}
+
 double MotorGroup::getActualVelocity() {
     return motors.at(0).getActualVelocity();
 }

@@ -48,9 +48,11 @@ class Chassis {
      * 
      * @param ileftMotors Left motors
      * @param irightMotors Right motors
+     * @param wheelDiameter The wheel diameter of the chassis wheels
+     * @param iencoders The encoders used for odom, also includes their TPR
      * @param igearRatio The external gear ratio of the chasssis
      */
-    Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double wheelCircumference, double igearRatio = 1);
+    Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double wheelDiameter, Encoders iencoders, double igearRatio = 1);
 
     /**
      * @brief Moves the left and right motors when using the controller. The power that is given to the motors are according to the joyMap
@@ -191,7 +193,7 @@ class Chassis {
     lamaLib::MotorGroup leftMotors;
     lamaLib::MotorGroup rightMotors;
 
-    double wheelCircumference;
+    double wheelDiameter;
 
     okapi::AbstractMotor::GearsetRatioPair gearset {okapi::AbstractMotor::gearset::green, 1};
 

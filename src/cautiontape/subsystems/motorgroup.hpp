@@ -33,6 +33,13 @@ class MotorGroup {
     double getActualVelocity();
 
     /**
+     * @brief Gets the motors
+     * 
+     * @return A vector containing the motors in the motor group
+     */
+    vector<Motor> getMotors();
+
+    /**
      * @brief Sets the brake mode of the motors
      * 
      * @param ibrakeMode The new brake mode value from okapi that is to be set to the motors

@@ -3,9 +3,11 @@
 using namespace std;
 using namespace lamaLib;
 
-Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightmotors, double iwheelCircumference, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightmotors), wheelCircumference(iwheelCircumference), gearset(leftMotors.getGearing(), igearRatio) {
+Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightmotors, double iwheelDiameter, Encoders iencoders, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightmotors), wheelDiameter(iwheelDiameter), encoders(iencoders), gearset(leftMotors.getGearing(), igearRatio) {
     leftMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
     rightMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+
+    startOdom();
 }
 
 void Chassis::move(int left, int right) { //uses the pros controller which goes from -127 to 127
@@ -47,16 +49,16 @@ void Chassis::move(int left, int right) { //uses the pros controller which goes 
 
 void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<double> iends) {
     if (idistances.size() != imaxes.size() || idistances.size() != iends.size()) {
-        cerr << "Incorrect input sizes, vectors too large\n";
+        cerr << "Incorrect input sizes, vectors different sizes\n";
         return;
     }
 
-    MotionProfile profile = lamaLib::generateTrapezoid(imaxes.at(0), {0}, {idistances.at(0), iends.at(0)});
+    MotionProfile profile = lamaLib::generateTrapezoid(imaxes.at(0) / gearset.ratio, {0}, {idistances.at(0) / gearset.ratio, iends.at(0) / gearset.ratio});
     for (int i = 1; i < idistances.size(); i++)
-        profile += lamaLib::generateTrapezoid(imaxes.at(i), {idistances.at(i - 1), iends.at(i - 1), profile.profile.at(i - 1).time}, {idistances.at(i), iends.at(i)});
+        profile += lamaLib::generateTrapezoid(imaxes.at(i) / gearset.ratio, {idistances.at(i - 1) / gearset.ratio, iends.at(i - 1), profile.profile.at(i - 1).time / gearset.ratio}, {idistances.at(i) / gearset.ratio, iends.at(i) / gearset.ratio});
 
     for (MotionData vel : profile.profile) {
-        double rpm = vel.velocity * 60 / (PI * wheelCircumference);
+        double rpm = vel.velocity * 60 / (M_PI * wheelDiameter);
         cout << rpm << "\n";
 
         leftMotors.moveVelocity(rpm);
@@ -107,7 +109,7 @@ Encoders Chassis::getTrackingWheels() {
     return encoders;
 }
 EncoderValues Chassis::getEncoders() {
-    return {encoders.left->get(), encoders.right->get(), encoders.rear->get()};
+    return {encoders.left->get(), encoders.right->get(), (double) encoders.rear.get_value()};
 }
 
 Pose Chassis::getPose() {
@@ -125,6 +127,8 @@ void Chassis::setScales(RobotScales iscales) {
 }
 
 RobotScales Chassis::calibrateOdom(pros::Controller controller, Inertial iinertial) {
+    endOdom();
+
     uint32_t time = pros::millis();
     while (iinertial.getYaw() < 3600) {
         move(200, -200);
@@ -156,7 +160,7 @@ void Chassis::endOdom() {
     pros::c::task_delete(odomTask);
 }
 
-void odometryMain(void *iparam) {
+void lamaLib::odometryMain(void *iparam) {
     Odometry odom = {};
 
     EncoderValues currReadings = chassis.getEncoders();

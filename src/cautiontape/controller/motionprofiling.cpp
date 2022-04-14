@@ -8,6 +8,13 @@ void MotionProfile::operator+=(MotionProfile rhs) {
 		profile.emplace_back(data);
 }
 
+MotionLimit MotionLimit::operator*(double rhs) {
+	return {maxVelocity * rhs, maxAcceleration * rhs};
+}
+MotionLimit MotionLimit::operator/(double rhs) {
+	return {maxVelocity / rhs, maxAcceleration / rhs};
+}
+
 MotionProfile lamaLib::generateTrapezoid(MotionLimit imotionLimit, CutoffPoint istart, CutoffPoint iend) {
 	MotionProfile trapezoid = {};
 	trapezoid.profile = vector<MotionData>();
