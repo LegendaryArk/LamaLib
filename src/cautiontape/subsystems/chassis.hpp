@@ -68,9 +68,9 @@ class Chassis {
      *
      * Has cutoff implemented
      * 
-     * @param idistances The distances where cutoff is; the last one should be the total distance; accumulative
-     * @param imaxes The different max velocities and max accelerations for each cutoff segment
-     * @param iends The different end velocities for each cutoff segment
+     * @param idistances The distances where cutoff is in m; the last one should be the total distance; accumulative
+     * @param imaxes The different max velocities and max accelerations for each cutoff segment in m/s and m/s2 respectively
+     * @param iends The different end velocities for each cutoff segment in m/s
      */
     void moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<double> iends);
 
@@ -79,38 +79,33 @@ class Chassis {
      *
      * Uses odometry heading
      * 
-     * @param itarget The target angle
-     * @param imaxVel The max velocity
-     * @param kp The Kp used for the PID; default is 0
-     * @param ki The Ki used for the PID; default is 0
-     * @param kd The Kd used for the PID; default is 0
-     * @param kf The Kf used for the PID; default is 0
+     * @param itarget The target angle in deg
+     * @param imaxVel The max velocity in m/s
+     * @param pidVals The Kpk Ki, Kd, and Kf used for the PID; default is all 0
      */
-    void turnAbsolute(double itarget, double imaxVel, double kp = 0, double ki = 0, double kd = 0, double kf = 0);
+    void turnAbsolute(double itarget, double imaxVel, PIDValues pidVals = {0, 0, 0, 0});
 
     /**
      * @brief Turns the robot relative to the current heading
      * 
-     * @param itarget The target angle
-     * @param imaxVel The max velocity
-     * @param kp The Kp used for the PID; default is 0
-     * @param ki The Ki used for the PID; default is 0
-     * @param kd The Kd used for the PID; default is 0
-     * @param kf The Kf used for the PID; default is 0
+     * @param itarget The target angle in deg
+     * @param imaxVel The max velocity in m/s
+     * @param pidVals The Kp, Ki, Kd and Kf used for the PID, default is all 0
      */
-    void turnRelative(double itarget, double imaxVel, double kp = 0, double ki = 0, double kd = 0, double kf = 0);
+    void turnRelative(double itarget, double imaxVel, PIDValues pidVals = {0, 0, 0, 0});
 
     /**
      * @brief Turns the robot to face a given coordinate and moves to that point
      * 
-     * @param itarget The target point/coordinate
-     * @param turnVel The turn velocity
-     * @param cutoffDists The distances where a cutoff happens, excluding the final point
-     * @param imaxes The max velocities for each profiling segment
-     * @param iends The end velocities for each profiling segment
+     * @param itarget The target point/coordinate (x, y, theta)
+     * @param turnVel The turn velocity in m/s
+     * @param cutoffDists The distances where a cutoff happens, excluding the final point in m
+     * @param imaxes The max velocities for each profiling segment in m/s and m/s2 respecitvely
+     * @param iends The end velocities for each profiling segment in m/s
+     * @param turnPID The Kp, Ki, Kd, and Kf used in the turn, default is all 0
      * @param reverse Whether the robot should move forward or backwards to the point. True = backwards, false = forwards
      */
-    void moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, bool reverse = false);
+    void moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID = {0, 0, 0, 0}, bool reverse = false);
 
     /**
      * @brief Gets the left motors
@@ -177,7 +172,7 @@ class Chassis {
      * 
      * @param controller Used to determine when the calculations should be done; when the robot is in the correct orientation
      * @param iinertial Used to do the initial turn
-     * @return The new measurements; the only updated should be the radii 
+     * @return The new measurements; the only updated should be the radii; the measurements should already be updated
      */
     RobotScales calibrateOdom(pros::Controller controller, Inertial iinertial);
 

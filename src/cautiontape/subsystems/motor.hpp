@@ -9,6 +9,7 @@
 using namespace std;
 
 namespace lamaLib {
+
 class Motor: public okapi::Motor {
     public:
     Motor(int8_t port);
@@ -24,17 +25,11 @@ class Motor: public okapi::Motor {
     /**
      * @brief Sets the PID values for moveVelocity
      * 
-     * @param kp The Kp that is used for proportional
-     * @param ki The Ki that is used for integral
-     * @param kd The Kd that is used for derivative
-     * @param kf The Kf that is used for feed forward
+     * @param velPID The kp, ki, kd, and kf; default is 0
      */
-    void setVelocityPID(double kp, double ki, double kd, double kf);
+    void setVelocityPID(PIDValues velPID);
 
     private:
-    double velKp {0};
-    double velKi {0};
-    double velKd {0};
-    double velKf {0};
+    PIDValues velPID {0, 0, 0, 0};
 };
 } // namespace lamaLib

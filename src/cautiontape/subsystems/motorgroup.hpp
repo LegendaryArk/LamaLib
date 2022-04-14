@@ -41,6 +41,13 @@ class MotorGroup {
     vector<Motor> getMotors();
 
     /**
+     * @brief Sets the PID values for moveVelocity
+     * 
+     * @param velPID The kp, ki, kd, and kf; default is 0
+     */
+    void setMotorVelPID(PIDValues velPID);
+
+    /**
      * @brief Sets the brake mode of the motors
      * 
      * @param ibrakeMode The new brake mode value from okapi that is to be set to the motors

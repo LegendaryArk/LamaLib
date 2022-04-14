@@ -19,6 +19,11 @@ vector<Motor> MotorGroup::getMotors() {
     return motors;
 }
 
+void MotorGroup::setMotorVelPID(PIDValues velPID) {
+    for (Motor motor : motors)
+        motor.setVelocityPID(velPID);
+}
+
 double MotorGroup::getActualVelocity() {
     return motors.at(0).getActualVelocity();
 }

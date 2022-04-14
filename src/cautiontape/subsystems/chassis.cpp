@@ -68,26 +68,26 @@ void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes
     }
 }
 
-void Chassis::turnAbsolute(double itarget, double imaxVel, double kp, double ki, double kd, double kf) {
-    PIDController pidControl({kp, ki, kd, kf, 1});
+void Chassis::turnAbsolute(double itarget, double imaxVel, PIDValues pidVals) {
+    PIDController pidControl(pidVals, 1);
     while (fabs(itarget - pose.theta) > 2) {
         double pid = pidControl.calculatePID(pose.theta, itarget, 2);
 
-        double rpm = imaxVel * pid;
-        leftMotors.moveVelocity(rpm);
-        rightMotors.moveVelocity(-rpm);
+        double rpm = imaxVel  * 60 / (M_PI * wheelDiameter);
+        leftMotors.moveVelocity(rpm * pid);
+        rightMotors.moveVelocity(-rpm * pid);
 
         pros::delay(10);
     }
 }
 
-void Chassis::turnRelative(double itarget, double imaxVel, double kp, double ki, double kd, double kf) {
-    turnAbsolute(pose.theta + itarget, imaxVel, kp, ki, kd, kf);
+void Chassis::turnRelative(double itarget, double imaxVel, PIDValues pidVals) {
+    turnAbsolute(pose.theta + itarget, imaxVel, pidVals);
 }
 
-void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, bool reverse) {
+void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID, bool reverse) {
     double angle = reverse ? pose.angleTo(itarget) + 180 : pose.angleTo(itarget);
-    turnRelative(angle, turnVel);
+    turnRelative(angle, turnVel, turnPID);
 
     double totalDist = pose.distTo(itarget);
     cutoffDists.emplace_back(totalDist);
@@ -150,6 +150,7 @@ RobotScales Chassis::calibrateOdom(pros::Controller controller, Inertial iinerti
     pros::lcd::print(5, "Calibrated radii:");
     pros::lcd::print(6, "left: %f in   right: %f in", calibratedScales.leftRadius, calibratedScales.rightRadius);
     pros::lcd::print(7, "rear: %f in", calibratedScales.rearRadius);
+    setScales(calibratedScales);
     return calibratedScales;
 }
 

@@ -28,7 +28,7 @@ MotorGroup rightMotors({
 	{BOTTOM_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
 });
 Encoders trackingWheels {leftMotors.getMotors().at(0).getEncoder().get(), rightMotors.getMotors().at(0).getEncoder().get(), {REAR_TRACKING_UPPER, REAR_TRACKING_LOWER}, 900, 900, 360};
-Chassis lamaLib::chassis(leftMotors, rightMotors, 0.1016, trackingWheels, 1);
+Chassis lamaLib::chassis(leftMotors, rightMotors, 0.1016, trackingWheels, 5.0 / 3.0);
 
 void initialize() {
 	pros::lcd::initialize();
@@ -94,8 +94,6 @@ void opcontrol() {
 	Motor backClaw(BACK_CLAW, false, okapi::AbstractMotor::gearset::red);
 
 	// Pneumatic frontClaw(pros::ADIDigitalOut(FRONT_CLAW));
-
-	// chassis.moveDistance({1}, {{1.5, 1}}, {{0, 0}});
 	
 	// MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
 	// MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});
@@ -115,8 +113,26 @@ void opcontrol() {
 	// 	pros::delay(20);
 	// }
 
-	// OdomScales calibrated = odom.calibrate(chassis, master, inertial);
-	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
+	// Odom calibrate
+	RobotScales calibrated = chassis.calibrateOdom(master, inertial);
+	cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
+
+	// Move velocity test
+	chassis.getLeftMotors().setMotorVelPID({0.005, 0.0001, 0, 1});
+	chassis.getRightMotors().setMotorVelPID({0.005, 0.0001, 0, 1});
+	chassis.getLeftMotors().moveVelocity(200);
+	chassis.getRightMotors().moveVelocity(200);
+
+	// Move distance test
+	chassis.moveDistance({1}, {{1.5, 1}}, {0});
+	chassis.moveDistance({-1}, {{1.5, 1}}, {0});
+	chassis.moveDistance({1, 1.5, 2.5}, {{1.5, 1}, {0.5, 0.5}, {1, 0.7}}, {0.5, 1, 0});
+
+	// Turn test
+	chassis.turnAbsolute(90, 1.5, {0.05, 0.001, 0.02, 1});
+	chassis.turnAbsolute(-90, 1.5, {0.05, 0.001, 0.02, 1});
+	chassis.turnRelative(90, 1.5, {0.05, 0.001, 0.02, 1});
+	chassis.turnRelative(-90, 1.5, {0.05, 0.001, 0.02, 1});
 
 	int conveyorDir = 0;
 	while (true) {
