@@ -1,5 +1,4 @@
 #include "motorgroup.hpp"
-#include "okapi/api/device/motor/abstractMotor.hpp"
 
 using namespace std;
 using namespace lamaLib;

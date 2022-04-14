@@ -1,5 +1,6 @@
 #include "motor.hpp"
 
+using namespace std;
 using namespace lamaLib;
 
 Motor::Motor(int8_t port) : okapi::Motor(port) {}

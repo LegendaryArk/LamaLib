@@ -3,6 +3,8 @@
 #include "motor.hpp"
 #include <vector>
 
+using namespace std;
+
 namespace lamaLib {
 class MotorGroup {
     public:
@@ -11,7 +13,7 @@ class MotorGroup {
      * 
      * @param imotors A vector of the motors that are in the group
      */
-    MotorGroup(std::vector<Motor> imotors);
+    MotorGroup(vector<Motor> imotors);
 
     /**
      * @brief Sets all the motors to a specific velocity with a built-in PID
@@ -74,6 +76,6 @@ class MotorGroup {
     okapi::AbstractMotor::gearset getGearing();
 
     private:
-    std::vector<Motor> motors;
+    vector<Motor> motors;
 };
 } // namespace lamaLib

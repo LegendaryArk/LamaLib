@@ -1,5 +1,6 @@
 #include "pid.hpp"
 
+using namespace std;
 using namespace lamaLib;
 
 PIDController::PIDController(PIDValues pidValues, double max, double iComp) :

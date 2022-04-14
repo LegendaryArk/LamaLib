@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-using namespace std;
-
 namespace lamaLib {
 struct PIDValues {
     double kp;

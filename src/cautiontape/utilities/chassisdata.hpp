@@ -2,8 +2,6 @@
 
 #include "okapi/api/device/rotarysensor/continuousRotarySensor.hpp"
 
-using namespace std;
-
 namespace lamaLib {
 /**
  * @brief Tracking wheels that are used in odom and their TPR

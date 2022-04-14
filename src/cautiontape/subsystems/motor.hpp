@@ -6,8 +6,6 @@
 #define YINTERCEPT -8.0757575
 #define SLOPE 0.0197937062
 
-using namespace std;
-
 namespace lamaLib {
 
 class Motor: public okapi::Motor {
