@@ -10,8 +10,6 @@ Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double iwheelD
     startOdom();
 }
 
-Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double iwheelDiameter) : leftMotors(ileftMotors), rightMotors(irightMotors), wheelDiameter(iwheelDiameter) {}
-
 void Chassis::move(int left, int right) { //uses the pros controller which goes from -127 to 127
     int aleft = abs(left);
     int aright = abs(right);
