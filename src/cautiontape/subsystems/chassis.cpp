@@ -3,7 +3,7 @@
 using namespace std;
 using namespace lamaLib;
 
-Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double iwheelDiameter, Encoders iencoders, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightMotors), wheelDiameter(iwheelDiameter), encoders(iencoders), gearset(leftMotors.getGearing(), igearRatio) {
+Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightmotors, double iwheelDiameter, Encoders iencoders, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightmotors), wheelDiameter(iwheelDiameter), encoders(iencoders), gearset(leftMotors.getGearing(), igearRatio) {
     leftMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
     rightMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 }
