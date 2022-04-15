@@ -58,8 +58,9 @@ class Chassis {
      * @param wheelDiameter The wheel diameter of the chassis wheels
      * @param iencoders The encoders used for odom, also includes their TPR
      * @param igearRatio The external gear ratio of the chasssis
+     * @param iinterval The interval between slew rate calculations
      */
-    Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double wheelDiameter, Encoders iencoders, double igearRatio = 1);
+    Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double wheelDiameter, Encoders iencoders, int iinterval, double igearRatio = 1);
 
     /**
      * @brief Moves the left and right motors when using the controller. The power that is given to the motors are according to the joyMap
@@ -186,6 +187,30 @@ class Chassis {
     RobotScales calibrateOdom(pros::Controller controller, Inertial iinertial);
 
     /**
+     * @brief Calculates slew rate for left motor inputs
+     * WARNING, ALWAYS RUN rcalcSlew AND lcalcSlew IN THE SAME LOOP OR ELSE THE 
+     * INTERVAL WON't UPDATE PROPERLY
+     * 
+     * @param itarget The controller input that is fed into the slew rate
+     * @param istep The step in between motor inputs
+     *
+     * @return Motor input with slew
+     */
+    int lcalcSlew(int itarget, int istep);
+
+    /**
+     * @brief Calculates slew rate for right motor inputs
+     * WARNING, ALWAYS RUN rcalcSlew AND lcalcSlew IN THE SAME LOOP OR ELSE THE 
+     * INTERVAL WON't UPDATE PROPERLY
+     * 
+     * @param itarget The controller input that is fed into the slew rate
+     * @param istep The step in between motor inputs
+     *
+     * @return Motor input with slew
+     */
+    int rcalcSlew(int itarget, int istep);
+
+    /**
      * @brief Starts the odometry task
      */
     void startOdom();
@@ -195,6 +220,10 @@ class Chassis {
     void endOdom();
     
     private:
+    int counter;
+    int interval;
+    int previousOutputL = 0;
+    int previousOutputR = 0;
     MotorGroup leftMotors;
     MotorGroup rightMotors;
     map<string, MotorROC> leftROCs;
