@@ -3,7 +3,8 @@
 using namespace std;
 using namespace lamaLib;
 
-Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightmotors, double iwheelDiameter, Encoders iencoders, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightmotors), wheelDiameter(iwheelDiameter), encoders(iencoders), gearset(leftMotors.getGearing(), igearRatio) {
+Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double iwheelDiameter, Encoders iencoders, int iinterval, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightMotors), wheelDiameter(iwheelDiameter), encoders(iencoders), gearset(leftMotors.getGearing(), igearRatio) {
+    interval = iinterval;
     leftMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
     rightMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 }
@@ -164,6 +165,42 @@ RobotScales Chassis::calibrateOdom(pros::Controller controller, Inertial iinerti
     pros::lcd::print(7, "rear: %f in", calibratedScales.rearRadius);
     setScales(calibratedScales);
     return calibratedScales;
+}
+
+int Chassis::lCalcSlew(int itarget, int istep){
+    if(counter < interval){
+        counter++;
+        return previousOutputL;
+    }
+    else{
+        int output;
+        if(abs(itarget - previousOutputL) > istep){
+            output = previousOutputL + (sign(itarget-previousOutputL))*istep;
+        }
+        else{
+            output = itarget;
+        }
+        previousOutputL = output;
+        counter = 0;
+        return output;
+    }
+}
+
+int Chassis::rCalcSlew(int itarget, int istep){
+    if(counter < interval){
+        return previousOutputR;
+    }
+    else{
+        int output;
+        if(abs(itarget - previousOutputR) > istep){
+            output = previousOutputR + (sign(itarget-previousOutputR))*istep;
+        }
+        else{
+            output = itarget;
+        }
+        previousOutputR = output;
+        return output;
+    }
 }
 
 void Chassis::startOdom() {
