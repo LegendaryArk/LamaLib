@@ -25,9 +25,9 @@ class Motor: public okapi::Motor {
      * 
      * @param velPID The kp, ki, kd, and kf; default is 0
      */
-    void setVelocityPID(PIDValues velPID);
+    void setVelocityPID(PIDValues ivelPID);
 
     private:
-    PIDValues velPID {0, 0, 0, 0};
+    PIDController pidControl {{0, 0, 0, 0}, 1};
 };
 } // namespace lamaLib

@@ -97,25 +97,32 @@ void opcontrol() {
 	// }
 
 	// Odom calibrate
-	RobotScales calibrated = chassis.calibrateOdom(master, inertial);
-	cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
+	// RobotScales calibrated = chassis.calibrateOdom(master, inertial);
+	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
 
 	// Move velocity test
 	chassis.getLeftMotors().setMotorVelPID({0.005, 0.0001, 0, 1});
 	chassis.getRightMotors().setMotorVelPID({0.005, 0.0001, 0, 1});
-	chassis.getLeftMotors().moveVelocity(200);
-	chassis.getRightMotors().moveVelocity(200);
+	int count = 0;
+	while (count < 200) {
+		leftMotors.moveVelocity(200);
+		rightMotors.moveVelocity(200);
+		count++;
+		pros::delay(10);
+	}
+	leftMotors.moveVelocity(0);
+	rightMotors.moveVelocity(0);
 
-	// Move distance test
-	chassis.moveDistance({1}, {{1.5, 1}}, {0});
-	chassis.moveDistance({-1}, {{1.5, 1}}, {0});
-	chassis.moveDistance({1, 1.5, 2.5}, {{1.5, 1}, {0.5, 0.5}, {1, 0.7}}, {0.5, 1, 0});
+	// // Move distance test
+	// chassis.moveDistance({1}, {{1.5, 1}}, {0});
+	// chassis.moveDistance({-1}, {{1.5, 1}}, {0});
+	// chassis.moveDistance({1, 1.5, 2.5}, {{1.5, 1}, {0.5, 0.5}, {1, 0.7}}, {0.5, 1, 0});
 
-	// Turn test
-	chassis.turnAbsolute(90, 1.5, {0.05, 0.001, 0.02, 1});
-	chassis.turnAbsolute(-90, 1.5, {0.05, 0.001, 0.02, 1});
-	chassis.turnRelative(90, 1.5, {0.05, 0.001, 0.02, 1});
-	chassis.turnRelative(-90, 1.5, {0.05, 0.001, 0.02, 1});
+	// // Turn test
+	// chassis.turnAbsolute(90, 1.5, {0.05, 0.001, 0.02, 1});
+	// chassis.turnAbsolute(-90, 1.5, {0.05, 0.001, 0.02, 1});
+	// chassis.turnRelative(90, 1.5, {0.05, 0.001, 0.02, 1});
+	// chassis.turnRelative(-90, 1.5, {0.05, 0.001, 0.02, 1});
 
 	int conveyorDir = 0;
 	while (true) {

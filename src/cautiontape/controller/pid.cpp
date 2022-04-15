@@ -1,4 +1,5 @@
 #include "pid.hpp"
+#include <iostream>
 
 using namespace std;
 using namespace lamaLib;
@@ -30,6 +31,7 @@ double PIDController::calculatePID(double current, double target, double leeway)
     else
         integral = newIntegral;
 
+    cout << error << "\t" << integral << "\t" << derivative << "\t" << signal << "\n";
     return signal;
 }
 

@@ -12,7 +12,7 @@ struct PIDValues {
 
 class PIDController {
     public:
-    PIDController(PIDValues pidValues, double max, double iComp = 10);
+    PIDController(PIDValues pidValues, double max = 1, double iComp = 10);
 
     double calculatePID(double current, double target, double leeway);
     void asyncPID(double current, double target, double leeway);

@@ -11,22 +11,14 @@ okapi::Motor (port, reverse, igearset, encoderUnits) {
 }
 
 int32_t Motor::moveVelocity(int16_t ivelocity) {
-    PIDController pidControl({velPID.kp, velPID.ki, velPID.kd, velPID.kf}, 1);
+    double volt = (ivelocity - YINTERCEPT) / SLOPE;
+    
+    double signal = pidControl.calculatePID(getActualVelocity(), ivelocity, 2);
+    moveVoltage(volt * signal);
+    cout << volt << "\t" << signal << "\t" << getActualVelocity() << "\n";
 
-    while (fabs(getActualVelocity() - ivelocity) < 2) {
-        double signal = pidControl.calculatePID(getActualVelocity(), ivelocity, 2);
-        double volt = (ivelocity - YINTERCEPT) / SLOPE;
-
-        moveVoltage(volt * signal);
-
-        cout << "rpm: " << getActualVelocity();
-
-        pros::delay(20);
-    }
-
-    moveVoltage(0);
     return 0;
 }
-void Motor::setVelocityPID(PIDValues velPID) {
-    this->velPID = velPID;
+void Motor::setVelocityPID(PIDValues ivelPID) {
+    pidControl.updatePID(ivelPID);
 }

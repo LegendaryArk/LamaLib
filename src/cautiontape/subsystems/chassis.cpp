@@ -4,10 +4,8 @@ using namespace std;
 using namespace lamaLib;
 
 Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double iwheelDiameter, Encoders iencoders, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightMotors), wheelDiameter(iwheelDiameter), encoders(iencoders), gearset(leftMotors.getGearing(), igearRatio) {
-    leftMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
-    rightMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
-
-    startOdom();
+    leftMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+    rightMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 }
 
 void Chassis::move(int left, int right) { //uses the pros controller which goes from -127 to 127
@@ -127,8 +125,6 @@ void Chassis::setScales(RobotScales iscales) {
 }
 
 RobotScales Chassis::calibrateOdom(pros::Controller controller, Inertial iinertial) {
-    endOdom();
-
     uint32_t time = pros::millis();
     while (iinertial.getYaw() < 3600) {
         move(200, -200);
