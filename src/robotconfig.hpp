@@ -7,7 +7,7 @@
 #define FRONT_ARM_RIGHT 2
 #define CONVEYOR 11
 
-#define FRONT_CLAW 'A'
+#define FRONT_CLAW 'C'
 #define BACK_CLAW 13
 
 #define REAR_TRACKING_UPPER 'A'

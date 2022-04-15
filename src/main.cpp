@@ -76,7 +76,7 @@ void opcontrol() {
 
 	Motor backClaw(BACK_CLAW, false, okapi::AbstractMotor::gearset::red);
 
-	// Pneumatic frontClaw(pros::ADIDigitalOut(FRONT_CLAW));
+	Pneumatic frontClaw(pros::ADIDigitalOut(FRONT_CLAW));
 	
 	// MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
 	// MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});
@@ -101,26 +101,26 @@ void opcontrol() {
 	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
 
 	// Move velocity test
-	int count = 0;
-	double leftSum = 0, rightSum = 0;
-	while (count < 200) {
-		leftMotors.moveVelocity(100, 0.189, -19.191);
-		rightMotors.moveVelocity(100, 0.018, -20.053);
-		cout << leftMotors.getActualVelocity() << "\n";
-		count++;
-		pros::delay(10);
-	}
-	leftMotors.moveVelocity(0, 1, 0);
-	rightMotors.moveVelocity(0, 1, 0);
-	pros::delay(1000);
-	while (count < 400) {
-		leftMotors.moveVoltage(-2000);
-		rightMotors.moveVoltage(-2000);
-		count++;
-		pros::delay(10);
-	}
-	leftMotors.moveVelocity(0, 1, 0);
-	rightMotors.moveVelocity(0, 1, 0);
+	// int count = 0;
+	// double leftSum = 0, rightSum = 0;
+	// while (count < 200) {
+	// 	leftMotors.moveVelocity(100, 0.189, -19.191);
+	// 	rightMotors.moveVelocity(100, 0.018, -20.053);
+	// 	cout << leftMotors.getActualVelocity() << "\n";
+	// 	count++;
+	// 	pros::delay(10);
+	// }
+	// leftMotors.moveVelocity(0, 1, 0);
+	// rightMotors.moveVelocity(0, 1, 0);
+	// pros::delay(1000);
+	// while (count < 400) {
+	// 	leftMotors.moveVoltage(-2000);
+	// 	rightMotors.moveVoltage(-2000);
+	// 	count++;
+	// 	pros::delay(10);
+	// }
+	// leftMotors.moveVelocity(0, 1, 0);
+	// rightMotors.moveVelocity(0, 1, 0);
 	// // Move distance test
 	// chassis.moveDistance({1}, {{1.5, 1}}, {0});
 	// chassis.moveDistance({-1}, {{1.5, 1}}, {0});
@@ -132,42 +132,45 @@ void opcontrol() {
 	// chassis.turnRelative(90, 1.5, {0.05, 0.001, 0.02, 1});
 	// chassis.turnRelative(-90, 1.5, {0.05, 0.001, 0.02, 1});
 
-	// int conveyorDir = 0;
-	// while (true) {
+	int conveyorDir = 0;
+	while (true) {
 		
-	// 	int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-	// 	int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 		
-	// 	chassis.move(joyY + joyX, joyY - joyX);
+		chassis.move(joyY + joyX, joyY - joyX);
+
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
+			frontClaw.toggle();
 		
-	// 	if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
-	// 		if(conveyorDir == 0)
-	// 			conveyorDir = 1;
-	// 		else
-	// 			conveyorDir = 0;
-	// 	}
-	// 	else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
-	// 		if(conveyorDir == 0)
-	// 			conveyorDir = -1;
-	// 		else
-	// 			conveyorDir = 0;
-	// 	}
-	// 	conveyor.moveVelocity(600 * conveyorDir);
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
+			if(conveyorDir == 0)
+				conveyorDir = 1;
+			else
+				conveyorDir = 0;
+		}
+		else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
+			if(conveyorDir == 0)
+				conveyorDir = -1;
+			else
+				conveyorDir = 0;
+		}
+		conveyor.moveVelocity(600 * conveyorDir);
 		
-	// 	if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
-	// 		frontArm.moveVelocity(100);
-	// 	else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
-	// 		frontArm.moveVelocity(-100);
-	// 	else
-	// 		frontArm.moveVelocity(0);
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
+			frontArm.moveVelocity(100);
+		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
+			frontArm.moveVelocity(-100);
+		else
+			frontArm.moveVelocity(0);
 		
-	// 	if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
-	// 		backClaw.moveVelocity(100);
-	// 	else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
-	// 		backClaw.moveVelocity(-100);
-	// 	else
-	// 		backClaw.moveVelocity(0);
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+			backClaw.moveVelocity(100);
+		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+			backClaw.moveVelocity(-100);
+		else
+			backClaw.moveVelocity(0);
 		
-	// 	pros::delay(20);
-	// }
+		pros::delay(20);
+	}
 }

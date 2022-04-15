@@ -20,7 +20,7 @@ class MotorGroup {
      * 
      * @param ivel The desired velocity in rpm
      */
-    void moveVelocity(int ivel, double slope, double yintercept);
+    void moveVelocity(int ivel, double slope = 1, double yintercept = 0);
     /**
      * @brief Sets all the motors to a specific voltage
      * 

@@ -19,7 +19,7 @@ class Motor: public okapi::Motor {
      * 
      * @param ivelocity The desired velocity
      */
-    void moveVelocity(int ivelocity, double slope, double yIntercept);
+    void moveVelocity(int ivelocity, double slope = 1, double yIntercept = 0);
     /**
      * @brief Sets the PID values for moveVelocity
      * 
