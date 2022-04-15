@@ -20,7 +20,7 @@ class MotorGroup {
      * 
      * @param ivel The desired velocity in rpm
      */
-    void moveVelocity(int ivel);
+    void moveVelocity(int ivel, double slope, double yintercept);
     /**
      * @brief Sets all the motors to a specific voltage
      * 
@@ -47,7 +47,7 @@ class MotorGroup {
      * 
      * @param velPID The kp, ki, kd, and kf; default is 0
      */
-    void setMotorVelPID(PIDValues velPID);
+    void setVelocityPID(PIDValues velPID);
 
     /**
      * @brief Sets the brake mode of the motors

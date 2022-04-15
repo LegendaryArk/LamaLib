@@ -10,6 +10,7 @@
 #include "../utilities/mathhelper.hpp"
 #include "../utilities/pose.hpp"
 #include <cmath>
+#include <map>
 
 namespace lamaLib {
 /**
@@ -19,6 +20,11 @@ struct EncoderValues {
     double left;
     double right;
     double rear;
+};
+
+struct MotorROC {
+    double slope;
+    double yIntercept;
 };
 
 /**
@@ -72,7 +78,7 @@ class Chassis {
      * @param imaxes The different max velocities and max accelerations for each cutoff segment in m/s and m/s2 respectively
      * @param iends The different end velocities for each cutoff segment in m/s
      */
-    void moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<double> iends);
+    void moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<double> iends, string rocKey);
 
     /**
      * @brief Turns the robot relative to the starting heading at the beginning of the program
@@ -83,7 +89,7 @@ class Chassis {
      * @param imaxVel The max velocity in m/s
      * @param pidVals The Kpk Ki, Kd, and Kf used for the PID; default is all 0
      */
-    void turnAbsolute(double itarget, double imaxVel, PIDValues pidVals = {0, 0, 0, 0});
+    void turnAbsolute(double itarget, double imaxVel, string rocKey, PIDValues pidVals = {0, 0, 0, 0});
 
     /**
      * @brief Turns the robot relative to the current heading
@@ -92,7 +98,7 @@ class Chassis {
      * @param imaxVel The max velocity in m/s
      * @param pidVals The Kp, Ki, Kd and Kf used for the PID, default is all 0
      */
-    void turnRelative(double itarget, double imaxVel, PIDValues pidVals = {0, 0, 0, 0});
+    void turnRelative(double itarget, double imaxVel, string rocKey, PIDValues pidVals = {0, 0, 0, 0});
 
     /**
      * @brief Turns the robot to face a given coordinate and moves to that point
@@ -105,7 +111,10 @@ class Chassis {
      * @param turnPID The Kp, Ki, Kd, and Kf used in the turn, default is all 0
      * @param reverse Whether the robot should move forward or backwards to the point. True = backwards, false = forwards
      */
-    void moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID = {0, 0, 0, 0}, bool reverse = false);
+    void moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, string rocKey, PIDValues turnPID = {0, 0, 0, 0}, bool reverse = false);
+
+    void addLeftROC(string key, MotorROC roc);
+    void addRightROC(string key, MotorROC roc);
 
     /**
      * @brief Gets the left motors
@@ -186,8 +195,10 @@ class Chassis {
     void endOdom();
     
     private:
-    lamaLib::MotorGroup leftMotors;
-    lamaLib::MotorGroup rightMotors;
+    MotorGroup leftMotors;
+    MotorGroup rightMotors;
+    map<string, MotorROC> leftROCs;
+    map<string, MotorROC> rightROCs;
 
     double wheelDiameter;
 

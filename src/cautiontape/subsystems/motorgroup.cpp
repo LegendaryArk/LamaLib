@@ -5,9 +5,9 @@ using namespace lamaLib;
 
 MotorGroup::MotorGroup(vector<Motor> imotors) : motors(imotors) {}
 
-void MotorGroup::moveVelocity(int ivel) {
+void MotorGroup::moveVelocity(int ivel, double slope, double yIntercept) {
     for (Motor motor : motors)
-        motor.moveVelocity(ivel);
+        motor.moveVelocity(ivel, slope, yIntercept);
 }
 void MotorGroup::moveVoltage(int ivolt) {
     for (Motor motor : motors)
@@ -18,7 +18,7 @@ vector<Motor> MotorGroup::getMotors() {
     return motors;
 }
 
-void MotorGroup::setMotorVelPID(PIDValues velPID) {
+void MotorGroup::setVelocityPID(PIDValues velPID) {
     for (Motor motor : motors)
         motor.setVelocityPID(velPID);
 }

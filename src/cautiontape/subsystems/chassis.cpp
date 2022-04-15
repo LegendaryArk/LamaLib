@@ -41,11 +41,15 @@ void Chassis::move(int left, int right) { //uses the pros controller which goes 
     }
 
     //send these values to the motors to move
-    leftMotors.moveVelocity(leftV);
-    rightMotors.moveVelocity(rightV);
+    leftMotors.moveVelocity(leftV, leftROCs.at(0).slope, leftROCs.at(0).yIntercept);
+    rightMotors.moveVelocity(rightV, rightROCs.at(0).slope, rightROCs.at(0).yIntercept);
 }
 
-void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<double> iends) {
+void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<double> iends, string rocKey) {
+    if (leftROCs.find(rocKey) == leftROCs.end() || rightROCs.find(rocKey) == rightROCs.end()) {
+        cerr << "Did not find key to rate of change in map\n";
+        return;
+    }
     if (idistances.size() != imaxes.size() || idistances.size() != iends.size()) {
         cerr << "Incorrect input sizes, vectors different sizes\n";
         return;
@@ -59,33 +63,38 @@ void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes
         double rpm = vel.velocity * 60 / (M_PI * wheelDiameter);
         cout << rpm << "\n";
 
-        leftMotors.moveVelocity(rpm);
-        rightMotors.moveVelocity(rpm);
+        leftMotors.moveVelocity(rpm, leftROCs.at(0).slope, leftROCs.at(0).yIntercept);
+        rightMotors.moveVelocity(rpm, rightROCs.at(0).slope, rightROCs.at(0).yIntercept);
         
         pros::delay(20);
     }
 }
 
-void Chassis::turnAbsolute(double itarget, double imaxVel, PIDValues pidVals) {
+void Chassis::turnAbsolute(double itarget, double imaxVel, string rocKey, PIDValues pidVals) {
+    if (leftROCs.find(rocKey) == leftROCs.end() || rightROCs.find(rocKey) == rightROCs.end()) {
+        cerr << "Did not find key to rate of change in map\n";
+        return;
+    }
+
     PIDController pidControl(pidVals, 1);
     while (fabs(itarget - pose.theta) > 2) {
         double pid = pidControl.calculatePID(pose.theta, itarget, 2);
 
         double rpm = imaxVel  * 60 / (M_PI * wheelDiameter);
-        leftMotors.moveVelocity(rpm * pid);
-        rightMotors.moveVelocity(-rpm * pid);
+        leftMotors.moveVelocity(rpm * pid, leftROCs.at(0).slope, leftROCs.at(0).yIntercept);
+        rightMotors.moveVelocity(-rpm * pid, rightROCs.at(0).slope, rightROCs.at(0).yIntercept);
 
         pros::delay(10);
     }
 }
 
-void Chassis::turnRelative(double itarget, double imaxVel, PIDValues pidVals) {
-    turnAbsolute(pose.theta + itarget, imaxVel, pidVals);
+void Chassis::turnRelative(double itarget, double imaxVel, string rocKey, PIDValues pidVals) {
+    turnAbsolute(pose.theta + itarget, imaxVel, rocKey, pidVals);
 }
 
-void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID, bool reverse) {
+void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, string rocKey, PIDValues turnPID, bool reverse) {
     double angle = reverse ? pose.angleTo(itarget) + 180 : pose.angleTo(itarget);
-    turnRelative(angle, turnVel, turnPID);
+    turnRelative(angle, turnVel, rocKey, turnPID);
 
     double totalDist = pose.distTo(itarget);
     cutoffDists.emplace_back(totalDist);
@@ -93,7 +102,14 @@ void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDist
         for (int i = 0; i < cutoffDists.size(); i++)
             cutoffDists.at(i) = -cutoffDists.at(i);
     }
-    moveDistance(cutoffDists, imaxes, iends);
+    moveDistance(cutoffDists, imaxes, iends, rocKey);
+}
+
+void Chassis::addLeftROC(string key, MotorROC roc) {
+    leftROCs.emplace(key, roc);
+}
+void Chassis::addRightROC(string key, MotorROC roc) {
+    rightROCs.emplace(key, roc);
 }
 
 MotorGroup Chassis::getLeftMotors() {
