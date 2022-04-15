@@ -196,7 +196,7 @@ class Chassis {
      *
      * @return Motor input with slew
      */
-    int lcalcSlew(int itarget, int istep);
+    int lCalcSlew(int itarget, int istep);
 
     /**
      * @brief Calculates slew rate for right motor inputs
@@ -208,7 +208,7 @@ class Chassis {
      *
      * @return Motor input with slew
      */
-    int rcalcSlew(int itarget, int istep);
+    int rCalcSlew(int itarget, int istep);
 
     /**
      * @brief Starts the odometry task

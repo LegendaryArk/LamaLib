@@ -167,7 +167,7 @@ RobotScales Chassis::calibrateOdom(pros::Controller controller, Inertial iinerti
     return calibratedScales;
 }
 
-int Chassis::lcalcSlew(int itarget, int istep){
+int Chassis::lCalcSlew(int itarget, int istep){
     if(counter < interval){
         counter++;
         return previousOutputL;
@@ -186,7 +186,7 @@ int Chassis::lcalcSlew(int itarget, int istep){
     }
 }
 
-int Chassis::rcalcSlew(int itarget, int istep){
+int Chassis::rCalcSlew(int itarget, int istep){
     if(counter < interval){
         return previousOutputR;
     }
