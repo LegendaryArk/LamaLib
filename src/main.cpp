@@ -11,7 +11,7 @@ MotorGroup rightMotors({
 	{BOTTOM_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, {0, 0, 0, 0}, okapi::AbstractMotor::encoderUnits::counts}
 });
 Encoders trackingWheels {leftMotors.getMotors().at(0).getEncoder().get(), rightMotors.getMotors().at(0).getEncoder().get(), {REAR_TRACKING_UPPER, REAR_TRACKING_LOWER}, 900, 900, 360};
-Chassis lamaLib::chassis(leftMotors, rightMotors, 0.1016, trackingWheels, 5.0 / 3.0);
+Chassis lamaLib::chassis(leftMotors, rightMotors, 0.1016, trackingWheels, 1, 5.0 / 3.0);
 
 void initialize() {
 	pros::lcd::initialize();
@@ -68,8 +68,7 @@ void autonomous() {}
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-
-	MotorGroup frontArm({{FRONT_ARM_LEFT, false, okapi::AbstractMotor::gearset::red},
+	MotorGroup frontArm({{FRONT_ARM_LEFT, true, okapi::AbstractMotor::gearset::red},
 						{FRONT_ARM_RIGHT, false, okapi::AbstractMotor::gearset::red}});
 
 	Motor conveyor(CONVEYOR, false, okapi::AbstractMotor::gearset::blue);
@@ -104,12 +103,16 @@ void opcontrol() {
 	// int count = 0;
 	// double leftSum = 0, rightSum = 0;
 	// while (count < 200) {
-	// 	leftMotors.moveVelocity(100, 0.189, -19.191);
-	// 	rightMotors.moveVelocity(100, 0.018, -20.053);
-	// 	cout << leftMotors.getActualVelocity() << "\n";
+	// 	// leftMotors.moveVelocity(100, 0.189, -19.191);
+	// 	// rightMotors.moveVelocity(100, 0.018, -20.053);
+	// 	leftMotors.moveVoltage(2000);
+	// 	rightMotors.moveVoltage(2000);
+	// 	if (count > 25)
+	// 		leftSum++; rightSum++;
 	// 	count++;
 	// 	pros::delay(10);
 	// }
+	// cout << leftSum / 175 << "\t" << rightSum / 175 << "\n";
 	// leftMotors.moveVelocity(0, 1, 0);
 	// rightMotors.moveVelocity(0, 1, 0);
 	// pros::delay(1000);
@@ -121,6 +124,7 @@ void opcontrol() {
 	// }
 	// leftMotors.moveVelocity(0, 1, 0);
 	// rightMotors.moveVelocity(0, 1, 0);
+
 	// // Move distance test
 	// chassis.moveDistance({1}, {{1.5, 1}}, {0});
 	// chassis.moveDistance({-1}, {{1.5, 1}}, {0});
@@ -138,7 +142,10 @@ void opcontrol() {
 		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 		
-		chassis.move(joyY + joyX, joyY - joyX);
+		int leftPower = chassis.lCalcSlew(joyY + joyX, 60);
+		int rightPower = chassis.rCalcSlew(joyY - joyX, 60);
+		cout << leftPower << "\t" << rightPower << "\n";
+		chassis.move(leftPower, rightPower);
 
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
 			frontClaw.toggle();

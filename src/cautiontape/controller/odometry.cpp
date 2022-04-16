@@ -1,5 +1,6 @@
 #include "odometry.hpp"
 
+using namespace std;
 using namespace lamaLib;
 
 Odometry::Odometry() {}

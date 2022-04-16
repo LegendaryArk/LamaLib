@@ -19,7 +19,7 @@ void Motor::moveVelocity(int ivelocity, double slope, double yIntercept) {
     double signal = pidControl.calculatePID(getActualVelocity(), ivelocity, 2);
 
     moveVoltage(volt + signal);
-    cout << volt << "\t" << signal << "\t" << getActualVelocity() << "\n";
+    // cout << volt << "\t" << signal << "\t" << getActualVelocity() << "\n";
 }
 void Motor::setVelocityPID(PIDValues ivelPID) {
     pidControl.setPID(ivelPID);

@@ -121,7 +121,7 @@ void lamaLib::driftCompensation(void* iparam) {
         inertial.setPitch(angles.y + errors.y);
         inertial.setYaw(angles.z + errors.z);
 
-        std::cout << "x: " << inertial.getRoll() << "\ty: " << inertial.getPitch() << "\tz: " << inertial.getHeading() << "\n";
+        // std::cout << "x: " << inertial.getRoll() << "\ty: " << inertial.getPitch() << "\tz: " << inertial.getHeading() << "\n";
 
         pros::delay(10);
     }

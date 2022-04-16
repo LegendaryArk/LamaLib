@@ -114,8 +114,8 @@ class Chassis {
      */
     void moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, string rocKey, PIDValues turnPID = {0, 0, 0, 0}, bool reverse = false);
 
-    void addLeftROC(string key, MotorROC roc);
-    void addRightROC(string key, MotorROC roc);
+    // void addLeftROC(string key, MotorROC roc);
+    // void addRightROC(string key, MotorROC roc);
 
     /**
      * @brief Gets the left motors
@@ -226,8 +226,8 @@ class Chassis {
     int previousOutputR = 0;
     MotorGroup leftMotors;
     MotorGroup rightMotors;
-    map<string, MotorROC> leftROCs;
-    map<string, MotorROC> rightROCs;
+    // map<string, MotorROC> leftROCs;
+    // map<string, MotorROC> rightROCs;
 
     double wheelDiameter;
 
