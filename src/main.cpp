@@ -1,6 +1,7 @@
 #include "main.h"
 #include "api.h"
 #include "okapi/api.hpp"
+#include "pros/rtos.h"
 #include "robotconfig.hpp"
 
 /**
@@ -52,7 +53,18 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+	gpsSystem gps(5);
+	gps.gpsInitialize(0, 0, 0, 0, 0);
+	pros::c::gps_status_s_t status;
+	while(true){
+		 status = gps.getStatus();
+		pros::lcd::print(1, "x: %3f, y: %3f", status.x, status.y);
+    	pros::lcd::print(2, "pitch: %3f, yaw: %3f", status.pitch, status.yaw);
+    	pros::lcd::print(3, "roll: %3f", status.roll);
+		pros::c::delay(200);
+	}
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task

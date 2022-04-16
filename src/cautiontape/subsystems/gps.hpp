@@ -1,7 +1,7 @@
 #include "api.h"
 #include "pros/gps.hpp"
 
-namespace lamalib {
+namespace lamaLib {
 class gpsSystem {
 public:
   pros::Gps gpsSensor;

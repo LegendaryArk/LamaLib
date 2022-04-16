@@ -1,7 +1,7 @@
 #include "gps.hpp"
 #include "pros/gps.h"
 
-namespace lamalib{
+namespace lamaLib{
     gpsSystem::gpsSystem(int gpsPort):gpsSensor(gpsPort){
     }
 
