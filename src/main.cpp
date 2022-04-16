@@ -1,4 +1,5 @@
 #include "main.h"
+#include "pros/llemu.hpp"
 
 Inertial lamaLib::inertial(21);
 
@@ -141,11 +142,17 @@ void opcontrol() {
 		
 		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-		
+
 		int leftPower = chassis.lCalcSlew(joyY + joyX, 60);
 		int rightPower = chassis.rCalcSlew(joyY - joyX, 60);
+
+		pros::lcd::print(1, "joyX %d", joyX);
+		pros::lcd::print(2, "joyY %d", joyY);
+		pros::lcd::print(3, "leftPower %d", leftPower);
+		pros::lcd::print(4, "rightPower %d", rightPower);
+
 		cout << leftPower << "\t" << rightPower << "\n";
-		chassis.move(leftPower, rightPower);
+		chassis.move(joyY + joyX, joyY - joyX);
 
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
 			frontClaw.toggle();

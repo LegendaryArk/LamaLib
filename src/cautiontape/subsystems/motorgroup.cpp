@@ -7,7 +7,7 @@ MotorGroup::MotorGroup(vector<Motor> imotors) : motors(imotors) {}
 
 void MotorGroup::moveVelocity(int ivel, double slope, double yIntercept) {
     for (Motor motor : motors)
-        motor.moveVelocity(ivel, slope, yIntercept);
+        motor.moveVelocity(ivel);
 }
 void MotorGroup::moveVoltage(int ivolt) {
     for (Motor motor : motors)

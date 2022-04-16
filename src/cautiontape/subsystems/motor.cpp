@@ -13,7 +13,7 @@ okapi::Motor (port, reverse, igearset, encoderUnits), pidControl(pidVals) {
     Motor::setBrakeMode(AbstractMotor::brakeMode::brake);
 }
 
-void Motor::moveVelocity(int ivelocity, double slope, double yIntercept) {
+void Motor::moveMotor(int ivelocity, double slope, double yIntercept) {
     double volt = (ivelocity - YINTERCEPT) / SLOPE;
     
     double signal = pidControl.calculatePID(getActualVelocity(), ivelocity, 2);
