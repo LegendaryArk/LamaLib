@@ -11,6 +11,7 @@
 #include "../utilities/pose.hpp"
 #include <cmath>
 #include <map>
+#include <string>
 
 namespace lamaLib {
 /**
@@ -25,6 +26,7 @@ struct EncoderValues {
 struct MotorROC {
     double slope;
     double yIntercept;
+    PIDValues pid;
 };
 
 /**
@@ -114,8 +116,7 @@ class Chassis {
      */
     void moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, string rocKey, PIDValues turnPID = {0, 0, 0, 0}, bool reverse = false);
 
-    // void addLeftROC(string key, MotorROC roc);
-    // void addRightROC(string key, MotorROC roc);
+    void addROC(string key, MotorROC leftROC, MotorROC rightROC);
 
     /**
      * @brief Gets the left motors
@@ -226,8 +227,8 @@ class Chassis {
     int previousOutputR = 0;
     MotorGroup leftMotors;
     MotorGroup rightMotors;
-    // map<string, MotorROC> leftROCs;
-    // map<string, MotorROC> rightROCs;
+    map<string, MotorROC> leftROCs;
+    map<string, MotorROC> rightROCs;
 
     double wheelDiameter;
 

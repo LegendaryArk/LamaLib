@@ -5,9 +5,13 @@ using namespace lamaLib;
 
 MotorGroup::MotorGroup(vector<Motor> imotors) : motors(imotors) {}
 
-void MotorGroup::moveVelocity(int ivel, double slope, double yIntercept) {
+void MotorGroup::moveVelocity(int ivel) {
     for (Motor motor : motors)
         motor.moveVelocity(ivel);
+}
+void MotorGroup::moveMotor(int ivel, double slope, double yIntercept, PIDValues pid) {
+    for (Motor motor : motors)
+        motor.moveMotor(ivel, slope, yIntercept, pid);
 }
 void MotorGroup::moveVoltage(int ivolt) {
     for (Motor motor : motors)

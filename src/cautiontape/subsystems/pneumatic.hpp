@@ -37,6 +37,6 @@ class Pneumatic {
     private:
     pros::ADIDigitalOut pneumatic;
 
-    bool state;
+    bool state {false};
 };
 } // namespace lamaLib

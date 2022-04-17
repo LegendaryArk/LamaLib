@@ -49,10 +49,10 @@ void Chassis::move(int left, int right) { //uses the pros controller which goes 
 }
 
 void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<double> iends, string rocKey) {
-    // if (leftROCs.find(rocKey) == leftROCs.end() || rightROCs.find(rocKey) == rightROCs.end()) {
-    //     cerr << "Did not find key to rate of change in map\n";
-    //     return;
-    // }
+    if (leftROCs.find(rocKey) == leftROCs.end() || rightROCs.find(rocKey) == rightROCs.end()) {
+        cerr << "Did not find key to rate of change in map\n";
+        return;
+    }
     if (idistances.size() != imaxes.size() || idistances.size() != iends.size()) {
         cerr << "Incorrect input sizes, vectors different sizes\n";
         return;
@@ -64,32 +64,28 @@ void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes
 
     for (MotionData vel : profile.profile) {
         double rpm = vel.velocity * 60 / (M_PI * wheelDiameter);
-        cout << rpm << "\n";
+        cout << rpm << "," << leftMotors.getActualVelocity() << "," << rightMotors.getActualVelocity() << "\n";
 
-        // , leftROCs.at(0).slope, leftROCs.at(0).yIntercept
-        leftMotors.moveVelocity(rpm);
-        // , rightROCs.at(0).slope, rightROCs.at(0).yIntercept
-        rightMotors.moveVelocity(rpm);
+        leftMotors.moveMotor(rpm, leftROCs.at(rocKey).slope, leftROCs.at(rocKey).yIntercept, leftROCs.at(rocKey).pid);
+        rightMotors.moveMotor(rpm, rightROCs.at(rocKey).slope, rightROCs.at(rocKey).yIntercept, rightROCs.at(rocKey).pid);
         
         pros::delay(20);
     }
 }
 
 void Chassis::turnAbsolute(double itarget, double imaxVel, string rocKey, PIDValues pidVals) {
-    // if (leftROCs.find(rocKey) == leftROCs.end() || rightROCs.find(rocKey) == rightROCs.end()) {
-    //     cerr << "Did not find key to rate of change in map\n";
-    //     return;
-    // }
+    if (leftROCs.find(rocKey) == leftROCs.end() || rightROCs.find(rocKey) == rightROCs.end()) {
+        cerr << "Did not find key to rate of change in map\n";
+        return;
+    }
 
     PIDController pidControl(pidVals, 1);
     while (fabs(itarget - pose.theta) > 2) {
         double pid = pidControl.calculatePID(pose.theta, itarget, 2);
 
         double rpm = imaxVel  * 60 / (M_PI * wheelDiameter);
-        // , leftROCs.at(0).slope, leftROCs.at(0).yIntercept
-        leftMotors.moveVelocity(rpm * pid);
-        // , rightROCs.at(0).slope, rightROCs.at(0).yIntercept
-        rightMotors.moveVelocity(-rpm * pid);
+        leftMotors.moveMotor(rpm * pid, leftROCs.at(rocKey).slope, leftROCs.at(rocKey).yIntercept, leftROCs.at(rocKey).pid);
+        rightMotors.moveMotor(-rpm * pid, rightROCs.at(rocKey).slope, rightROCs.at(rocKey).yIntercept, rightROCs.at(rocKey).pid);
 
         pros::delay(10);
     }
@@ -112,12 +108,10 @@ void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDist
     moveDistance(cutoffDists, imaxes, iends, rocKey);
 }
 
-// void Chassis::addLeftROC(string key, MotorROC roc) {
-//     leftROCs.emplace(key, roc);
-// }
-// void Chassis::addRightROC(string key, MotorROC roc) {
-//     rightROCs.emplace(key, roc);
-// }
+void Chassis::addROC(string key, MotorROC leftROC, MotorROC rightROC) {
+    leftROCs.emplace(key, leftROC);
+    rightROCs.emplace(key, rightROC);
+}
 
 MotorGroup Chassis::getLeftMotors() {
     return leftMotors;
