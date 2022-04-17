@@ -4,8 +4,8 @@
 using namespace std;
 using namespace lamaLib;
 
-PIDController::PIDController(PIDValues ipidValues, double max, double iComp) :
-                            pidValues(ipidValues), max(max), integralComp(iComp) {}
+PIDController::PIDController(PIDValues ipidValues, double max, double min, double iComp) :
+                            pidValues(ipidValues), max(max), min(min), integralComp(iComp) {}
 
 double PIDController::calculatePID(double current, double target, double leeway) {
     double error = target - current;
@@ -26,8 +26,8 @@ double PIDController::calculatePID(double current, double target, double leeway)
     double signal = error * pidValues.kp + integral * pidValues.ki + derivative * pidValues.kd + pidValues.kf;
     if (signal > max)
         signal = max;
-    else if (signal < -max)
-        signal = -max;
+    else if (signal < min)
+        signal = min;
     else
         integral = newIntegral;
 

@@ -12,7 +12,7 @@ okapi::Motor (port, reverse, igearset, encoderUnits) {
 void Motor::moveMotor(int ivelocity, double slope, double yIntercept, PIDValues pid) {
     double volt = (abs(ivelocity) - yIntercept) / slope;
 
-    PIDController pidControl(pid);
+    PIDController pidControl(pid, 2, 0);
     double signal = pidControl.calculatePID(getActualVelocity(), ivelocity, 2);
 
     if (abs(ivelocity) < 5) {
@@ -21,6 +21,6 @@ void Motor::moveMotor(int ivelocity, double slope, double yIntercept, PIDValues 
     }
 
     moveVoltage(volt * signal * sign(ivelocity));
-    cout << signal << "\n";
+    // cout << signal << "," << getActualVelocity() << "\n";
     // cout << volt << "\t" << signal << "\t" << getActualVelocity() << "\n";
 }

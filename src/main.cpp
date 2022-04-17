@@ -140,12 +140,16 @@ void opcontrol() {
 	// // Move distance test
 	// chassis.addROC("0", {0.0189, -19.191, {0.05, 0.0001, 0.05, 1}}, {0.018, -20.053, {0.05, 0.0001, 0.05, 1}});
 	while (count < 200) {
-		leftMotors.moveMotor(100, 0.0189, -19.191, {0.05, 0.001, 0.05, 1});
-		rightMotors.moveMotor(100, 0.018, -20.053, {0.05, 0.001, 0.05, 1});
-		cout << 100 << "," << leftMotors.getActualVelocity() << "," << rightMotors.getActualVelocity() << ",";
+		// , {0.005, 0.001, 0.05, 1}
+		leftMotors.moveMotor(100, 0.0189, -19.191);
+		rightMotors.moveMotor(100, 0.018, -20.053);
+		cout << 100 << "," << leftMotors.getMotors().at(0).getActualVelocity() << "," << leftMotors.getMotors().at(1).getActualVelocity() << ","
+			<< rightMotors.getMotors().at(0).getActualVelocity() << "," << rightMotors.getMotors().at(1).getActualVelocity() << "\n";
 		count++;
 		pros::delay(10);
 	}
+	leftMotors.moveMotor(0);
+	rightMotors.moveMotor(0);
 	// chassis.addROC("1", {0.0183, -22.301}, {0.0183, -23.267});
 	// chassis.addROC("2", {0.0179, -22.772}, {0.0178, -22.467});
 	// chassis.moveDistance({1}, {{1.5, 1}}, {0}, "0");
