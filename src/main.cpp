@@ -140,11 +140,13 @@ void opcontrol() {
 	// // Move distance test
 	// chassis.addROC("0", {0.0189, -19.191, {0.05, 0.0001, 0.05, 1}}, {0.018, -20.053, {0.05, 0.0001, 0.05, 1}});
 	while (count < 200) {
-		// , {0.005, 0.001, 0.05, 1}
-		leftMotors.moveMotor(100, 0.0189, -19.191);
-		rightMotors.moveMotor(100, 0.018, -20.053);
-		cout << 100 << "," << leftMotors.getMotors().at(0).getActualVelocity() << "," << leftMotors.getMotors().at(1).getActualVelocity() << ","
-			<< rightMotors.getMotors().at(0).getActualVelocity() << "," << rightMotors.getMotors().at(1).getActualVelocity() << "\n";
+		leftMotors.moveMotor(100, 0.0189, -19.191, {0.005, 0.003, 0, 1});
+		rightMotors.moveMotor(100, 0.018, -20.053, {0.005, 0.003, 0, 1});
+		cout << 100 << "," << pros::battery::get_current() << ","
+			<< leftMotors.getMotors().at(0).getActualVelocity() << ","
+			<< leftMotors.getMotors().at(1).getActualVelocity() << ","
+			<< rightMotors.getMotors().at(0).getActualVelocity() << ","
+			<< rightMotors.getMotors().at(1).getActualVelocity() << "\n";
 		count++;
 		pros::delay(10);
 	}
@@ -188,13 +190,13 @@ void opcontrol() {
 	// 		frontClaw.toggle();
 		
 	// 	if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
-	// 		if(conveyorDir == 0)
+	// 		if(conveyorDir != 1)
 	// 			conveyorDir = 1;
 	// 		else
 	// 			conveyorDir = 0;
 	// 	}
 	// 	else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
-	// 		if(conveyorDir == 0)
+	// 		if(conveyorDir != -1)
 	// 			conveyorDir = -1;
 	// 		else
 	// 			conveyorDir = 0;
