@@ -21,6 +21,8 @@ struct EncoderValues {
     double left;
     double right;
     double rear;
+
+    EncoderValues operator-(EncoderValues rhs);
 };
 
 struct MotorROC {

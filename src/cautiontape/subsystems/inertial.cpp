@@ -44,6 +44,12 @@ double Inertial::getHeading() {
 void Inertial::setHeading(double iangle) {
     this->set_heading(iangle);
 }
+double Inertial::getRotation() {
+    return this->get_rotation();
+}
+void Inertial::setRotation(double iangle) {
+    this->set_rotation(iangle);
+}
 
 Angles Inertial::calibrate() {
     if (calibrating) return {0, 0, 0};

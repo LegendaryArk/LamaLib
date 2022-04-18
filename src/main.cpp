@@ -11,15 +11,16 @@ MotorGroup rightMotors({
 	{TOP_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
 	{BOTTOM_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
 });
-Encoders trackingWheels {leftMotors.getMotors().at(0).getEncoder().get(), rightMotors.getMotors().at(0).getEncoder().get(), {REAR_TRACKING_UPPER, REAR_TRACKING_LOWER}, 900, 900, 360};
-Chassis lamaLib::chassis(leftMotors, rightMotors, 0.1016, trackingWheels, 2, 5.0 / 3.0);
+Encoders trackingWheels {leftMotors.getMotors().at(0).getEncoder(), rightMotors.getMotors().at(0).getEncoder(), {REAR_TRACKING_UPPER, REAR_TRACKING_LOWER}, 900, 900, 360};
+Chassis lamaLib::chassis(leftMotors, rightMotors, WHEEL_DIAMETER, trackingWheels, 2, 5.0 / 3.0);
 
 void initialize() {
 	pros::lcd::initialize();
 	// pros::lcd::set_text(1, "Hello PROS User!");
 
 	// pros::lcd::register_btn1_cb(on_center_button);
-	
+	inertial.calibrate();
+	while (inertial.isCalibrating()) pros::delay(10);
 }
 
 /**
@@ -99,11 +100,12 @@ void opcontrol() {
 	// }
 
 	// Odom calibrate
-	// RobotScales calibrated = chassis.calibrateOdom(master, inertial);
-	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
+	RobotScales calibrated = chassis.calibrateOdom(master, inertial);
+	cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
+	chassis.startOdom();
 
 	// Move velocity test
-	int count = 0;
+	// int count = 0;
 	// int mV = 12000;
 	// double leftSum = 0, rightSum = 0;
 	// while (count < 200) {
@@ -139,23 +141,23 @@ void opcontrol() {
 
 	// // Move distance test
 	// chassis.addROC("0", {0.0189, -19.191, {0.05, 0.0001, 0.05, 1}}, {0.018, -20.053, {0.05, 0.0001, 0.05, 1}});
-	while (count < 200) {
-		leftMotors.moveMotor(100, 0.0189, -19.191, {0.005, 0.003, 0, 1});
-		rightMotors.moveMotor(100, 0.018, -20.053, {0.005, 0.003, 0, 1});
-		cout << 100 << "," << pros::battery::get_current() << ","
-			<< leftMotors.getMotors().at(0).getActualVelocity() << ","
-			<< leftMotors.getMotors().at(1).getActualVelocity() << ","
-			<< rightMotors.getMotors().at(0).getActualVelocity() << ","
-			<< rightMotors.getMotors().at(1).getActualVelocity() << "\n";
-		count++;
-		pros::delay(10);
-	}
-	leftMotors.moveMotor(0);
-	rightMotors.moveMotor(0);
+	// while (count < 200) {
+	// 	leftMotors.moveMotor(100, 0.0189, -19.191, {0, 0, 0, 1});
+	// 	rightMotors.moveMotor(100, 0.018, -20.053, {0.0001, 0, 0, 1});
+	// 	cout << 100 << ","
+	// 		<< leftMotors.getMotors().at(0).getActualVelocity() << ","
+	// 		<< leftMotors.getMotors().at(1).getActualVelocity() << ","
+	// 		<< rightMotors.getMotors().at(0).getActualVelocity() << ","
+	// 		<< rightMotors.getMotors().at(1).getActualVelocity() << "\n";
+	// 	count++;
+	// 	pros::delay(10);
+	// }
+	// leftMotors.moveMotor(0);
+	// rightMotors.moveMotor(0);
 	// chassis.addROC("1", {0.0183, -22.301}, {0.0183, -23.267});
 	// chassis.addROC("2", {0.0179, -22.772}, {0.0178, -22.467});
-	// chassis.moveDistance({1}, {{1.5, 1}}, {0}, "0");
-	// chassis.moveDistance({-1}, {{1.5, 1}}, {0});
+	//chassis.moveDistance({0.1 / (5.0 / 4.0)}, {{1.25, 2}}, {0}, "0");//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+	// chassis.moveDistance({-1.0 / (5.0/4.0)}, {{1.25, 2}}, {0}, "0");
 	// chassis.moveDistance({1, 1.5, 2.5}, {{1.5, 1}, {0.5, 0.5}, {1, 0.7}}, {0.5, 1, 0});
 
 	// // Turn test

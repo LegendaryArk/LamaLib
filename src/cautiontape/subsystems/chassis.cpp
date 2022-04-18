@@ -3,10 +3,16 @@
 using namespace std;
 using namespace lamaLib;
 
+EncoderValues EncoderValues::operator-(EncoderValues rhs) {
+    return {left - rhs.left, right - rhs.right, rear - rhs.rear};
+}
+
 Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double iwheelDiameter, Encoders iencoders, int iinterval, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightMotors), wheelDiameter(iwheelDiameter), encoders(iencoders), gearset(leftMotors.getGearing(), igearRatio) {
     interval = iinterval;
     leftMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
     rightMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+
+    scales.wheelDiameter = iwheelDiameter;
 }
 
 void Chassis::move(int left, int right) { //uses the pros controller which goes from -127 to 127
@@ -58,19 +64,22 @@ void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes
         return;
     }
 
-    MotionProfile profile = lamaLib::generateTrapezoid(imaxes.at(0) / gearset.ratio, {0}, {idistances.at(0) / gearset.ratio, iends.at(0) / gearset.ratio});
+    MotionProfile profile = lamaLib::generateTrapezoid(imaxes.at(0), {0}, {idistances.at(0), iends.at(0)});
     for (int i = 1; i < idistances.size(); i++)
-        profile += lamaLib::generateTrapezoid(imaxes.at(i) / gearset.ratio, {idistances.at(i - 1) / gearset.ratio, iends.at(i - 1), profile.profile.at(i - 1).time / gearset.ratio}, {idistances.at(i) / gearset.ratio, iends.at(i) / gearset.ratio});
+        profile += lamaLib::generateTrapezoid(imaxes.at(i), {idistances.at(i - 1), iends.at(i - 1), profile.profile.at(i - 1).time}, {idistances.at(i), iends.at(i)});
 
     for (MotionData vel : profile.profile) {
-        double rpm = vel.velocity * 60 / (M_PI * wheelDiameter);
-        cout << rpm << "," << leftMotors.getActualVelocity() << "," << rightMotors.getActualVelocity() << "\n";
-
-        leftMotors.moveMotor(rpm, leftROCs.at(rocKey).slope, leftROCs.at(rocKey).yIntercept, leftROCs.at(rocKey).pid);
-        rightMotors.moveMotor(rpm, rightROCs.at(rocKey).slope, rightROCs.at(rocKey).yIntercept, rightROCs.at(rocKey).pid);
+        double rpm = (vel.velocity) * 60 / (M_PI * wheelDiameter);
+        cout << rpm << "," << vel.distance << "," << leftMotors.getActualVelocity() << "," << rightMotors.getActualVelocity() << "\n";
+        // , leftROCs.at(rocKey).slope, leftROCs.at(rocKey).yIntercept, leftROCs.at(rocKey).pid
+        // , rightROCs.at(rocKey).slope, rightROCs.at(rocKey).yIntercept, rightROCs.at(rocKey).pid
+        leftMotors.moveVelocity(rpm);
+        rightMotors.moveVelocity(rpm);
         
         pros::delay(20);
     }
+    leftMotors.moveVelocity(0);
+    rightMotors.moveVelocity(0);
 }
 
 void Chassis::turnAbsolute(double itarget, double imaxVel, string rocKey, PIDValues pidVals) {
@@ -142,27 +151,28 @@ void Chassis::setScales(RobotScales iscales) {
 }
 
 RobotScales Chassis::calibrateOdom(pros::Controller controller, Inertial iinertial) {
-    uint32_t time = pros::millis();
-    while (iinertial.getYaw() < 3600) {
-        move(200, -200);
+	uint32_t time = pros::millis();
+    while (iinertial.getRotation() < 3600) {
+        leftMotors.moveVelocity(200);
+        rightMotors.moveVelocity(-200);
 
         pros::Task::delay_until(&time, 10);
     }
 
-    move(0, 0);
+    leftMotors.moveVelocity(0);
+    rightMotors.moveVelocity(0);
 
-    while (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_A)) {
-        pros::Task::delay_until(&time, 10);
-    }
+    while (!controller.get_digital(pros::E_CONTROLLER_DIGITAL_A)) pros::Task::delay_until(&time, 10);
 
-    double leftDiameter = ((getEncoders().left / encoders.leftTPR) * getScales().wheelDiameter) / 10;
-    double rightDiameter = ((getEncoders().right / encoders.rightTPR) * getScales().wheelDiameter) / 10;
-    double rearDiameter = ((getEncoders().rear / encoders.rearTPR) * getScales().wheelDiameter) / 10;
+    double leftDiameter = ((getEncoders().left / encoders.leftTPR) * getScales().wheelDiameter) / 10.0;
+    double rightDiameter = ((getEncoders().right / encoders.rightTPR) * getScales().wheelDiameter) / 10.0;
+    double rearDiameter = ((getEncoders().rear / encoders.rearTPR) * getScales().wheelDiameter) / 10.0;
+    cout << getEncoders().left << "\t" << encoders.leftTPR << "\t" << getScales().wheelDiameter << "\n";
 
-    RobotScales calibratedScales = {getScales().wheelDiameter, leftDiameter / 2, rightDiameter / 2, rearDiameter / 2};
+    RobotScales calibratedScales = {getScales().wheelDiameter, leftDiameter / 2.0, rightDiameter / 2.0, rearDiameter / 2.0};
     pros::lcd::print(5, "Calibrated radii:");
-    pros::lcd::print(6, "left: %f in   right: %f in", calibratedScales.leftRadius, calibratedScales.rightRadius);
-    pros::lcd::print(7, "rear: %f in", calibratedScales.rearRadius);
+    pros::lcd::print(6, "left: %.2f in   right: %.2f in", calibratedScales.leftRadius, calibratedScales.rightRadius);
+    pros::lcd::print(7, "rear: %.2f in", calibratedScales.rearRadius);
     setScales(calibratedScales);
     return calibratedScales;
 }
@@ -220,8 +230,9 @@ void lamaLib::odometryMain(void *iparam) {
     while (true) {
         prevReadings = currReadings;
         currReadings = chassis.getEncoders();
+        EncoderValues diffReadings = currReadings - prevReadings;
 
-        chassis.setPose(odom.updatePose(chassis.getPose(), chassis.getScales(), chassis.getTrackingWheels(), {currReadings.left, currReadings.right, currReadings.rear, chassis.getPose().theta}));
+        chassis.setPose(odom.updatePose(chassis.getPose(), chassis.getScales(), chassis.getTrackingWheels(), {diffReadings.left, diffReadings.right, diffReadings.rear, chassis.getPose().theta}));
 
         pros::lcd::print(0, "x: %.2f in   y: %.2f in", chassis.getPose().x, chassis.getPose().y);
         pros::lcd::print(1, "theta: %.2f deg", chassis.getPose().theta);

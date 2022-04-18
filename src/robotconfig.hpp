@@ -7,6 +7,8 @@
 // #define TOP_RIGHT_CHASSIS 8
 // #define BOTTOM_RIGHT_CHASSIS 21
 
+#define WHEEL_DIAMETER 0.08255
+
 #define FRONT_ARM_LEFT 7
 #define FRONT_ARM_RIGHT 2
 #define CONVEYOR 11

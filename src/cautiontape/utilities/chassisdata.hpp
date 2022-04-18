@@ -2,13 +2,15 @@
 
 #include "okapi/api/device/rotarysensor/continuousRotarySensor.hpp"
 
+using namespace std;
+
 namespace lamaLib {
 /**
  * @brief Tracking wheels that are used in odom and their TPR
  */
 struct Encoders {
-    okapi::ContinuousRotarySensor *left;
-    okapi::ContinuousRotarySensor *right;
+    shared_ptr<okapi::ContinuousRotarySensor> left;
+    shared_ptr<okapi::ContinuousRotarySensor> right;
     pros::ADIEncoder rear {1, 1};
     double leftTPR {0};
     double rightTPR {0};
