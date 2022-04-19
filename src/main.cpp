@@ -19,8 +19,8 @@ void initialize() {
 	// pros::lcd::set_text(1, "Hello PROS User!");
 
 	// pros::lcd::register_btn1_cb(on_center_button);
-	inertial.calibrate();
-	while (inertial.isCalibrating()) pros::delay(10);
+	// inertial.calibrate();
+	// while (inertial.isCalibrating()) pros::delay(10);
 }
 
 /**
@@ -100,9 +100,9 @@ void opcontrol() {
 	// }
 
 	// Odom calibrate
-	RobotScales calibrated = chassis.calibrateOdom(master, inertial);
-	cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
-	chassis.startOdom();
+	// chassis.calibrateOdom(master, inertial);
+	// chassis.setScales({0.116074, 0.120606, 0.00628297});
+	// chassis.startOdom();
 
 	// Move velocity test
 	// int count = 0;
@@ -156,7 +156,7 @@ void opcontrol() {
 	// rightMotors.moveMotor(0);
 	// chassis.addROC("1", {0.0183, -22.301}, {0.0183, -23.267});
 	// chassis.addROC("2", {0.0179, -22.772}, {0.0178, -22.467});
-	//chassis.moveDistance({0.1 / (5.0 / 4.0)}, {{1.25, 2}}, {0}, "0");//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+	// chassis.moveDistance({1}, {{1.45, 2.8}}, {0}, "0");//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 	// chassis.moveDistance({-1.0 / (5.0/4.0)}, {{1.25, 2}}, {0}, "0");
 	// chassis.moveDistance({1, 1.5, 2.5}, {{1.5, 1}, {0.5, 0.5}, {1, 0.7}}, {0.5, 1, 0});
 
@@ -166,65 +166,65 @@ void opcontrol() {
 	// chassis.turnRelative(90, 1.5, {0.05, 0.001, 0.02, 1});
 	// chassis.turnRelative(-90, 1.5, {0.05, 0.001, 0.02, 1});
 
-	// int conveyorDir = 0;
-	// while (true) {
+	int conveyorDir = 0;
+	while (true) {
 		
-	// 	int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-	// 	int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
-	// 	int leftSlew = chassis.lCalcSlew(joyY + joyX, 30);
-	// 	int rightSlew = chassis.rCalcSlew(joyY - joyX, 30);
+		int leftSlew = chassis.lCalcSlew(joyY + joyX, 30);
+		int rightSlew = chassis.rCalcSlew(joyY - joyX, 30);
 
-	// 	pros::lcd::print(1, "joyX %d", joyX);
-	// 	pros::lcd::print(2, "joyY %d", joyY);
-	// 	pros::lcd::print(3, "leftPower %d", leftSlew);
-	// 	pros::lcd::print(4, "rightPower %d", rightSlew);
-	// 	pros::lcd::print(5, "leftRPM %f", chassis.getLeftMotors().getActualVelocity());
-	// 	pros::lcd::print(6, "rightRPM %f", chassis.getRightMotors().getActualVelocity());
+		pros::lcd::print(1, "joyX %d", joyX);
+		pros::lcd::print(2, "joyY %d", joyY);
+		pros::lcd::print(3, "leftPower %d", leftSlew);
+		pros::lcd::print(4, "rightPower %d", rightSlew);
+		pros::lcd::print(5, "leftRPM %f", chassis.getLeftMotors().getActualVelocity());
+		pros::lcd::print(6, "rightRPM %f", chassis.getRightMotors().getActualVelocity());
 
-	// 	// cout << leftPower << "\t" << rightPower << "\n";
-	// 	if (armLimit.get() > 2000)
-	// 		chassis.move(leftSlew, rightSlew);
-	// 	else
-	// 		chassis.move(joyY + joyX, joyY - joyX);
+		// cout << leftPower << "\t" << rightPower << "\n";
+		if (armLimit.get() > 2000)
+			chassis.move(leftSlew, rightSlew);
+		else
+			chassis.move(joyY + joyX, joyY - joyX);
 
-	// 	if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
-	// 		frontClaw.toggle();
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
+			frontClaw.toggle();
 		
-	// 	if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
-	// 		if(conveyorDir != 1)
-	// 			conveyorDir = 1;
-	// 		else
-	// 			conveyorDir = 0;
-	// 	}
-	// 	else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
-	// 		if(conveyorDir != -1)
-	// 			conveyorDir = -1;
-	// 		else
-	// 			conveyorDir = 0;
-	// 	}
-	// 	conveyor.moveVelocity(420 * conveyorDir);
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
+			if(conveyorDir != 1)
+				conveyorDir = 1;
+			else
+				conveyorDir = 0;
+		}
+		else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
+			if(conveyorDir != -1)
+				conveyorDir = -1;
+			else
+				conveyorDir = 0;
+		}
+		conveyor.moveVelocity(420 * conveyorDir);
 		
-	// 	if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-	// 		if (armLimit.get() < ARM_UPPER_LIMIT)
-	// 			frontArm.moveVelocity(100);
-	// 		else
-	// 			frontArm.moveVelocity(0);
-	// 	} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
-	// 		if (armLimit.get() > ARM_LOWER_LIMIT)
-	// 			frontArm.moveVelocity(-100);
-	// 		else
-	// 		 	frontArm.moveVelocity(0);
-	// 	} else
-	// 		frontArm.moveVelocity(0);
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+			if (armLimit.get() < ARM_UPPER_LIMIT)
+				frontArm.moveVelocity(100);
+			else
+				frontArm.moveVelocity(0);
+		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+			if (armLimit.get() > ARM_LOWER_LIMIT)
+				frontArm.moveVelocity(-100);
+			else
+			 	frontArm.moveVelocity(0);
+		} else
+			frontArm.moveVelocity(0);
 		
-	// 	if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
-	// 		backClaw.moveVelocity(100);
-	// 	else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
-	// 		backClaw.moveVelocity(-100);
-	// 	else
-	// 		backClaw.moveVelocity(0);
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+			backClaw.moveVelocity(100);
+		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+			backClaw.moveVelocity(-100);
+		else
+			backClaw.moveVelocity(0);
 		
-	// 	pros::delay(20);
-	// }
+		pros::delay(20);
+	}
 }

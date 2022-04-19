@@ -6,13 +6,14 @@ using namespace lamaLib;
 Odometry::Odometry() {}
 
 Pose Odometry::updatePose(Pose icurrPose, RobotScales iscales, Encoders iencoders, OdomValues ireadingsDiff) {
+    cout << iscales.wheelDiameter << "\n";
     double wheelCircumference = iscales.wheelDiameter * M_PI;
     double chassisDiameter = iscales.leftRadius + iscales.rightRadius;
     
     // Delta distance
     OdomValues delta;
-    delta.left = (ireadingsDiff.left / iencoders.leftTPR) * wheelCircumference;
-    delta.right = (ireadingsDiff.right / iencoders.rightTPR) * wheelCircumference;
+    delta.left = ((double) ireadingsDiff.left / iencoders.leftTPR) * wheelCircumference * iscales.gearRatio;
+    delta.right = ((double) ireadingsDiff.right / iencoders.rightTPR) * wheelCircumference * iscales.gearRatio;
 
     // Delta theta
     delta.theta = (delta.left - delta.right) / chassisDiameter;

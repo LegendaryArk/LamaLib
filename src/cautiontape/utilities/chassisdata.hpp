@@ -23,6 +23,7 @@ struct Encoders {
  * Left and right are separate in the case that they are different
  */
 struct RobotScales {
+    double gearRatio;
     double wheelDiameter;
     double leftRadius;
     double rightRadius;
