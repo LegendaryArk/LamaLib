@@ -12,7 +12,7 @@ MotorGroup rightMotors({
 	{BOTTOM_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
 });
 Encoders trackingWheels {leftMotors.getMotors().at(0).getEncoder(), rightMotors.getMotors().at(0).getEncoder(), {REAR_TRACKING_UPPER, REAR_TRACKING_LOWER}, 900, 900, 360};
-Chassis lamaLib::chassis(leftMotors, rightMotors, WHEEL_DIAMETER, trackingWheels, 2, 5.0 / 3.0);
+Chassis lamaLib::chassis(leftMotors, rightMotors, PARALLEL_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, trackingWheels, 2, 5.0 / 3.0);
 
 void initialize() {
 	pros::lcd::initialize();
@@ -80,6 +80,12 @@ void opcontrol() {
 	Pneumatic frontClaw(pros::ADIDigitalOut(FRONT_CLAW));
 
 	okapi::Potentiometer armLimit(ARM_POTENTIOMETER);
+	
+	// chassis.calibrateWheelDiameter(master, 2);
+	// chassis.calibrateChassisDiameter(master, inertial);
+	chassis.setScales({GEAR_RATIO, PARALLEL_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, LEFT_RADIUS, RIGHT_RADIUS, REAR_RADIUS});
+	chassis.startOdom();
+	chassis.turnAbsolute(90, 1, {0.006, 0.002, 0, 0});
 	
 	// MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
 	// MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});

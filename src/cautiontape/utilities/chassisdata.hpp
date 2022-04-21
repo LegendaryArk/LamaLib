@@ -24,7 +24,8 @@ struct Encoders {
  */
 struct RobotScales {
     double gearRatio;
-    double wheelDiameter;
+    double parallelWheelDiameter;
+    double rearWheelDiameter {0};
     double leftRadius;
     double rightRadius;
     double rearRadius {0};

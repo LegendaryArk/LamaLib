@@ -22,13 +22,8 @@ struct EncoderValues {
     double right;
     double rear;
 
+    EncoderValues operator+(EncoderValues rhs);
     EncoderValues operator-(EncoderValues rhs);
-};
-
-struct MotorROC {
-    double slope;
-    double yIntercept;
-    PIDValues pid;
 };
 
 /**
@@ -64,7 +59,7 @@ class Chassis {
      * @param igearRatio The external gear ratio of the chasssis
      * @param iinterval The interval between slew rate calculations
      */
-    Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double wheelDiameter, Encoders iencoders, int iinterval, double igearRatio = 1);
+    Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double iparallelWheelDiameter, double irearWheelDiameter, Encoders iencoders, int iinterval, double igearRatio = 1);
 
     /**
      * @brief Moves the left and right motors when using the controller. The power that is given to the motors are according to the joyMap
@@ -83,7 +78,7 @@ class Chassis {
      * @param imaxes The different max velocities and max accelerations for each cutoff segment in m/s and m/s2 respectively
      * @param iends The different end velocities for each cutoff segment in m/s
      */
-    void moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<double> iends, string rocKey);
+    void moveDistance(vector<double> idistances, vector<MotionLimit> imaxes, vector<double> iends);
 
     /**
      * @brief Turns the robot relative to the starting heading at the beginning of the program
@@ -94,7 +89,7 @@ class Chassis {
      * @param imaxVel The max velocity in m/s
      * @param pidVals The Kpk Ki, Kd, and Kf used for the PID; default is all 0
      */
-    void turnAbsolute(double itarget, double imaxVel, string rocKey, PIDValues pidVals = {0, 0, 0, 0});
+    void turnAbsolute(double itarget, double imaxVel, PIDValues pidVals = {0, 0, 0, 0});
 
     /**
      * @brief Turns the robot relative to the current heading
@@ -103,7 +98,7 @@ class Chassis {
      * @param imaxVel The max velocity in m/s
      * @param pidVals The Kp, Ki, Kd and Kf used for the PID, default is all 0
      */
-    void turnRelative(double itarget, double imaxVel, string rocKey, PIDValues pidVals = {0, 0, 0, 0});
+    void turnRelative(double itarget, double imaxVel, PIDValues pidVals = {0, 0, 0, 0});
 
     /**
      * @brief Turns the robot to face a given coordinate and moves to that point
@@ -116,9 +111,7 @@ class Chassis {
      * @param turnPID The Kp, Ki, Kd, and Kf used in the turn, default is all 0
      * @param reverse Whether the robot should move forward or backwards to the point. True = backwards, false = forwards
      */
-    void moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, string rocKey, PIDValues turnPID = {0, 0, 0, 0}, bool reverse = false);
-
-    void addROC(string key, MotorROC leftROC, MotorROC rightROC);
+    void moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID = {0, 0, 0, 0}, bool reverse = false);
 
     /**
      * @brief Gets the left motors
@@ -174,6 +167,8 @@ class Chassis {
      */
     void setScales(RobotScales iscales);
 
+    RobotScales calibrateWheelDiameter(pros::Controller controller, double actualDist);
+
     /**
      * @brief Calibrate the distance from the tracking wheel to the center of the robot
      *
@@ -187,7 +182,7 @@ class Chassis {
      * @param iinertial Used to do the initial turn
      * @return The new measurements; the only updated should be the radii; the measurements should already be updated
      */
-    RobotScales calibrateOdom(pros::Controller controller, Inertial iinertial);
+    RobotScales calibrateChassisDiameter(pros::Controller controller, Inertial iinertial);
 
     /**
      * @brief Calculates slew rate for left motor inputs
@@ -229,10 +224,6 @@ class Chassis {
     int previousOutputR = 0;
     MotorGroup leftMotors;
     MotorGroup rightMotors;
-    map<string, MotorROC> leftROCs;
-    map<string, MotorROC> rightROCs;
-
-    double wheelDiameter;
 
     okapi::AbstractMotor::GearsetRatioPair gearset {okapi::AbstractMotor::gearset::green, 1};
 
