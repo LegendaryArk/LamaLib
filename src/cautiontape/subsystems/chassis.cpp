@@ -10,13 +10,14 @@ EncoderValues EncoderValues::operator-(EncoderValues rhs) {
     return {left - rhs.left, right - rhs.right, rear - rhs.rear};
 }
 
-Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double iparallelWheelDiameter, double irearWheelDiameter, Encoders iencoders, int iinterval, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightMotors), encoders(iencoders), gearset(leftMotors.getGearing(), igearRatio) {
+Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double ileftWheelDiameter, double irightWheelDiameter, double irearWheelDiameter, Encoders iencoders, int iinterval, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightMotors), encoders(iencoders), gearset(leftMotors.getGearing(), igearRatio) {
     interval = iinterval;
     leftMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
     rightMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 
     scales.gearRatio = igearRatio;
-    scales.parallelWheelDiameter = iparallelWheelDiameter;
+    scales.leftWheelDiameter = ileftWheelDiameter;
+    scales.rightWheelDiameter = irightWheelDiameter;
     scales.rearWheelDiameter = irearWheelDiameter;
 }
 
@@ -69,10 +70,11 @@ void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes
         profile += lamaLib::generateTrapezoid(imaxes.at(i) / gearRatio, {idistances.at(i - 1) / gearRatio, iends.at(i - 1) / gearRatio, profile.profile.at(i - 1).time}, {idistances.at(i) / gearRatio, iends.at(i) / gearRatio});
 
     for (MotionData vel : profile.profile) {
-        double rpm = vel.velocity * 60 / (M_PI * scales.parallelWheelDiameter);
-        cout << rpm << "," << vel.distance << "," << leftMotors.getActualVelocity() << "," << rightMotors.getActualVelocity() << "\n";
-        leftMotors.moveVelocity(rpm);
-        rightMotors.moveVelocity(rpm);
+        double leftRPM = vel.velocity * 60 / (M_PI * scales.leftWheelDiameter);
+        double rightRPM = vel.velocity * 60 / (M_PI * scales.rightWheelDiameter);
+        cout << leftRPM << "," << rightRPM << "," << vel.distance << "," << leftMotors.getActualVelocity() << "," << rightMotors.getActualVelocity() << "\n";
+        leftMotors.moveVelocity(leftRPM);
+        rightMotors.moveVelocity(rightRPM);
         
         pros::delay(20);
     }
@@ -85,9 +87,10 @@ void Chassis::turnAbsolute(double itarget, double imaxVel, PIDValues pidVals) {
     while (fabs(itarget - pose.theta) > 1) {
         double pid = pidControl.calculatePID(pose.theta, itarget, 1);
 
-        double rpm = imaxVel * 60 / (M_PI * scales.parallelWheelDiameter);
-        leftMotors.moveVelocity(rpm * pid);
-        rightMotors.moveVelocity(-rpm * pid);
+        double leftRPM = imaxVel * 60 / (M_PI * scales.leftWheelDiameter);
+        double rightRPM = imaxVel * 60 / (M_PI * scales.rightWheelDiameter);
+        leftMotors.moveVelocity(leftRPM * pid);
+        rightMotors.moveVelocity(-rightRPM * pid);
 
         pros::delay(10);
     }
@@ -144,20 +147,19 @@ RobotScales Chassis::calibrateWheelDiameter(pros::Controller controller, double 
 
     EncoderValues encoderVals = getEncoders();
     double gearRatio = gearset.ratio;
-    double leftWheelDist = ((encoderVals.left / encoders.leftTPR) * scales.parallelWheelDiameter * M_PI) * gearRatio;
-    double rightWheelDist = ((encoderVals.right / encoders.rightTPR) * scales.parallelWheelDiameter * M_PI) * gearRatio;
+    double leftWheelDist = ((encoderVals.left / encoders.leftTPR) * scales.leftWheelDiameter * M_PI) * gearRatio;
+    double rightWheelDist = ((encoderVals.right / encoders.rightTPR) * scales.rightWheelDiameter * M_PI) * gearRatio;
     double rearWheelDist = ((encoderVals.rear / encoders.rearTPR) * scales.rearWheelDiameter * M_PI) * gearRatio;
 
     double leftRatio = actualDist / leftWheelDist;
     double rightRatio = actualDist / rightWheelDist;
     double rearRatio = actualDist / rearWheelDist;
 
-    RobotScales calibratedScales = {gearRatio,
-                                    scales.parallelWheelDiameter * leftRatio, scales.rearWheelDiameter * rearRatio,
-                                    scales.leftRadius, scales.rightRadius, scales.rearRadius};
+    RobotScales calibratedScales = {0, scales.leftWheelDiameter * leftRatio, scales.rightWheelDiameter * rightRatio, scales.rearWheelDiameter * rearRatio, 0, 0, 0};
     pros::lcd::print(5, "Calibrated diameters:");
-    pros::lcd::print(6, "left: %.2f m   rear: %.2f m", calibratedScales.parallelWheelDiameter, calibratedScales.rearWheelDiameter);
-    cout << calibratedScales.parallelWheelDiameter  << ", " << calibratedScales.rearWheelDiameter << "\n";
+    pros::lcd::print(6, "left: %.2f m   right: %.2f m", calibratedScales.leftWheelDiameter, calibratedScales.rightWheelDiameter);
+    pros::lcd::print(7, "rear: %.2f m", calibratedScales.rearWheelDiameter);
+    cout << calibratedScales.leftWheelDiameter << "," << calibratedScales.rightWheelDiameter  << ", " << calibratedScales.rearWheelDiameter << "\n";
 
     return calibratedScales;
 }
@@ -178,13 +180,11 @@ RobotScales Chassis::calibrateChassisDiameter(pros::Controller controller, Inert
 
     EncoderValues encoderVals = getEncoders();
     double gearRatio = gearset.ratio;
-    double leftDiameter = ((encoderVals.left / encoders.leftTPR) * scales.parallelWheelDiameter) * gearRatio / 10.0;
-    double rightDiameter = ((encoderVals.right / encoders.rightTPR) * scales.parallelWheelDiameter) * gearRatio / 10.0;
+    double leftDiameter = ((encoderVals.left / encoders.leftTPR) * scales.leftWheelDiameter) * gearRatio / 10.0;
+    double rightDiameter = ((encoderVals.right / encoders.rightTPR) * scales.rightWheelDiameter) * gearRatio / 10.0;
     double rearDiameter = ((encoderVals.rear / encoders.rearTPR) * scales.rearWheelDiameter) / 10.0;
 
-    RobotScales calibratedScales = {gearset.ratio,
-                                    scales.parallelWheelDiameter, scales.rearWheelDiameter,
-                                    fabs(leftDiameter / 2.0), fabs(rightDiameter / 2.0), fabs(rearDiameter / 2.0)};
+    RobotScales calibratedScales = {0, 0, 0, 0, fabs(leftDiameter / 2.0), fabs(rightDiameter / 2.0), fabs(rearDiameter / 2.0)};
 
     pros::lcd::print(5, "Calibrated radii:");
     pros::lcd::print(6, "left: %.2f m   right: %.2f m", calibratedScales.leftRadius, calibratedScales.rightRadius);

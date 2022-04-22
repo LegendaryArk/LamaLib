@@ -12,7 +12,7 @@ MotorGroup rightMotors({
 	{BOTTOM_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
 });
 Encoders trackingWheels {leftMotors.getMotors().at(0).getEncoder(), rightMotors.getMotors().at(0).getEncoder(), {REAR_TRACKING_UPPER, REAR_TRACKING_LOWER}, 900, 900, 360};
-Chassis lamaLib::chassis(leftMotors, rightMotors, PARALLEL_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, trackingWheels, 2, 5.0 / 3.0);
+Chassis lamaLib::chassis(leftMotors, rightMotors, LEFT_WHEEL_DIAMETER, RIGHT_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, trackingWheels, 3, 5.0 / 3.0);
 
 void initialize() {
 	pros::lcd::initialize();
@@ -83,9 +83,9 @@ void opcontrol() {
 	
 	// chassis.calibrateWheelDiameter(master, 2);
 	// chassis.calibrateChassisDiameter(master, inertial);
-	chassis.setScales({GEAR_RATIO, PARALLEL_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, LEFT_RADIUS, RIGHT_RADIUS, REAR_RADIUS});
-	chassis.startOdom();
-	chassis.turnAbsolute(90, 1, {0.006, 0.002, 0, 0});
+	// chassis.setScales({GEAR_RATIO, LEFT_WHEEL_DIAMETER, RIGHT_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, LEFT_RADIUS, RIGHT_RADIUS, REAR_RADIUS});
+	// chassis.startOdom();
+	// chassis.turnAbsolute(90, 1, {0.006, 0.002, 0, 0});
 	
 	// MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
 	// MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});
@@ -104,11 +104,6 @@ void opcontrol() {
 	// 	cout << chassis.getLeftMotors().getActualVelocity() << ", " << chassis.getRightMotors().getActualVelocity() << ", " << rpm << "\n";
 	// 	pros::delay(20);
 	// }
-
-	// Odom calibrate
-	// chassis.calibrateOdom(master, inertial);
-	// chassis.setScales({0.116074, 0.120606, 0.00628297});
-	// chassis.startOdom();
 
 	// Move velocity test
 	// int count = 0;
@@ -178,8 +173,8 @@ void opcontrol() {
 		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
-		int leftSlew = chassis.lCalcSlew(joyY + joyX, 30);
-		int rightSlew = chassis.rCalcSlew(joyY - joyX, 30);
+		int leftSlew = chassis.lCalcSlew(joyY + joyX, 20);
+		int rightSlew = chassis.rCalcSlew(joyY - joyX, 20);
 
 		pros::lcd::print(1, "joyX %d", joyX);
 		pros::lcd::print(2, "joyY %d", joyY);
@@ -189,9 +184,9 @@ void opcontrol() {
 		pros::lcd::print(6, "rightRPM %f", chassis.getRightMotors().getActualVelocity());
 
 		// cout << leftPower << "\t" << rightPower << "\n";
-		if (armLimit.get() > 2000)
-			chassis.move(leftSlew, rightSlew);
-		else
+		// if (armLimit.get() > 2000)
+		// 	chassis.move(leftSlew, rightSlew);
+		// else
 			chassis.move(joyY + joyX, joyY - joyX);
 
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))

@@ -59,7 +59,7 @@ class Chassis {
      * @param igearRatio The external gear ratio of the chasssis
      * @param iinterval The interval between slew rate calculations
      */
-    Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double iparallelWheelDiameter, double irearWheelDiameter, Encoders iencoders, int iinterval, double igearRatio = 1);
+    Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double ileftWheelDiameter, double irightWheelDiameter, double irearWheelDiameter, Encoders iencoders, int iinterval, double igearRatio = 1);
 
     /**
      * @brief Moves the left and right motors when using the controller. The power that is given to the motors are according to the joyMap
