@@ -77,6 +77,7 @@ void opcontrol() {
 	Motor conveyor(CONVEYOR, false, okapi::AbstractMotor::gearset::blue);
 
 	Motor backClaw(BACK_CLAW, false, okapi::AbstractMotor::gearset::red);
+	backClaw.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
 
 	Pneumatic frontClaw(pros::ADIDigitalOut(FRONT_CLAW));
 
@@ -211,7 +212,7 @@ void opcontrol() {
 			else
 				conveyorDir = 0;
 		}
-		conveyor.moveVelocity(420 * conveyorDir);
+		conveyor.moveVelocity(600 * conveyorDir);
 		
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
 			if (armLimit.get() < ARM_UPPER_LIMIT)
