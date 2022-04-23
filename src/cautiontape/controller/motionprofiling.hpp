@@ -1,7 +1,8 @@
 #pragma once
 
 #include "api.h"
-#include "../utilities/mathHelper.hpp"
+#include "../utilities/pose.hpp"
+#include "../utilities/mathhelper.hpp"
 
 namespace lamaLib {
 /**
@@ -20,15 +21,20 @@ struct MotionData {
 	double acceleration {0};
 	double jerk {0};
 	double time {0};
-	double x {0};
-	double y {0};
-	double heading {0};
+	Pose position {0, 0, 0};
 };
 /**
  * @brief The motion profile
  */
 struct MotionProfile {
 	std::vector<MotionData> profile;
+
+	/**
+	 * @brief Combines 2 motion profiles
+	 * 
+	 * @param rhs The profile that is added on to the end of this profile
+	 */
+	void operator+=(MotionProfile rhs);
 };
 
 /**
@@ -37,6 +43,21 @@ struct MotionProfile {
 struct MotionLimit {
 	double maxVelocity;
 	double maxAcceleration;
+	
+	/**
+	 * @brief Multiplies the max velocities and max accelerations by a factor
+	 * 
+	 * @param rhs The factor
+	 * @return The new MotionLimit with the products
+	 */
+	MotionLimit operator*(double rhs);
+	/**
+	 * @brief Divides the max velocities and max acceleration by a divisor
+	 * 
+	 * @param rhs The divisor
+	 * @return The new MotionLimit with the quotients
+	 */
+	MotionLimit operator/(double rhs);
 };
 
 /**

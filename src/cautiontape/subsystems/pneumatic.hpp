@@ -29,14 +29,14 @@ class Pneumatic {
     /**
      * @brief Gets the state of the pneumatic
      * 
-     * @return true 
-     * @return false 
+     * @return true for open
+     * @return false for closed
      */
     bool getState();
 
     private:
     pros::ADIDigitalOut pneumatic;
 
-    bool state;
+    bool state {false};
 };
 } // namespace lamaLib

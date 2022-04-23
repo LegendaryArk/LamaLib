@@ -44,6 +44,12 @@ double Inertial::getHeading() {
 void Inertial::setHeading(double iangle) {
     this->set_heading(iangle);
 }
+double Inertial::getRotation() {
+    return this->get_rotation();
+}
+void Inertial::setRotation(double iangle) {
+    this->set_rotation(iangle);
+}
 
 Angles Inertial::calibrate() {
     if (calibrating) return {0, 0, 0};
@@ -121,7 +127,7 @@ void lamaLib::driftCompensation(void* iparam) {
         inertial.setPitch(angles.y + errors.y);
         inertial.setYaw(angles.z + errors.z);
 
-        std::cout << "x: " << inertial.getRoll() << "\ty: " << inertial.getPitch() << "\tz: " << inertial.getHeading() << "\n";
+        // std::cout << "x: " << inertial.getRoll() << "\ty: " << inertial.getPitch() << "\tz: " << inertial.getHeading() << "\n";
 
         pros::delay(10);
     }

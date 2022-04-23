@@ -3,6 +3,18 @@
 using namespace std;
 using namespace lamaLib;
 
+void MotionProfile::operator+=(MotionProfile rhs) {
+	for (MotionData data : rhs.profile)
+		profile.emplace_back(data);
+}
+
+MotionLimit MotionLimit::operator*(double rhs) {
+	return {maxVelocity * rhs, maxAcceleration * rhs};
+}
+MotionLimit MotionLimit::operator/(double rhs) {
+	return {maxVelocity / rhs, maxAcceleration / rhs};
+}
+
 MotionProfile lamaLib::generateTrapezoid(MotionLimit imotionLimit, CutoffPoint istart, CutoffPoint iend) {
 	MotionProfile trapezoid = {};
 	trapezoid.profile = vector<MotionData>();
@@ -17,12 +29,12 @@ MotionProfile lamaLib::generateTrapezoid(MotionLimit imotionLimit, CutoffPoint i
 	double accelTime = imotionLimit.maxVelocity / imotionLimit.maxAcceleration;
 	// Acceleration distance = 1/2at^2
 	double accelDist = 0.5 * imotionLimit.maxAcceleration * accelTime * accelTime;
-	double trapezoidDist = cutoffStartDist + iend.distance - istart.distance + cutoffEndDist;
+	double trapezoidDist = cutoffStartDist + fabs(iend.distance - istart.distance) + cutoffEndDist;
 	double maxDist = trapezoidDist - 2 * accelDist;
 
 	// When max speed is not able to be reached
 	if (maxDist < 0) {
-		accelTime = sqrt(iend.distance / imotionLimit.maxAcceleration);
+		accelTime = sqrt(fabs(iend.distance) / imotionLimit.maxAcceleration);
 		maxDist = 0;
 	}
 
@@ -32,7 +44,7 @@ MotionProfile lamaLib::generateTrapezoid(MotionLimit imotionLimit, CutoffPoint i
 	// endDecel = maxDistance + endAccel
 	double endDecel = endMax + accelTime - cutoffEndTime;
 
-	cout << endAccel << "\t" << endMax << "\t" << endDecel << "\t" << accelTime << "\t" << cutoffStartTime << "\t" << cutoffEndTime << "\n";
+	 cout << endAccel << "\t" << endMax << "\t" << endDecel << "\t" << accelTime << "\t" << cutoffStartTime << "\t" << cutoffEndTime << "\n";
 
 	int direction = sign(iend.distance);
 	imotionLimit.maxVelocity *= direction;
@@ -41,7 +53,7 @@ MotionProfile lamaLib::generateTrapezoid(MotionLimit imotionLimit, CutoffPoint i
 	double time = 0;
 	double prevTime = 0;
 
-	std::cout << "velocity,distance,time\n";
+	// std::cout << "velocity,distance,time\n";
 	while (time <= endDecel) {
 		MotionData movement;
 
@@ -71,7 +83,7 @@ MotionProfile lamaLib::generateTrapezoid(MotionLimit imotionLimit, CutoffPoint i
 
 		trapezoid.profile.emplace_back(movement);
 
-		std::cout << movement.velocity << "," << movement.distance << "," << movement.time << "\n";
+		// std::cout << movement.velocity << "," << movement.distance << "," << movement.time << "\n";
 
 		prevTime = time;
 		time += 0.02;

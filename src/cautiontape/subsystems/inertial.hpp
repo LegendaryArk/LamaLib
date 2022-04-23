@@ -63,7 +63,7 @@ class Inertial : pros::IMU {
     void setPitch(double iangle);
 
     /**
-     * @brief Gets the yaw, or the orientation about the z axis in degrees
+     * @brief Gets the yaw, or the orientation about the z axis in degrees, clamped between -180 and 180
      *
      * Better known as the heading
      * 
@@ -71,7 +71,7 @@ class Inertial : pros::IMU {
      */
     double getYaw();
     /**
-     * @brief Sets the yaw, or the orientation about the z axis in degrees
+     * @brief Sets the yaw, or the orientation about the z axis in degrees, clamped between -180 and 180
      *
      * Better known as the heading
      * 
@@ -88,12 +88,22 @@ class Inertial : pros::IMU {
     double getHeading();
     /**
      * @brief Sets the yaw, or the orientation about the z axis in degrees, clamped between 0 and 360
-     *
-     * Better known as the heading
      * 
      * @param iangle The new angle in degrees
      */
     void setHeading(double iangle);
+    /**
+     * @brief Gets the yaw, or the orientation about the z axis in degrees
+     * 
+     * @return double 
+     */
+    double getRotation();
+    /**
+     * @brief Sets the yaw, or the orientation about the z axis in degrees
+     * 
+     * @param iangle The new angle in degrees
+     */
+    void setRotation(double iangle);
 
     /**
      * @brief Calibrates the inertial sensor, finding the max drifts about each axis

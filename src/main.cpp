@@ -1,28 +1,26 @@
 #include "main.h"
-#include "api.h"
-#include "okapi/api.hpp"
-#include "robotconfig.hpp"
-
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-/**
- * Runs initialization code. This occurs as soon as the program is started.
- *
- * All other competition modes are blocked by initialize; it is recommended
- * to keep execution time for this mode under a few seconds.
- */
+#include "pros/llemu.hpp"
 
 Inertial lamaLib::inertial(21);
+
+MotorGroup leftMotors({
+	{TOP_LEFT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
+	{BOTTOM_LEFT_CHASSIS, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
+});
+MotorGroup rightMotors({
+	{TOP_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts},
+	{BOTTOM_RIGHT_CHASSIS, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts}
+});
+Encoders trackingWheels {leftMotors.getMotors().at(0).getEncoder(), rightMotors.getMotors().at(0).getEncoder(), {REAR_TRACKING_UPPER, REAR_TRACKING_LOWER}, 900, 900, 360};
+Chassis lamaLib::chassis(leftMotors, rightMotors, LEFT_WHEEL_DIAMETER, RIGHT_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, trackingWheels, 3, 5.0 / 3.0);
+
 void initialize() {
 	pros::lcd::initialize();
 	// pros::lcd::set_text(1, "Hello PROS User!");
 
 	// pros::lcd::register_btn1_cb(on_center_button);
-	
+	// inertial.calibrate();
+	// while (inertial.isCalibrating()) pros::delay(10);
 }
 
 /**
@@ -71,43 +69,163 @@ void autonomous() {}
  */
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	int8_t ports[4] = {
-		TOP_LEFT_CHASSIS,
-		BOTTOM_LEFT_CHASSIS,
-		TOP_RIGHT_CHASSIS,
-		BOTTOM_RIGHT_CHASSIS
-	};
-	bool reverseConfig[4] = {
-		false, false, true, true
-	};
-	Chassis chassis(ports, reverseConfig, okapi::AbstractMotor::gearset::green);
-	
-	MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
-	MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});
-	
-	for (MotionData movement : trapezoid.profile) {
-		double rpm = movement.velocity * 60 / (PI * 0.1016);
-		chassis.getLeftMotors().moveVelocity(rpm);
-		chassis.getRightMotors().moveVelocity(rpm);
-		cout << chassis.getLeftMotors().getActualVelocity() << ", " << chassis.getRightMotors().getActualVelocity() << ", " << rpm << "\n";
-		pros::delay(20);
-	}
-	for (MotionData movement : trapezoid2.profile) {
-		double rpm = movement.velocity * 60 / (PI * 0.1016);
-		chassis.getLeftMotors().moveVelocity(rpm);
-		chassis.getRightMotors().moveVelocity(rpm);
-		cout << chassis.getLeftMotors().getActualVelocity() << ", " << chassis.getRightMotors().getActualVelocity() << ", " << rpm << "\n";
-		pros::delay(20);
-	}
 
-	// OdomScales calibrated = odom.calibrate(chassis, master, inertial);
-	// cout << calibrated.leftRadius << " " << calibrated.rightRadius << " " << calibrated.rearRadius << "\n";
+	MotorGroup frontArm({{FRONT_ARM_LEFT, true, okapi::AbstractMotor::gearset::red},
+						{FRONT_ARM_RIGHT, false, okapi::AbstractMotor::gearset::red}});
 
+	Motor conveyor(CONVEYOR, false, okapi::AbstractMotor::gearset::blue);
+
+	Motor backClaw(BACK_CLAW, false, okapi::AbstractMotor::gearset::red);
+
+	Pneumatic frontClaw(pros::ADIDigitalOut(FRONT_CLAW));
+
+	okapi::Potentiometer armLimit(ARM_POTENTIOMETER);
+	
+	// chassis.calibrateWheelDiameter(master, 2);
+	// chassis.calibrateChassisDiameter(master, inertial);
+	// chassis.setScales({GEAR_RATIO, LEFT_WHEEL_DIAMETER, RIGHT_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, LEFT_RADIUS, RIGHT_RADIUS, REAR_RADIUS});
+	// chassis.startOdom();
+	// chassis.turnAbsolute(90, 1, {0.006, 0.002, 0, 0});
+	
+	// MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
+	// MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});
+	
+	// for (MotionData movement : trapezoid.profile) {
+	// 	double rpm = movement.velocity * 60 / (PI * 0.1016);
+	// 	chassis.getLeftMotors().moveVelocity(rpm);
+	// 	chassis.getRightMotors().moveVelocity(rpm);
+	// 	cout << chassis.getLeftMotors().getActualVelocity() << ", " << chassis.getRightMotors().getActualVelocity() << ", " << rpm << "\n";
+	// 	pros::delay(20);
+	// }
+	// for (MotionData movement : trapezoid2.profile) {
+	// 	double rpm = movement.velocity * 60 / (PI * 0.1016);
+	// 	chassis.getLeftMotors().moveVelocity(rpm);
+	// 	chassis.getRightMotors().moveVelocity(rpm);
+	// 	cout << chassis.getLeftMotors().getActualVelocity() << ", " << chassis.getRightMotors().getActualVelocity() << ", " << rpm << "\n";
+	// 	pros::delay(20);
+	// }
+
+	// Move velocity test
+	// int count = 0;
+	// int mV = 12000;
+	// double leftSum = 0, rightSum = 0;
+	// while (count < 200) {
+	// 	leftMotors.moveMotor(100, 0.0189, -19.191);
+	// 	rightMotors.moveMotor(100, 0.018, -20.053);
+	// 	// leftMotors.moveMotor(100, 0.0179, -22.772);
+	// 	// rightMotors.moveMotor(100, 0.0178, -22.467);
+	// 	cout << leftMotors.getActualVelocity() << "\t" << rightMotors.getActualVelocity() << "\n";
+	// 	// leftMotors.moveVoltage(mV);
+	// 	// rightMotors.moveVoltage(mV);
+	// 	// if (count > 25) {
+	// 	// 	leftSum += leftMotors.getActualVelocity();
+	// 	// 	rightSum += rightMotors.getActualVelocity();
+	// 	// }
+	// 	count++;
+	// 	pros::delay(10);
+	// }
+	// // cout << leftSum / 175 << "\t" << rightSum / 175 << "\n";
+	// leftMotors.moveVelocity(0);
+	// rightMotors.moveVelocity(0);
+	// pros::delay(1000);
+	// while (count < 400) {
+	// 	leftMotors.moveMotor(-100, 0.0189, -19.191);
+	// 	rightMotors.moveMotor(-100, 0.018, -20.053);
+	// 	cout << leftMotors.getActualVelocity() << "\t" << rightMotors.getActualVelocity() << "\n";
+	// 	// leftMotors.moveVoltage(-mV);
+	// 	// rightMotors.moveVoltage(-mV);
+	// 	count++;
+	// 	pros::delay(10);
+	// }
+	// leftMotors.moveVelocity(0);
+	// rightMotors.moveVelocity(0);
+
+	// // Move distance test
+	// chassis.addROC("0", {0.0189, -19.191, {0.05, 0.0001, 0.05, 1}}, {0.018, -20.053, {0.05, 0.0001, 0.05, 1}});
+	// while (count < 200) {
+	// 	leftMotors.moveMotor(100, 0.0189, -19.191, {0, 0, 0, 1});
+	// 	rightMotors.moveMotor(100, 0.018, -20.053, {0.0001, 0, 0, 1});
+	// 	cout << 100 << ","
+	// 		<< leftMotors.getMotors().at(0).getActualVelocity() << ","
+	// 		<< leftMotors.getMotors().at(1).getActualVelocity() << ","
+	// 		<< rightMotors.getMotors().at(0).getActualVelocity() << ","
+	// 		<< rightMotors.getMotors().at(1).getActualVelocity() << "\n";
+	// 	count++;
+	// 	pros::delay(10);
+	// }
+	// leftMotors.moveMotor(0);
+	// rightMotors.moveMotor(0);
+	// chassis.addROC("1", {0.0183, -22.301}, {0.0183, -23.267});
+	// chassis.addROC("2", {0.0179, -22.772}, {0.0178, -22.467});
+	// chassis.moveDistance({1}, {{1.45, 2.8}}, {0}, "0");//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+	// chassis.moveDistance({-1.0 / (5.0/4.0)}, {{1.25, 2}}, {0}, "0");
+	// chassis.moveDistance({1, 1.5, 2.5}, {{1.5, 1}, {0.5, 0.5}, {1, 0.7}}, {0.5, 1, 0});
+
+	// // Turn test
+	// chassis.turnAbsolute(90, 1.5, {0.05, 0.001, 0.02, 1});
+	// chassis.turnAbsolute(-90, 1.5, {0.05, 0.001, 0.02, 1});
+	// chassis.turnRelative(90, 1.5, {0.05, 0.001, 0.02, 1});
+	// chassis.turnRelative(-90, 1.5, {0.05, 0.001, 0.02, 1});
+
+	int conveyorDir = 0;
 	while (true) {
+		
 		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
-		chassis.move(joyY + joyX, joyY - joyX);
+		int leftSlew = chassis.lCalcSlew(joyY + joyX, 20);
+		int rightSlew = chassis.rCalcSlew(joyY - joyX, 20);
+
+		pros::lcd::print(1, "joyX %d", joyX);
+		pros::lcd::print(2, "joyY %d", joyY);
+		pros::lcd::print(3, "leftPower %d", leftSlew);
+		pros::lcd::print(4, "rightPower %d", rightSlew);
+		pros::lcd::print(5, "leftRPM %f", chassis.getLeftMotors().getActualVelocity());
+		pros::lcd::print(6, "rightRPM %f", chassis.getRightMotors().getActualVelocity());
+
+		// cout << leftPower << "\t" << rightPower << "\n";
+		// if (armLimit.get() > 2000)
+		// 	chassis.move(leftSlew, rightSlew);
+		// else
+			chassis.move(joyY + joyX, joyY - joyX);
+
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
+			frontClaw.toggle();
+		
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
+			if(conveyorDir != 1)
+				conveyorDir = 1;
+			else
+				conveyorDir = 0;
+		}
+		else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
+			if(conveyorDir != -1)
+				conveyorDir = -1;
+			else
+				conveyorDir = 0;
+		}
+		conveyor.moveVelocity(420 * conveyorDir);
+		
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+			if (armLimit.get() < ARM_UPPER_LIMIT)
+				frontArm.moveVelocity(100);
+			else
+				frontArm.moveVelocity(0);
+		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+			if (armLimit.get() > ARM_LOWER_LIMIT)
+				frontArm.moveVelocity(-100);
+			else
+			 	frontArm.moveVelocity(0);
+		} else
+			frontArm.moveVelocity(0);
+		
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+			backClaw.moveVelocity(100);
+		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+			backClaw.moveVelocity(-100);
+		else
+			backClaw.moveVelocity(0);
+		
 		pros::delay(20);
 	}
 }

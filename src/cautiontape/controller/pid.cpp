@@ -1,35 +1,14 @@
 #include "pid.hpp"
+#include <iostream>
+
+using namespace std;
 using namespace lamaLib;
 
-PIDController::PIDController(double p, double i, double d, double min, double max, double iComp) {
-    kp = p;
-    ki = i;
-    kd = d;
-    minimum = min;
-    maximum = max;
-    difference = max - min;
-    integralCompensation = iComp;
-}
-
-void PIDController::resetPID() {
-    integral = 0;
-    derivative = 0;
-    prevError = 0;
-    count = 0;
-}
-
-int fabs(double val) {
-    return ((val > 0) - (val < 0)) * val;
-}
+PIDController::PIDController(PIDValues ipidValues, double max, double min, double iComp) :
+                            pidValues(ipidValues), max(max), min(min), integralComp(iComp) {}
 
 double PIDController::calculatePID(double current, double target, double leeway) {
     double error = target - current;
-    if (error > maximum) {
-        error -= difference;
-    }
-    if (error < minimum) {
-        error += difference;
-    }
 
     if (fabs(error) <= leeway) {
         count++;
@@ -40,8 +19,29 @@ double PIDController::calculatePID(double current, double target, double leeway)
         count = 0;
     }
 
-    derivative = error - prevError;
-    integral = fabs(error) < integralCompensation ? integral + error : 0;
+    double derivative = error - prevError;
+    double newIntegral = fabs(error) < integralComp ? integral + error : 0;
     prevError = error;
-    return error * kp + integral * ki + derivative * kd;
+
+    double signal = error * pidValues.kp + integral * pidValues.ki + derivative * pidValues.kd + pidValues.kf;
+    if (signal > max)
+        signal = max;
+    else if (signal < min)
+        signal = min;
+    else
+        integral = newIntegral;
+
+    return signal;
+}
+
+void PIDController::setPID(PIDValues ipidValues) {
+    pidValues = ipidValues;
+}
+PIDValues PIDController::getPID() {
+    return pidValues;
+}
+void PIDController::resetPID() {
+    integral = 0;
+    prevError = 0;
+    count = 0;
 }
