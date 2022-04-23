@@ -17,6 +17,18 @@ double degToRad(double deg);
  */
 double radToDeg(double rad);
 
+double inToCm(double in);
+double cmToIn(double cm);
+
+double ftToCm(double ft);
+double cmToFt(double cm);
+
+double inToM(double in);
+double mToIn(double m);
+
+double ftToM(double ft);
+double mToFt(double m);
+
 /**
  * @brief Returns the sign of the given number
  * 
