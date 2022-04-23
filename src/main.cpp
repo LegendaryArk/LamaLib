@@ -15,8 +15,8 @@ Encoders trackingWheels {leftMotors.getMotors().at(0).getEncoder(), rightMotors.
 Chassis lamaLib::chassis(leftMotors, rightMotors, LEFT_WHEEL_DIAMETER, RIGHT_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, trackingWheels, 3, 5.0 / 3.0);
 
 void initialize() {
-	pros::lcd::initialize();
-	// pros::lcd::set_text(1, "Hello PROS User!");
+  pros::lcd::initialize();
+  // pros::lcd::set_text(1, "Hello PROS User!");
 
 	// pros::lcd::register_btn1_cb(on_center_button);
 	// inertial.calibrate();
@@ -52,6 +52,24 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
+
+/*
+pros::vision_signature_s_t inputs[7] {
+    pros::Vision::signature_from_utility(1, 1599, 3341, 2470, -4265, -3981,
+                                         -4123, 2.900, 0),
+    pros::Vision::signature_from_utility(2, -2231, -1643, -1937, 7951, 9405,
+                                         8678, 3.000, 0),
+    pros::Vision::signature_from_utility(3, 5611, 8165, 6888, -1395, -979,
+                                         -1187, 3.000, 0),
+    pros::Vision::signature_from_utility(4, 0, 0, 0, 0, 0, 0, 3.000, 0),
+    pros::Vision::signature_from_utility(5, 0, 0, 0, 0, 0, 0, 3.000, 0),
+    pros::Vision::signature_from_utility(6, 0, 0, 0, 0, 0, 0, 3.000, 0),
+    pros::Vision::signature_from_utility(7, 0, 0, 0, 0, 0, 0, 3.000, 0)
+  };
+  lamalib::visionSensor visSensor(1);
+  visSensor.setSignatures(inputs);
+*/
+
 void autonomous() {}
 
 /**

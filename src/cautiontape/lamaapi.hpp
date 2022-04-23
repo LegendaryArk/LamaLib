@@ -8,6 +8,6 @@
 #include "subsystems/motor.hpp"
 #include "subsystems/motorgroup.hpp"
 #include "subsystems/pneumatic.hpp"
-#include "subsystems/vision.hpp"
-#include "utilities/mathhelper.hpp"
+#include "subsystems/visionSensor.hpp"
+#include "utilities/mathHelper.hpp"
 #include "utilities/pose.hpp"
