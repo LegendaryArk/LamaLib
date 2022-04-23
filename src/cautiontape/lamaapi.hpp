@@ -9,5 +9,5 @@
 #include "subsystems/motorgroup.hpp"
 #include "subsystems/pneumatic.hpp"
 #include "subsystems/visionSensor.hpp"
-#include "utilities/mathHelper.hpp"
+#include "utilities/mathhelper.hpp"
 #include "utilities/pose.hpp"
