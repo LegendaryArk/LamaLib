@@ -126,6 +126,9 @@ class Chassis {
      */
     MotorGroup getRightMotors();
 
+    void setBrakeMode(okapi::AbstractMotor::brakeMode ibrakeMode);
+    okapi::AbstractMotor::brakeMode getBrakeMode();
+
     /**
      * @brief Gets the tracking wheels
      * 

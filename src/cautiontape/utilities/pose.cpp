@@ -9,7 +9,7 @@ double Pose::distTo(Pose ipoint) {
 
 double Pose::angleTo(Pose ipoint) {
     Pose diff = ipoint - *this;
-    return atan2(diff.x, diff.y) + theta;
+    return radToDeg(atan2(diff.x, diff.y)) + theta;
 }
 
 Pose Pose::operator+(Pose rhs) {

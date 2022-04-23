@@ -94,6 +94,8 @@ void Chassis::turnAbsolute(double itarget, double imaxVel, PIDValues pidVals) {
 
         pros::delay(10);
     }
+    leftMotors.moveVelocity(0);
+    rightMotors.moveVelocity(0);
 }
 
 void Chassis::turnRelative(double itarget, double imaxVel, PIDValues pidVals) {
@@ -118,6 +120,14 @@ MotorGroup Chassis::getLeftMotors() {
 }
 MotorGroup Chassis::getRightMotors() {
     return rightMotors;
+}
+
+void Chassis::setBrakeMode(okapi::AbstractMotor::brakeMode ibrakeMode) {
+    leftMotors.setBrakeMode(ibrakeMode);
+    rightMotors.setBrakeMode(ibrakeMode);
+}
+okapi::AbstractMotor::brakeMode Chassis::getBrakeMode() {
+    return leftMotors.getBrakeMode();
 }
 
 Encoders Chassis::getTrackingWheels() {

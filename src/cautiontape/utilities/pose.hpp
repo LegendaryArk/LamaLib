@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api.h"
+#include "mathhelper.hpp"
 
 namespace lamaLib {
 /**

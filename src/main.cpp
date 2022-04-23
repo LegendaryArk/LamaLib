@@ -19,6 +19,7 @@ void initialize() {
 	// pros::lcd::set_text(1, "Hello PROS User!");
 
 	// pros::lcd::register_btn1_cb(on_center_button);
+
 	// inertial.calibrate();
 	// while (inertial.isCalibrating()) pros::delay(10);
 }
@@ -85,7 +86,13 @@ void opcontrol() {
 	// chassis.calibrateChassisDiameter(master, inertial);
 	// chassis.setScales({GEAR_RATIO, LEFT_WHEEL_DIAMETER, RIGHT_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, LEFT_RADIUS, RIGHT_RADIUS, REAR_RADIUS});
 	// chassis.startOdom();
-	// chassis.turnAbsolute(90, 1, {0.006, 0.002, 0, 0});
+	// chassis.turnAbsolute(90, 1, {0.0067, 0.002, 0.0025, 0});
+	// chassis.moveToPose({0, 1}, 1, {}, {{1.45, 2.8}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	// chassis.moveToPose({1, 1}, 1, {}, {{1.45, 2.8}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	// chassis.moveToPose({1, 0}, 1, {}, {{1.45, 2.8}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	// chassis.moveToPose({0, 0}, 1, {}, {{1.45, 2.8}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	// // pros::delay(2000);
+	// chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	
 	// MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
 	// MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});
@@ -187,7 +194,7 @@ void opcontrol() {
 		// if (armLimit.get() > 2000)
 		// 	chassis.move(leftSlew, rightSlew);
 		// else
-			chassis.move(joyY + joyX, joyY - joyX);
+		chassis.move(joyY + joyX, joyY - joyX);
 
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
 			frontClaw.toggle();
