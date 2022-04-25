@@ -7,3 +7,5 @@ void startLeftLeftGoal();
 void startRightRightGoal();
 void startLeftFullAWP();
 void startRightFullAWP();
+
+void skills();

@@ -17,3 +17,7 @@ void startLeftFullAWP() {
 void startRightFullAWP() {
 
 }
+
+void skills() {
+	
+}
