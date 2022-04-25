@@ -22,6 +22,8 @@
 #define FRONT_CLAW 'C'
 #define BACK_CLAW 13
 
+#define INERTIAL 21
+
 #define ARM_POTENTIOMETER 'D'
 #define ARM_UPPER_LIMIT 2700
 #define ARM_LOWER_LIMIT 1200

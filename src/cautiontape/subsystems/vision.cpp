@@ -2,7 +2,7 @@
 #include "pros/vision.h"
 #include "pros/vision.hpp"
 
-namespace lamalib {
+namespace lamaLib {
     visionSensor::visionSensor(pros::Vision vSensor) : vSensor (pros::Vision(1)) {
         //Configures colour signatures
         //See: https://pros.cs.purdue.edu/v5/tutorials/topical/vision.html#setting-signatures

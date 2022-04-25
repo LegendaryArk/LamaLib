@@ -1,11 +1,14 @@
 #pragma once
 
 #include "cautiontape/lamaapi.hpp"
+#include "robot.hpp"
 
-void startLeftMidGoal();
-void startLeftLeftGoal();
-void startRightRightGoal();
-void startLeftFullAWP();
+void startRightMidGoal();
+void startRightLeftGoal();
+
+void startLeftRightGoal();
+
 void startRightFullAWP();
+void startLeftFullAWP();
 
 void skills();

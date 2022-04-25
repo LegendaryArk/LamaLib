@@ -113,6 +113,8 @@ void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDist
             cutoffDists.at(i) = -cutoffDists.at(i);
     }
     moveDistance(cutoffDists, imaxes, iends);
+
+    turnAbsolute(itarget.theta, turnVel, turnPID);
 }
 
 MotorGroup Chassis::getLeftMotors() {
@@ -141,7 +143,8 @@ Pose Chassis::getPose() {
     return pose;
 }
 void Chassis::setPose(Pose ipose) {
-    pose = ipose;
+    Pose mPose = {ftToM(ipose.x), ftToM(ipose.y), ipose.theta};
+    pose = mPose;
 }
 
 RobotScales Chassis::getScales() {
