@@ -102,14 +102,18 @@ void Chassis::turnRelative(double itarget, double imaxVel, PIDValues pidVals) {
     turnAbsolute(pose.theta + itarget, imaxVel, pidVals);
 }
 
-void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID, bool reverse) {
+void Chassis::moveToPose(Pose itarget, double turnVel, vector<Pose> cutoffPoses, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID, bool reverse) {
     double angle = reverse ? pose.angleTo(itarget) + 180 : pose.angleTo(itarget);
     turnRelative(angle, turnVel, turnPID);
 
+    vector<double> cutoffDists;
+    for (int i = 0; i < cutoffPoses.size(); i++)
+        cutoffDists.emplace_back(pose.distTo(cutoffPoses.at(i)));
+    
     double totalDist = pose.distTo(itarget);
     cutoffDists.emplace_back(totalDist);
     if (reverse) {
-        for (int i = 0; i < cutoffDists.size(); i++)
+        for (int i = 0; i < cutoffPoses.size(); i++)
             cutoffDists.at(i) = -cutoffDists.at(i);
     }
     moveDistance(cutoffDists, imaxes, iends);
