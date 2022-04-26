@@ -39,6 +39,14 @@ okapi::AbstractMotor::brakeMode MotorGroup::getBrakeMode() {
     return motors.at(0).getBrakeMode();
 }
 
+bool MotorGroup::isOverTemp() {
+    for (Motor motor : motors) {
+        if (motor.isOverTemp())
+            return true;
+    }
+    return false;
+}
+
 void MotorGroup::setGearing(okapi::AbstractMotor::gearset igearset) {
     for (Motor motor : motors)
         motor.setGearing(igearset);

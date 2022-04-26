@@ -19,7 +19,6 @@ void initialize() {
 	// pros::lcd::set_text(1, "Hello PROS User!");
 
 	// pros::lcd::register_btn1_cb(on_center_button);
-
 	// inertial.calibrate();
 	// while (inertial.isCalibrating()) pros::delay(10);
 }
@@ -176,7 +175,28 @@ void opcontrol() {
 	// chassis.turnRelative(-90, 1.5, {0.05, 0.001, 0.02, 1});
 
 	int conveyorDir = 0;
+	bool backClawOpen = false;
 	while (true) {
+		if (leftMotors.isOverTemp()) {
+			pros::lcd::print(0, "Left motors overheating: %f°C  %f°C", leftMotors.getMotors().at(0).getTemperature(), leftMotors.getMotors().at(1).getTemperature());
+			// master.rumble(".");
+		}
+		if (rightMotors.isOverTemp()) {
+			pros::lcd::print(1, "Right motors overheating: %f°C  %f°C", rightMotors.getMotors().at(0).getTemperature(), rightMotors.getMotors().at(1).getTemperature());
+			// master.rumble(".");
+		}
+		if (frontArm.isOverTemp()) {
+			pros::lcd::print(2, "Front arm is overheating: %f°C  %f°C", frontArm.getMotors().at(0).getTemperature(), frontArm.getMotors().at(1).getTemperature());
+			// master.rumble(".");
+		}
+		if (backClaw.isOverTemp()) {
+			pros::lcd::print(3, "Back claw is overheating: %f°C", backClaw.getTemperature());
+			// master.rumble(".");
+		}
+		if (conveyor.isOverTemp()) {
+			pros::lcd::print(4, "Intake is overheating: %f°C", conveyor.getTemperature());
+			// master.rumble(".");
+		}
 		
 		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
@@ -197,7 +217,7 @@ void opcontrol() {
 		// else
 		chassis.move(joyY + joyX, joyY - joyX);
 
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1))
 			frontClaw.toggle();
 		
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
@@ -212,7 +232,12 @@ void opcontrol() {
 			else
 				conveyorDir = 0;
 		}
-		conveyor.moveVelocity(600 * conveyorDir);
+		conveyor.moveVelocity(420 * conveyorDir);
+
+		if (conveyorDir == 0)
+			backClaw.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+		else
+		 	backClaw.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
 		
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
 			if (armLimit.get() < ARM_UPPER_LIMIT)
@@ -227,12 +252,13 @@ void opcontrol() {
 		} else
 			frontArm.moveVelocity(0);
 		
-		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
-			backClaw.moveVelocity(100);
-		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
-			backClaw.moveVelocity(-100);
-		else
-			backClaw.moveVelocity(0);
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+			if (backClawOpen)
+				backClaw.moveAbsolute(0, 100);
+			else
+			 	backClaw.moveAbsolute(-450, 100);
+			backClawOpen = !backClawOpen;
+		}
 		
 		pros::delay(20);
 	}
