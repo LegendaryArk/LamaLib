@@ -111,7 +111,7 @@ class Chassis {
      * @param turnPID The Kp, Ki, Kd, and Kf used in the turn, default is all 0
      * @param reverse Whether the robot should move forward or backwards to the point. True = backwards, false = forwards
      */
-    void moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID = {0, 0, 0, 0}, bool reverse = false);
+    void moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID = {0, 0, 0, 0}, bool reverse = false, bool angleWrap = false);
 
     /**
      * @brief Gets the left motors
@@ -125,6 +125,9 @@ class Chassis {
      * @return The right motors 
      */
     MotorGroup getRightMotors();
+
+    void setBrakeMode(okapi::AbstractMotor::brakeMode ibrakeMode);
+    okapi::AbstractMotor::brakeMode getBrakeMode();
 
     /**
      * @brief Gets the tracking wheels

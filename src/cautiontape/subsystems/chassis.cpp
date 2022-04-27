@@ -72,7 +72,7 @@ void Chassis::moveDistance(vector<double> idistances, vector<MotionLimit> imaxes
     for (MotionData vel : profile.profile) {
         double leftRPM = vel.velocity * 60 / (M_PI * scales.leftWheelDiameter);
         double rightRPM = vel.velocity * 60 / (M_PI * scales.rightWheelDiameter);
-        cout << leftRPM << "," << rightRPM << "," << vel.distance << "," << leftMotors.getActualVelocity() << "," << rightMotors.getActualVelocity() << "\n";
+        // cout << leftRPM << "," << rightRPM << "," << vel.distance << "," << leftMotors.getActualVelocity() << "," << rightMotors.getActualVelocity() << "\n";
         leftMotors.moveVelocity(leftRPM);
         rightMotors.moveVelocity(rightRPM);
         
@@ -94,15 +94,18 @@ void Chassis::turnAbsolute(double itarget, double imaxVel, PIDValues pidVals) {
 
         pros::delay(10);
     }
+    leftMotors.moveVelocity(0);
+    rightMotors.moveVelocity(0);
 }
 
 void Chassis::turnRelative(double itarget, double imaxVel, PIDValues pidVals) {
     turnAbsolute(pose.theta + itarget, imaxVel, pidVals);
 }
 
-void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID, bool reverse) {
+void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID, bool reverse, bool angleWrap) {
     double angle = reverse ? pose.angleTo(itarget) + 180 : pose.angleTo(itarget);
-    turnRelative(angle, turnVel, turnPID);
+    angle = angleWrap ? angleWrap180(angle) : angle;
+    turnAbsolute(angle, turnVel, turnPID);
 
     double totalDist = pose.distTo(itarget);
     cutoffDists.emplace_back(totalDist);
@@ -118,6 +121,14 @@ MotorGroup Chassis::getLeftMotors() {
 }
 MotorGroup Chassis::getRightMotors() {
     return rightMotors;
+}
+
+void Chassis::setBrakeMode(okapi::AbstractMotor::brakeMode ibrakeMode) {
+    leftMotors.setBrakeMode(ibrakeMode);
+    rightMotors.setBrakeMode(ibrakeMode);
+}
+okapi::AbstractMotor::brakeMode Chassis::getBrakeMode() {
+    return leftMotors.getBrakeMode();
 }
 
 Encoders Chassis::getTrackingWheels() {

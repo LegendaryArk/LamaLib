@@ -63,6 +63,8 @@ class MotorGroup {
      */
     okapi::AbstractMotor::brakeMode getBrakeMode();
 
+    bool isOverTemp();
+
     /**
      * @brief Sets the gearing
      * 

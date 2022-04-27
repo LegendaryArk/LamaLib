@@ -16,7 +16,7 @@ MotionLimit MotionLimit::operator/(double rhs) {
 }
 
 MotionProfile lamaLib::generateTrapezoid(MotionLimit imotionLimit, CutoffPoint istart, CutoffPoint iend) {
-	MotionProfile trapezoid = {};
+	MotionProfile trapezoid;
 	trapezoid.profile = vector<MotionData>();
 
 	double cutoffStartTime = fabs(istart.velocity / imotionLimit.maxAcceleration);
@@ -44,7 +44,7 @@ MotionProfile lamaLib::generateTrapezoid(MotionLimit imotionLimit, CutoffPoint i
 	// endDecel = maxDistance + endAccel
 	double endDecel = endMax + accelTime - cutoffEndTime;
 
-	 cout << endAccel << "\t" << endMax << "\t" << endDecel << "\t" << accelTime << "\t" << cutoffStartTime << "\t" << cutoffEndTime << "\n";
+	cout << endAccel << "\t" << endMax << "\t" << endDecel << "\t" << accelTime << "\t" << cutoffStartTime << "\t" << cutoffEndTime << "\n";
 
 	int direction = sign(iend.distance);
 	imotionLimit.maxVelocity *= direction;

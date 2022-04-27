@@ -35,6 +35,17 @@ double mToFt(double m) {
     return m * 3.281;
 }
 
+double angleWrap180(double ang) {
+    if (fmod(ang, 360) < 0)
+        ang += 360;
+    return ang;
+}
+double angleWrap360(double ang) {
+    if (fmod(ang + 180, 360) < 0)
+        ang += 360;
+    return ang - 180;
+}
+
 int sign(double n) {
     return (n > 0) - (n < 0);
 }

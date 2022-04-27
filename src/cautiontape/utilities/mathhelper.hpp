@@ -29,6 +29,9 @@ double mToIn(double m);
 double ftToM(double ft);
 double mToFt(double m);
 
+double angleWrap180(double ang);
+double angleWrap360(double ang);
+
 /**
  * @brief Returns the sign of the given number
  * 

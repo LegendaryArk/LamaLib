@@ -94,6 +94,7 @@ void opcontrol() {
 	Motor conveyor(CONVEYOR, false, okapi::AbstractMotor::gearset::blue);
 
 	Motor backClaw(BACK_CLAW, false, okapi::AbstractMotor::gearset::red);
+	backClaw.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
 
 	Pneumatic frontClaw(pros::ADIDigitalOut(FRONT_CLAW));
 
@@ -101,9 +102,15 @@ void opcontrol() {
 	
 	// chassis.calibrateWheelDiameter(master, 2);
 	// chassis.calibrateChassisDiameter(master, inertial);
-	// chassis.setScales({GEAR_RATIO, LEFT_WHEEL_DIAMETER, RIGHT_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, LEFT_RADIUS, RIGHT_RADIUS, REAR_RADIUS});
-	// chassis.startOdom();
-	// chassis.turnAbsolute(90, 1, {0.006, 0.002, 0, 0});
+	chassis.setScales({GEAR_RATIO, LEFT_WHEEL_DIAMETER, RIGHT_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, LEFT_RADIUS, RIGHT_RADIUS, REAR_RADIUS});
+	chassis.startOdom();
+	// chassis.turnAbsolute(90, 1, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveToPose({0, 1.05}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveToPose({1.05, 1.05}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveToPose({1.05, 0}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveToPose({0, 0}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	// // pros::delay(2000);
+	// chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	
 	// MotionProfile trapezoid = lamaLib::generateTrapezoid({0.75, 0.5}, {0, 0}, {1, 0.75});
 	// MotionProfile trapezoid2 = lamaLib::generateTrapezoid({0.5, 1}, {1, 0.75, trapezoid.profile.at(trapezoid.profile.size() - 1).time}, {1.5, 0});
@@ -186,7 +193,28 @@ void opcontrol() {
 	// chassis.turnRelative(-90, 1.5, {0.05, 0.001, 0.02, 1});
 
 	int conveyorDir = 0;
+	bool backClawOpen = false;
 	while (true) {
+		if (leftMotors.isOverTemp()) {
+			pros::lcd::print(0, "Left motors overheating: %f°C  %f°C", leftMotors.getMotors().at(0).getTemperature(), leftMotors.getMotors().at(1).getTemperature());
+			// master.rumble(".");
+		}
+		if (rightMotors.isOverTemp()) {
+			pros::lcd::print(1, "Right motors overheating: %f°C  %f°C", rightMotors.getMotors().at(0).getTemperature(), rightMotors.getMotors().at(1).getTemperature());
+			// master.rumble(".");
+		}
+		if (frontArm.isOverTemp()) {
+			pros::lcd::print(2, "Front arm is overheating: %f°C  %f°C", frontArm.getMotors().at(0).getTemperature(), frontArm.getMotors().at(1).getTemperature());
+			// master.rumble(".");
+		}
+		if (backClaw.isOverTemp()) {
+			pros::lcd::print(3, "Back claw is overheating: %f°C", backClaw.getTemperature());
+			// master.rumble(".");
+		}
+		if (conveyor.isOverTemp()) {
+			pros::lcd::print(4, "Intake is overheating: %f°C", conveyor.getTemperature());
+			// master.rumble(".");
+		}
 		
 		int joyY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		int joyX = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
@@ -194,20 +222,20 @@ void opcontrol() {
 		int leftSlew = chassis.lCalcSlew(joyY + joyX, 20);
 		int rightSlew = chassis.rCalcSlew(joyY - joyX, 20);
 
-		pros::lcd::print(1, "joyX %d", joyX);
-		pros::lcd::print(2, "joyY %d", joyY);
-		pros::lcd::print(3, "leftPower %d", leftSlew);
-		pros::lcd::print(4, "rightPower %d", rightSlew);
-		pros::lcd::print(5, "leftRPM %f", chassis.getLeftMotors().getActualVelocity());
-		pros::lcd::print(6, "rightRPM %f", chassis.getRightMotors().getActualVelocity());
+		// pros::lcd::print(1, "joyX %d", joyX);
+		// pros::lcd::print(2, "joyY %d", joyY);
+		// pros::lcd::print(3, "leftPower %d", leftSlew);
+		// pros::lcd::print(4, "rightPower %d", rightSlew);
+		// pros::lcd::print(5, "leftRPM %f", chassis.getLeftMotors().getActualVelocity());
+		// pros::lcd::print(6, "rightRPM %f", chassis.getRightMotors().getActualVelocity());
 
 		// cout << leftPower << "\t" << rightPower << "\n";
 		// if (armLimit.get() > 2000)
 		// 	chassis.move(leftSlew, rightSlew);
 		// else
-			chassis.move(joyY + joyX, joyY - joyX);
+		chassis.move(joyY + joyX, joyY - joyX);
 
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1))
 			frontClaw.toggle();
 		
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)){
@@ -223,6 +251,11 @@ void opcontrol() {
 				conveyorDir = 0;
 		}
 		conveyor.moveVelocity(420 * conveyorDir);
+
+		if (conveyorDir == 0)
+			backClaw.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+		else
+		 	backClaw.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
 		
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
 			if (armLimit.get() < ARM_UPPER_LIMIT)
@@ -237,12 +270,13 @@ void opcontrol() {
 		} else
 			frontArm.moveVelocity(0);
 		
-		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
-			backClaw.moveVelocity(100);
-		else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
-			backClaw.moveVelocity(-100);
-		else
-			backClaw.moveVelocity(0);
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+			if (backClawOpen)
+				backClaw.moveAbsolute(0, 100);
+			else
+			 	backClaw.moveAbsolute(-450, 100);
+			backClawOpen = !backClawOpen;
+		}
 		
 		pros::delay(20);
 	}
