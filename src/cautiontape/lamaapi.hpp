@@ -1,7 +1,7 @@
 #pragma once
 
-#include "controller/odometry.hpp"
 #include "controller/motionprofiling.hpp"
+#include "controller/odometry.hpp"
 #include "controller/pid.hpp"
 #include "subsystems/chassis.hpp"
 #include "subsystems/inertial.hpp"
