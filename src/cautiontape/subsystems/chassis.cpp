@@ -102,8 +102,9 @@ void Chassis::turnRelative(double itarget, double imaxVel, PIDValues pidVals) {
     turnAbsolute(pose.theta + itarget, imaxVel, pidVals);
 }
 
-void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID, bool reverse) {
+void Chassis::moveToPose(Pose itarget, double turnVel, vector<double> cutoffDists, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID, bool reverse, bool angleWrap) {
     double angle = reverse ? pose.angleTo(itarget) + 180 : pose.angleTo(itarget);
+    angle = angleWrap ? angleWrap180(angle) : angle;
     turnAbsolute(angle, turnVel, turnPID);
 
     double totalDist = pose.distTo(itarget);

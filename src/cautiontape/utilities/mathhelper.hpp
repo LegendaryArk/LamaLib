@@ -17,6 +17,9 @@ double degToRad(double deg);
  */
 double radToDeg(double rad);
 
+double angleWrap180(double ang);
+double angleWrap360(double ang);
+
 /**
  * @brief Returns the sign of the given number
  * 

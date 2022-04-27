@@ -87,10 +87,10 @@ void opcontrol() {
 	chassis.setScales({GEAR_RATIO, LEFT_WHEEL_DIAMETER, RIGHT_WHEEL_DIAMETER, REAR_WHEEL_DIAMETER, LEFT_RADIUS, RIGHT_RADIUS, REAR_RADIUS});
 	chassis.startOdom();
 	// chassis.turnAbsolute(90, 1, {0.0067, 0.002, 0.0025, 0});
-	// chassis.moveToPose({0, 1.05}, 1, {}, {{1.45, 2.7}}, {0}, {0.0067, 0.002, 0.0025, 0});
-	// chassis.moveToPose({1.05, 1.05}, 1, {}, {{1.45, 2.7}}, {0}, {0.0067, 0.002, 0.0025, 0});
-	// chassis.moveToPose({1.05, 0}, 1, {}, {{1.45, 2.7}}, {0}, {0.0067, 0.002, 0.0025, 0});
-	// chassis.moveToPose({0, 0}, 1, {}, {{1.45, 2.8}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveToPose({0, 1.05}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveToPose({1.05, 1.05}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveToPose({1.05, 0}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveToPose({0, 0}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
 	// // pros::delay(2000);
 	// chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	
@@ -204,12 +204,12 @@ void opcontrol() {
 		int leftSlew = chassis.lCalcSlew(joyY + joyX, 20);
 		int rightSlew = chassis.rCalcSlew(joyY - joyX, 20);
 
-		pros::lcd::print(1, "joyX %d", joyX);
-		pros::lcd::print(2, "joyY %d", joyY);
-		pros::lcd::print(3, "leftPower %d", leftSlew);
-		pros::lcd::print(4, "rightPower %d", rightSlew);
-		pros::lcd::print(5, "leftRPM %f", chassis.getLeftMotors().getActualVelocity());
-		pros::lcd::print(6, "rightRPM %f", chassis.getRightMotors().getActualVelocity());
+		// pros::lcd::print(1, "joyX %d", joyX);
+		// pros::lcd::print(2, "joyY %d", joyY);
+		// pros::lcd::print(3, "leftPower %d", leftSlew);
+		// pros::lcd::print(4, "rightPower %d", rightSlew);
+		// pros::lcd::print(5, "leftRPM %f", chassis.getLeftMotors().getActualVelocity());
+		// pros::lcd::print(6, "rightRPM %f", chassis.getRightMotors().getActualVelocity());
 
 		// cout << leftPower << "\t" << rightPower << "\n";
 		// if (armLimit.get() > 2000)
