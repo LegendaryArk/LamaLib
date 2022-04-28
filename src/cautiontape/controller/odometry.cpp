@@ -45,6 +45,5 @@ Pose Odometry::updatePose(Pose icurrPose, RobotScales iscales, Encoders iencoder
     double globalX = icurrPose.x + deltaGlobalX;
     double globalY = icurrPose.y + deltaGlobalY;
     double globalTheta = icurrPose.theta + radToDeg(delta.theta);
-    cout << icurrPose.x << "\t" << deltaGlobalX << "\t" << icurrPose.y << "\t" << deltaGlobalY << "\n";
     return {globalX, globalY, globalTheta, pros::millis()};
 }
