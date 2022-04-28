@@ -40,17 +40,12 @@ void startRightLeftGoal() {
 }
 
 void startLeftRightGoal() {
-	chassis.setPose({ftToM(2.8), ftToM(1.7), 20});
+	// chassis.setPose({ftToM(2.8), ftToM(1.7), 0});
 	chassis.startOdom();
-	cout << chassis.getPose().x << "\t" << chassis.getPose().y << "\n";
-	cout << chassis.getPose().x << "\t" << chassis.getPose().y << "\n";
-	for (int i = 0; i < 100; i++) {
-		chassis.turnRelative(3, 1, {0.0067, 0.002, 0.0025, 0});
-		cout << chassis.getPose().x << "\t" << chassis.getPose().y << "\n";
-		cout << chassis.getTrackingWheels().left->get() << "\t" << chassis.getTrackingWheels().right->get() << "\n";
-	}
-
-	// chassis.moveToPose({ftToM(3), ftToM(5), 20}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveToPose({1.05, 1.05, 90}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveToPose({1.05, 1.05, 180}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveToPose({1.05, 1.05, 0}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	// chassis.moveToPose({ftToM(3), ftToM(5.1), 90}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
 	// frontClaw.toggle();
 	// chassis.moveToPose({3.5, 2.2, -20}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0}, true);
 	// backClaw.moveAbsolute(-450, 100);

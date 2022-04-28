@@ -6,6 +6,11 @@ using namespace lamaLib;
 Odometry::Odometry() {}
 
 Pose Odometry::updatePose(Pose icurrPose, RobotScales iscales, Encoders iencoders, OdomValues ireadingsDiff) {
+    if (fabs(ireadingsDiff.left) > 30 || fabs(ireadingsDiff.right) > 30 || fabs(ireadingsDiff.rear) > 30) {
+        cerr << ireadingsDiff.left << "\t" << ireadingsDiff.right << "\t" << ireadingsDiff.rear << "\n";
+        return icurrPose;
+    }
+
     double leftWheelCircumference = iscales.leftWheelDiameter * M_PI;
     double rightWheelCircumference = iscales.rightWheelDiameter * M_PI;
     double rearWheelCircumference = iscales.rearWheelDiameter * M_PI;
@@ -19,7 +24,7 @@ Pose Odometry::updatePose(Pose icurrPose, RobotScales iscales, Encoders iencoder
     // Delta theta
     delta.theta = (delta.left - delta.right) / chassisDiameter;
 
-    delta.rear = ((ireadingsDiff.rear / iencoders.rearTPR) * rearWheelCircumference) - (delta.theta * iscales.rearRadius);
+    delta.rear = 0; // ((ireadingsDiff.rear / iencoders.rearTPR) * rearWheelCircumference) - (delta.theta * iscales.rearRadius);
 
     // Local coordinates
     double localOffsetX = delta.rear;

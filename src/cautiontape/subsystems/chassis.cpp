@@ -123,9 +123,9 @@ void Chassis::moveToPose(Pose itarget, double turnVel, vector<Pose> cutoffPoses,
             cutoffDists.at(i) = -cutoffDists.at(i);
     }
     
-    // moveDistance(cutoffDists, imaxes, iends);
+    moveDistance(cutoffDists, imaxes, iends);
     
-    // turnAbsolute(itarget.theta, turnVel, turnPID);
+    turnAbsolute(itarget.theta, turnVel, turnPID);
 }
 
 MotorGroup Chassis::getLeftMotors() {
