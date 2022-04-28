@@ -86,7 +86,7 @@ void Chassis::turnAbsolute(double itarget, double imaxVel, PIDValues pidVals) {
     PIDController pidControl(pidVals);
     while (fabs(itarget - pose.theta) > 1) {
         double pid = pidControl.calculatePID(pose.theta, itarget, 1);
-
+        
         double leftRPM = imaxVel * 60 / (M_PI * scales.leftWheelDiameter);
         double rightRPM = imaxVel * 60 / (M_PI * scales.rightWheelDiameter);
         leftMotors.moveVelocity(leftRPM * pid);
@@ -106,19 +106,21 @@ void Chassis::moveToPose(Pose itarget, double turnVel, vector<Pose> cutoffPoses,
     double angle = reverse ? pose.angleTo(itarget) + 180 : pose.angleTo(itarget);
     angle = angleWrap ? angleWrap180(angle) : angle;
     turnAbsolute(angle, turnVel, turnPID);
-
+    
     vector<double> cutoffDists;
     for (int i = 0; i < cutoffPoses.size(); i++)
         cutoffDists.emplace_back(pose.distTo(cutoffPoses.at(i)));
     
-    double totalDist = pose.distTo(itarget);
+    double totalDist = ftToM(pose.distTo(itarget));
+    cout << totalDist << "\n";
     cutoffDists.emplace_back(totalDist);
     if (reverse) {
         for (int i = 0; i < cutoffPoses.size(); i++)
             cutoffDists.at(i) = -cutoffDists.at(i);
     }
+    
     moveDistance(cutoffDists, imaxes, iends);
-
+    
     turnAbsolute(itarget.theta, turnVel, turnPID);
 }
 
@@ -266,7 +268,7 @@ void lamaLib::odometryMain(void *iparam) {
         prevReadings = currReadings;
         currReadings = chassis.getEncoders();
         EncoderValues diffReadings = currReadings - prevReadings;
-
+        
         chassis.setPose(odom.updatePose(chassis.getPose(), chassis.getScales(), chassis.getTrackingWheels(), {diffReadings.left, diffReadings.right, diffReadings.rear, 0}));
 
         pros::lcd::print(0, "x: %.2f in   y: %.2f in", chassis.getPose().x, chassis.getPose().y);

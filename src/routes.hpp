@@ -1,7 +1,7 @@
 #pragma once
 
-#include "cautiontape/lamaapi.hpp"
 #include "robot.hpp"
+//#include "main.h"
 
 void startRightMidGoal();
 void startRightLeftGoal();

@@ -20,6 +20,6 @@ Motor backClaw(BACK_CLAW, false, okapi::AbstractMotor::gearset::red);
 Motor conveyor(CONVEYOR, false, okapi::AbstractMotor::gearset::blue);
 
 okapi::Potentiometer armLimit(ARM_POTENTIOMETER);
-lamaLib::Inertial inertial(INERTIAL);
+Inertial lamaLib::inertial(INERTIAL);
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);

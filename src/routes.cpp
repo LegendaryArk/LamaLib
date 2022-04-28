@@ -41,15 +41,17 @@ void startRightLeftGoal() {
 
 void startLeftRightGoal() {
 	chassis.setPose({2.8, 1.2, 20});
+	chassis.startOdom();
 
-	chassis.moveToPose({3, 5.2, 20}, 0, {}, {{1.45, 2.7}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	// chassis.moveToPose({3, 5, 20}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveDistance({3.8052595180880893})
 	frontClaw.toggle();
-	chassis.moveToPose({3.5, 2.2, -20}, 0, {}, {{1.45, 2.7}}, {0}, {0.0067, 0.002, 0.0025, 0}, true);
+	chassis.moveToPose({3.5, 2.2, -20}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0}, true);
 	backClaw.moveAbsolute(-50, 100);
 	conveyor.moveVelocity(420);
-	chassis.moveToPose({5, 4.5, 45}, 0, {{3.5, 3.5}}, {{1.45, 2.2}, {0.5, 0.5}}, {1.45}, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveToPose({5, 4.5, 45}, 1, {{3.5, 3.5}}, {{1.4, 1.5}, {0.5, 0.5}}, {1.45, 0}, {0.0067, 0.002, 0.0025, 0});
 	conveyor.moveVelocity(0);
-	chassis.moveToPose({2, 3, 90}, 0, {}, {{1.45, 2.7}}, {0}, {0.0067, 0.002, 0.0025, 0}, true);
+	chassis.moveToPose({2, 3, 90}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0}, true);
 	frontClaw.toggle();
 	chassis.turnAbsolute(20, 1, {0.0067, 0.002, 0.0025, 0});
 	// Vision search

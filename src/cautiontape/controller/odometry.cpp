@@ -32,7 +32,7 @@ Pose Odometry::updatePose(Pose icurrPose, RobotScales iscales, Encoders iencoder
 
     // Polar coordinates
     double polarRadius = sqrt(pow(localOffsetX, 2) + pow(localOffsetY, 2));
-    double polarAngle =  atan2(localOffsetY, localOffsetX) - (degToRad(icurrPose.theta) + delta.theta / 2);
+    double polarAngle = atan2(localOffsetY, localOffsetX) - (degToRad(icurrPose.theta) + delta.theta / 2);
 
     // Global coordinates
     double deltaGlobalX = cos(polarAngle) * polarRadius;
@@ -45,6 +45,6 @@ Pose Odometry::updatePose(Pose icurrPose, RobotScales iscales, Encoders iencoder
     double globalX = icurrPose.x + deltaGlobalX;
     double globalY = icurrPose.y + deltaGlobalY;
     double globalTheta = icurrPose.theta + radToDeg(delta.theta);
-    
+    cout << icurrPose.x << "\t" << deltaGlobalX << "\t" << icurrPose.y << "\t" << deltaGlobalY << "\n";
     return {globalX, globalY, globalTheta, pros::millis()};
 }
