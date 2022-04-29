@@ -9,10 +9,11 @@ PIDController::PIDController(PIDValues ipidValues, double max, double min, doubl
 
 double PIDController::calculatePID(double current, double target, double leeway) {
     double error = target - current;
+    cout << error << endl;
 
     if (fabs(error) <= leeway) {
         count++;
-        if (count > 5) {
+        if (count > 4) {
             return 0;
         }
     } else {

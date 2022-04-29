@@ -6,6 +6,7 @@
 #include "../controller/odometry.hpp"
 #include "../controller/pid.hpp"
 #include "../subsystems/inertial.hpp"
+#include "../subsystems/fourbar.hpp"
 #include "../utilities/chassisdata.hpp"
 #include "../utilities/mathhelper.hpp"
 #include "../utilities/pose.hpp"
@@ -219,6 +220,8 @@ class Chassis {
      * @brief Ends the odometry task
      */
     void endOdom();
+    vector<FourBar> fourBarList;
+    void addFourBar(MotorGroup motors, double gearRatio, PIDValues pidValues);
     
     private:
     int counter;
@@ -239,8 +242,8 @@ class Chassis {
 
     Encoders encoders {nullptr, nullptr, {0, 0}, 0, 0, 0};
     RobotScales scales;
-
     pros::task_t odomTask {};
+    pros::task_t fbTsk {};
 };
 
 extern Chassis chassis;
@@ -251,4 +254,5 @@ extern Chassis chassis;
  * @param iparam 
  */
 void odometryMain(void *iparam);
+void fourBarTask(void *iparam);
 } // namespace lamaLib
