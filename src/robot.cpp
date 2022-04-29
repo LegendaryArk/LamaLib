@@ -15,11 +15,12 @@ Chassis lamaLib::chassis(leftMotors, rightMotors, LEFT_WHEEL_DIAMETER, RIGHT_WHE
 
 MotorGroup frontArm({{FRONT_ARM_LEFT, true, okapi::AbstractMotor::gearset::red},
 					{FRONT_ARM_RIGHT, false, okapi::AbstractMotor::gearset::red}});
-Pneumatic frontClaw(pros::ADIDigitalOut(FRONT_CLAW));
-Motor backClaw(BACK_CLAW, false, okapi::AbstractMotor::gearset::red);
+Pneumatic frontClaw(pros::ADIDigitalOut(FRONT_CLAW), true);
+MotorGroup backClaw({{BACK_CLAW, false, okapi::AbstractMotor::gearset::red}});
 Motor conveyor(CONVEYOR, false, okapi::AbstractMotor::gearset::blue);
 
-okapi::Potentiometer armLimit(ARM_POTENTIOMETER);
+okapi::Potentiometer armPos(ARM_POTENTIOMETER);
+okapi::Potentiometer backClawPos(BACK_POTENTIOMETER);
 Inertial lamaLib::inertial(INERTIAL);
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);

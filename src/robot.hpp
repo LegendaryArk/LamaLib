@@ -11,10 +11,11 @@ extern Chassis lamaLib::chassis;
 
 extern MotorGroup frontArm;
 extern Pneumatic frontClaw;
-extern Motor backClaw;
+extern MotorGroup backClaw;
 extern Motor conveyor;
 
-extern okapi::Potentiometer armLimit;
+extern okapi::Potentiometer armPos;
+extern okapi::Potentiometer backClawPos;
 extern Inertial lamaLib::inertial;
 
 extern pros::Controller master;

@@ -2,7 +2,7 @@
 
 using namespace lamaLib;
 
-Pneumatic::Pneumatic(pros::ADIDigitalOut pneumatic) : pneumatic(pneumatic) {}
+Pneumatic::Pneumatic(pros::ADIDigitalOut pneumatic, bool initState) : pneumatic(pneumatic), state(initState) {}
 
 void Pneumatic::setState(bool istate) {
     pneumatic.set_value(istate);
@@ -15,7 +15,7 @@ void Pneumatic::close() {
     setState(false);
 }
 void Pneumatic::toggle() {
-    setState(!state);
+    setState(state);
     state = !state;
 }
 
