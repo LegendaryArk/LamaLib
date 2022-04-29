@@ -42,12 +42,17 @@ void startRightLeftGoal() {
 void startLeftRightGoal() {
 	// chassis.setPose({ftToM(2.8), ftToM(1.7), 0});
 	chassis.startOdom();
-	chassis.moveToPose({1.05, 1.05, 90}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
-	chassis.moveToPose({1.05, 1.05, 180}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
-	chassis.moveToPose({1.05, 1.05, 0}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
-	// chassis.moveToPose({ftToM(3), ftToM(5.1), 90}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0});
-	// frontClaw.toggle();
-	// chassis.moveToPose({3.5, 2.2, -20}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0}, true);
+	frontClaw.close();
+
+	// chassis.moveToPose({ftToM(3), ftToM(5.1), 0}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0}, false, true);
+	chassis.moveDistance({1.1}, {{1.4, 2}}, {0});
+	frontClaw.toggle();
+	chassis.turnAbsolute(-5, 1, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveDistance({-1.12}, {{1.4, 2}}, {0});
+	chassis.turnAbsolute(-45, 1, {0.0067, 0.002, 0.0025, 0});
+	chassis.moveDistance({-0.3}, {{0.2, 0.5}}, {0});
+	backClaw.moveAbsolute(-450, 100);
+	// chassis.moveToPose({ftToM(3.5), ftToM(2.2), -20}, 1, {}, {{1.4, 2}}, {0}, {0.0067, 0.002, 0.0025, 0}, true);
 	// backClaw.moveAbsolute(-450, 100);
 	// conveyor.moveVelocity(420);
 	// chassis.moveToPose({5, 4.5, 45}, 1, {{3.5, 3.5}}, {{1.4, 1.5}, {0.5, 0.5}}, {1.45, 0}, {0.0067, 0.002, 0.0025, 0});

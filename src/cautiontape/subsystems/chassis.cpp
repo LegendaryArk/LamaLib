@@ -105,11 +105,8 @@ void Chassis::turnRelative(double itarget, double imaxVel, PIDValues pidVals) {
 void Chassis::moveToPose(Pose itarget, double turnVel, vector<Pose> cutoffPoses, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID, bool reverse, bool angleWrap) {
     double angle = reverse ? pose.angleTo(itarget) + 180 : pose.angleTo(itarget);
     angle = angleWrap ? angleWrap180(angle) : angle;
-    cout << getTrackingWheels().left->get() << "\t" << getTrackingWheels().right->get() << "\n";
-    cout << getPose().x << "\t" << getPose().y << "\n";
+    cout << angle << "\n";
     turnAbsolute(angle, turnVel, turnPID);
-    cout << getTrackingWheels().left->get() << "\t" << getTrackingWheels().right->get() << "\n";
-    cout << getPose().x << "\t" << getPose().y << "\n";
     
     vector<double> cutoffDists;
     for (int i = 0; i < cutoffPoses.size(); i++)
@@ -117,12 +114,11 @@ void Chassis::moveToPose(Pose itarget, double turnVel, vector<Pose> cutoffPoses,
 
     double totalDist = pose.distTo(itarget);
     cutoffDists.emplace_back(totalDist);
-    cout << totalDist << "\n";
     if (reverse) {
         for (int i = 0; i < cutoffPoses.size(); i++)
             cutoffDists.at(i) = -cutoffDists.at(i);
     }
-    
+    cout << cutoffDists.at(0) << "\n";
     moveDistance(cutoffDists, imaxes, iends);
     
     turnAbsolute(itarget.theta, turnVel, turnPID);

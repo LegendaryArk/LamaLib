@@ -6,7 +6,7 @@ using namespace lamaLib;
 Odometry::Odometry() {}
 
 Pose Odometry::updatePose(Pose icurrPose, RobotScales iscales, Encoders iencoders, OdomValues ireadingsDiff) {
-    if (fabs(ireadingsDiff.left) > 30 || fabs(ireadingsDiff.right) > 30 || fabs(ireadingsDiff.rear) > 30) {
+    if (fabs(ireadingsDiff.left) > 100 || fabs(ireadingsDiff.right) > 100 || fabs(ireadingsDiff.rear) > 100) {
         cerr << ireadingsDiff.left << "\t" << ireadingsDiff.right << "\t" << ireadingsDiff.rear << "\n";
         return icurrPose;
     }

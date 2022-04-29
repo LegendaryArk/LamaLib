@@ -15,7 +15,7 @@ void Pneumatic::close() {
     setState(false);
 }
 void Pneumatic::toggle() {
-    setState(state);
+    setState(!state);
     state = !state;
 }
 
