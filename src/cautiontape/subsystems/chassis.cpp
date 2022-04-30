@@ -10,7 +10,7 @@ EncoderValues EncoderValues::operator-(EncoderValues rhs) {
     return {left - rhs.left, right - rhs.right, rear - rhs.rear};
 }
 
-Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double ileftWheelDiameter, double irightWheelDiameter, double irearWheelDiameter, Encoders iencoders, int iinterval, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightMotors), encoders(iencoders), gearset(leftMotors.getGearing(), igearRatio) {
+Chassis::Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double ileftWheelDiameter, double irightWheelDiameter, double irearWheelDiameter, Encoders iencoders, int iinterval, double igearRatio) : leftMotors(ileftMotors), rightMotors(irightMotors), encoders(iencoders), gearset(leftMotors.getGearing(), igearRatio), visionMovePID({0, 0, 0, 0}), visionTrackPID({0, 0, 0, 0}), visionWidthPID({0, 0, 0, 0}) {
     interval = iinterval;
     leftMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
     rightMotors.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
@@ -214,6 +214,43 @@ RobotScales Chassis::calibrateChassisDiameter(pros::Controller controller, Inert
     cout << calibratedScales.leftRadius << ", " << calibratedScales.rightRadius << ", " << calibratedScales.rearRadius << "\n";
 
     return calibratedScales;
+}
+
+void Chassis::setVisionPID(PIDValues track, PIDValues move, PIDValues width){
+    visionTrackPID = track;
+    visionMovePID = move;
+    visionWidthPID = width;
+}
+int Chassis::moveToVision(int directionalTarget, int widthTarget, int moveSpeed, int turnSpeed, int widthMin, int width){
+    double turnPID;
+    double movePID;
+    double widthPID;
+    if(directionalTarget - 156 < -15 || directionalTarget - 156 > 15){
+        turnPID = visionTrackPID.calculatePID( 0, directionalTarget - 156, 0);
+        chassis.move(turnSpeed * turnPID, -turnSpeed * turnPID);
+        return 1;
+    }
+    else if(width <= widthMin){
+        chassis.move(0, 0);
+        return 4;
+    }
+    else if(width < widthTarget){
+        movePID = visionMovePID.calculatePID(0, directionalTarget - 156, 5);
+        widthPID = visionWidthPID.calculatePID(width, widthTarget, 10);
+        chassis.move((moveSpeed * movePID) * widthPID, (moveSpeed * -movePID) * widthPID);
+        return 2;
+    }
+    else{
+        chassis.move(0, 0);
+        return 3;
+    }
+    /*
+    if(width <= widthMin){
+        return false;
+    }
+    while(width < widthTarget){
+        movePID = visionMovePID.calculatePID(0, directionalTarget, double leeway)
+    }*/
 }
 
 int Chassis::lCalcSlew(int itarget, int istep){

@@ -27,4 +27,9 @@ namespace lamaLib {
         pros::vision_object_s_t inp = vSensor.get_by_sig(0, signature);
         return inp.width;
     }
+
+    int visionSensor::getCount(){
+        int inp = vSensor.get_object_count();
+        return inp;
+    }
 }

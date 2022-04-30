@@ -42,5 +42,12 @@ namespace lamaLib {
      * @return int
      */
     int getWidth(int signature);
+    /**
+     * @brief Get the number of objects of a certain signature.
+     * 
+     * @param signature 
+     * @return int 
+     */
+    int getCount();
     };
 }

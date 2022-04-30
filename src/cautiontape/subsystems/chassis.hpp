@@ -189,6 +189,32 @@ class Chassis {
     RobotScales calibrateChassisDiameter(pros::Controller controller, Inertial iinertial);
 
     /**
+     * @brief Pass in PID values for vision sensor tracking and movement.
+     * 
+     * @param track 
+     * @param move 
+     * @param width
+     */
+    void setVisionPID(PIDValues track, PIDValues move, PIDValues width);
+
+    /**
+     * @brief Turn to an object, move to a certain width. Returns true when the object is within desired range.
+     * 
+     * @param directionalTarget 
+     * @param widthTarget 
+     * @param moveSpeed 
+     * @param turnSpeed 
+     * @param widthMin 
+     * @param width
+     * @return 1 Turning to target
+     * @return 2 Moving to target
+     * @return 3 Target reached
+     * @return 4 Target too small
+     */
+    int moveToVision(int directionalTarget, int widthTarget, int moveSpeed, int turnSpeed, int widthMin, int width);
+        //maybe add a sort of a failsafe for if the goal gets snatched
+
+    /**
      * @brief Calculates slew rate for left motor inputs
      * WARNING, ALWAYS RUN rcalcSlew AND lcalcSlew IN THE SAME LOOP OR ELSE THE 
      * INTERVAL WON't UPDATE PROPERLY
@@ -228,6 +254,9 @@ class Chassis {
     int interval;
     int previousOutputL = 0;
     int previousOutputR = 0;
+    PIDController visionTrackPID;
+    PIDController visionMovePID;
+    PIDController visionWidthPID;
     MotorGroup leftMotors;
     MotorGroup rightMotors;
 
