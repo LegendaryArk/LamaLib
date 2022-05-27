@@ -5,7 +5,7 @@
 #include "../../controller/Odometry.hpp"
 #include "../../controller/PID.hpp"
 #include "../FourBar.hpp"
-#include "../Inertial.hpp"
+#include "../Sensors/Inertial.hpp"
 #include "../MotorGroup.hpp"
 #include "../../utilities/MathHelper.hpp"
 #include "../../utilities/Pose.hpp"

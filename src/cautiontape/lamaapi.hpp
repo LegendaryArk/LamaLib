@@ -2,11 +2,11 @@
 
 #include "controller/MotionProfiling.hpp"
 #include "controller/PID.hpp"
-#include "subsystems/Inertial.hpp"
+#include "subsystems/Sensors/Inertial.hpp"
+#include "subsystems/Sensors/VisionSensor.hpp"
 #include "subsystems/Motor.hpp"
 #include "subsystems/MotorGroup.hpp"
 #include "subsystems/Pneumatic.hpp"
-#include "subsystems/VisionSensor.hpp"
 #include "subsystems/FourBar.hpp"
 #include "utilities/MathHelper.hpp"
 #include "utilities/Pose.hpp"
