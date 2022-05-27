@@ -1,10 +1,10 @@
-#include "pid.hpp"
+#include "PID.hpp"
 #include <iostream>
 
 using namespace std;
 using namespace lamaLib;
 
-PIDController::PIDController(PIDValues ipidValues, double max, double min, double iComp) :
+PIDController::PIDController(PIDGains ipidValues, double max, double min, double iComp) :
                             pidValues(ipidValues), max(max), min(min), integralComp(iComp) {}
 
 double PIDController::calculatePID(double current, double target, double leeway) {
@@ -35,10 +35,10 @@ double PIDController::calculatePID(double current, double target, double leeway)
     return signal;
 }
 
-void PIDController::setPID(PIDValues ipidValues) {
+void PIDController::setPID(PIDGains ipidValues) {
     pidValues = ipidValues;
 }
-PIDValues PIDController::getPID() {
+PIDGains PIDController::getPID() {
     return pidValues;
 }
 void PIDController::resetPID() {

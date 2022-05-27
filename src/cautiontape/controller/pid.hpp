@@ -3,7 +3,7 @@
 #include <cmath>
 
 namespace lamaLib {
-struct PIDValues {
+struct PIDGains {
     double kp;
     double ki;
     double kd;
@@ -12,19 +12,19 @@ struct PIDValues {
 
 class PIDController {
     public:
-    PIDController(PIDValues ipidValues, double max = 1, double min = -1, double iComp = 10);
+    PIDController(PIDGains ipidValues, double max = 1, double min = -1, double iComp = 10);
 
     double calculatePID(double current, double target, double leeway);
 
-    void setPID(PIDValues ipidValues);
-    PIDValues getPID();
+    void setPID(PIDGains ipidValues);
+    PIDGains getPID();
     void resetPID();
     
     private:
     double integral;
     double integralComp;
     double prevError;
-    PIDValues pidValues;
+    PIDGains pidValues;
     double max;
     double min;
     double count;

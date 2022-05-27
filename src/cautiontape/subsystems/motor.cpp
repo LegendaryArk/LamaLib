@@ -1,4 +1,4 @@
-#include "motor.hpp"
+#include "Motor.hpp"
 
 using namespace std;
 using namespace lamaLib;
@@ -9,7 +9,7 @@ okapi::Motor (port, reverse, igearset, encoderUnits) {
     Motor::setBrakeMode(AbstractMotor::brakeMode::brake);
 }
 
-void Motor::moveMotor(int ivelocity, double slope, double yIntercept, PIDValues pid) {
+void Motor::moveMotor(int ivelocity, double slope, double yIntercept, PIDGains pid) {
     double volt = (abs(ivelocity) - yIntercept) / slope;
 
     PIDController pidControl(pid, 2, 0);

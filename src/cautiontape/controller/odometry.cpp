@@ -1,43 +1,61 @@
-#include "odometry.hpp"
+#include "Odometry.hpp"
 
 using namespace std;
 using namespace lamaLib;
 
-Odometry::Odometry() {}
+void EncoderScales::operator=(EncoderScales rhs) {
+	leftRadius = rhs.leftRadius;
+	rightRadius = rhs.rightRadius;
+	rearRadius = rhs.rearRadius;
+	leftWheelDiameter = rhs.leftWheelDiameter;
+	rightWheelDiameter = rhs.rightWheelDiameter;
+	rearWheelDiameter = rhs.rearWheelDiameter;
+	
+	wheelTrack = leftRadius + rearRadius;
+}
 
-Pose Odometry::updatePose(Pose icurrPose, RobotScales iscales, Encoders iencoders, OdomValues ireadingsDiff) {
+EncoderTicks EncoderTicks::operator+(EncoderTicks rhs) {
+    return {left + rhs.left, right + rhs.right, rear + rhs.rear};
+}
+EncoderTicks EncoderTicks::operator-(EncoderTicks rhs) {
+    return {left - rhs.left, right - rhs.right, rear - rhs.rear};
+}
+
+Odometry::Odometry(Encoders encoders, EncoderScales scales) : encoders(encoders), scales(scales) {}
+
+void Odometry::updatePose(EncoderTicks ireadingsDiff) {
     if (fabs(ireadingsDiff.left) > 100 || fabs(ireadingsDiff.right) > 100 || fabs(ireadingsDiff.rear) > 100) {
         cerr << ireadingsDiff.left << "\t" << ireadingsDiff.right << "\t" << ireadingsDiff.rear << "\n";
-        return icurrPose;
+        return;
     }
 
-    double leftWheelCircumference = iscales.leftWheelDiameter * M_PI;
-    double rightWheelCircumference = iscales.rightWheelDiameter * M_PI;
-    double rearWheelCircumference = iscales.rearWheelDiameter * M_PI;
-    double chassisDiameter = iscales.leftRadius + iscales.rightRadius;
+    double leftWheelCircumference = scales.leftWheelDiameter * M_PI;
+    double rightWheelCircumference = scales.rightWheelDiameter * M_PI;
+    double rearWheelCircumference = scales.rearWheelDiameter * M_PI;
+    double chassisDiameter = scales.leftRadius + scales.rightRadius;
     
     // Delta distance
     OdomValues delta;
-    delta.left = ((double) ireadingsDiff.left / iencoders.leftTPR) * leftWheelCircumference * iscales.gearRatio;
-    delta.right = ((double) ireadingsDiff.right / iencoders.rightTPR) * rightWheelCircumference * iscales.gearRatio;
+    delta.left = ((double) ireadingsDiff.left / scales.tpr) * leftWheelCircumference;
+    delta.right = ((double) ireadingsDiff.right / scales.tpr) * rightWheelCircumference;
 
     // Delta theta
     delta.theta = (delta.left - delta.right) / chassisDiameter;
 
-    delta.rear = 0; // ((ireadingsDiff.rear / iencoders.rearTPR) * rearWheelCircumference) - (delta.theta * iscales.rearRadius);
+    delta.rear = 0; // ((ireadingsDiff.rear / iencoders.rearTPR) * rearWheelCircumference) - (delta.theta * scales.rearRadius);
 
     // Local coordinates
     double localOffsetX = delta.rear;
     double localOffsetY = (delta.left + delta.right) / 2;
 
     if (delta.left != delta.right) {
-        localOffsetX = 2 * sin(delta.theta / 2) * (delta.rear / delta.theta + iscales.rearRadius);
-        localOffsetY = 2 * sin(delta.theta / 2) * (delta.right / delta.theta + (delta.left > delta.right ? iscales.rightRadius : iscales.leftRadius));
+        localOffsetX = 2 * sin(delta.theta / 2) * (delta.rear / delta.theta + scales.rearRadius);
+        localOffsetY = 2 * sin(delta.theta / 2) * (delta.right / delta.theta + (delta.left > delta.right ? scales.rightRadius : scales.leftRadius));
     }
 
     // Polar coordinates
     double polarRadius = sqrt(pow(localOffsetX, 2) + pow(localOffsetY, 2));
-    double polarAngle = atan2(localOffsetY, localOffsetX) - (degToRad(icurrPose.theta) + delta.theta / 2);
+    double polarAngle = atan2(localOffsetY, localOffsetX) - (degToRad(pose.theta) + delta.theta / 2);
 
     // Global coordinates
     double deltaGlobalX = cos(polarAngle) * polarRadius;
@@ -47,8 +65,66 @@ Pose Odometry::updatePose(Pose icurrPose, RobotScales iscales, Encoders iencoder
     if (isnan(deltaGlobalY)) deltaGlobalY = 0;
     if (isnan(delta.theta)) delta.theta = 0;
 
-    double globalX = icurrPose.x + deltaGlobalX;
-    double globalY = icurrPose.y + deltaGlobalY;
-    double globalTheta = icurrPose.theta + radToDeg(delta.theta);
-    return {globalX, globalY, globalTheta, pros::millis()};
+    double globalX = pose.x + deltaGlobalX;
+    double globalY = pose.y + deltaGlobalY;
+    double globalTheta = pose.theta + radToDeg(delta.theta);
+	setPose({globalX, globalY, globalTheta, pros::millis()});
+}
+
+Pose Odometry::getPose() {
+	return pose;
+}
+void Odometry::setPose(Pose newPose) {
+	pose = newPose;
+}
+
+Encoders Odometry::getEncoders() {
+	return encoders;
+}
+void Odometry::setEncoders(Encoders newEncoders) {
+	encoders = newEncoders;
+}
+
+EncoderScales Odometry::getEncoderScales() {
+	return scales;
+}
+void Odometry::setEncoderScales(EncoderScales newScales) {
+	scales = newScales;
+}
+
+EncoderTicks Odometry::getEncoderTicks() {
+	return {encoders.left.get(), encoders.right.get(), encoders.rear.get()};
+}
+
+void Odometry::startOdom() {
+	odomTask = {odometryMain, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Odometry"};
+}
+void Odometry::endOdom() {
+	odomTask.remove();
+}
+
+void odometryMain(void* odometry) {
+	Odometry* odom = (Odometry*) odometry;
+
+	Encoders encoders = odom->getEncoders();
+	EncoderScales scales = odom->getEncoderScales();
+
+	EncoderTicks prev = {0, 0, 0};
+
+	uint32_t time = pros::millis();
+	while (true) {
+		EncoderTicks current = odom->getEncoderTicks();
+		EncoderTicks diff = current - prev;
+
+		odom->updatePose(diff);
+
+		pros::lcd::print(0, "x: %.2f in   y: %.2f in", odom->getPose().x, odom->getPose().y);
+        pros::lcd::print(1, "theta: %.2f deg", odom->getPose().theta);
+
+        pros::lcd::print(2, "left: %.2f    right: %.2f", odom->getEncoderTicks().left, odom->getEncoderTicks().right);
+        pros::lcd::print(3, "rear: %.2f", odom->getEncoderTicks().rear);
+
+		prev = current;
+		pros::Task::delay_until(&time, 10);
+	}
 }

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "okapi/api.hpp"
-#include "../controller/pid.hpp"
-#include "../utilities/mathhelper.hpp"
+#include "../controller/PID.hpp"
+#include "../utilities/MathHelper.hpp"
 
 #define YINTERCEPT -19.191
 #define SLOPE 0.0189
@@ -19,12 +19,12 @@ class Motor: public okapi::Motor {
      * 
      * @param ivelocity The desired velocity
      */
-    void moveMotor(int ivelocity, double slope = 1, double yIntercept = 0, PIDValues pid = {0, 0, 0, 1});
+    void moveMotor(int ivelocity, double slope = 1, double yIntercept = 0, PIDGains pid = {0, 0, 0, 1});
     /**
      * @brief Sets the PID values for moveVelocity
      * 
      * @param velPID The kp, ki, kd, and kf; default is 0
      */
-    void setVelocityPID(PIDValues ivelPID);
+    void setVelocityPID(PIDGains ivelPID);
 };
 } // namespace lamaLib
