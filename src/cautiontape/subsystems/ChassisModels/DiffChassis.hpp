@@ -215,6 +215,7 @@ class Chassis {
      * @brief Ends the odometry task
      */
     void endOdom();
+
     vector<FourBar> fourBarList;
     void addFourBar(MotorGroup motors, double gearRatio, PIDGains pidValues);
     
@@ -240,13 +241,5 @@ class Chassis {
     pros::task_t fbTsk {};
 };
 
-extern Chassis chassis;
-
-/**
- * @brief The main odometry loop
- * 
- * @param iparam 
- */
-void odometryMain(void *iparam);
 void fourBarTask(void *iparam);
 } // namespace lamaLib

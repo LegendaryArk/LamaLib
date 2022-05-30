@@ -39,7 +39,7 @@ void Chassis::move(int ileft, int iright) { //uses the pros controller which goe
             rightV *= 6;
             break;
         default:
-            cout << "Inavlid gearbox\n";
+            cerr << "Inavlid gearbox\n";
             break;
     }
 
@@ -102,7 +102,7 @@ void Chassis::moveToPose(Pose itarget, double turnVel, vector<Pose> cutoffPoses,
 
     double angle = reverse ? pose.angleTo(itarget) + 180 : pose.angleTo(itarget);
     angle = angleWrap ? angleWrap180(angle) : angle;
-    cout << angle << "\n";
+
     turnAbsolute(angle, turnVel, turnPID);
     
     vector<double> cutoffDists;
@@ -115,7 +115,7 @@ void Chassis::moveToPose(Pose itarget, double turnVel, vector<Pose> cutoffPoses,
         for (int i = 0; i < cutoffPoses.size(); i++)
             cutoffDists.at(i) = -cutoffDists.at(i);
     }
-    cout << cutoffDists.at(0) << "\n";
+
     moveDistance(cutoffDists, imaxes, iends);
     
     turnAbsolute(itarget.theta, turnVel, turnPID);
@@ -221,21 +221,21 @@ int Chassis::moveToVision(int directionalTarget, int widthTarget, int moveSpeed,
     double widthPID;
     if(directionalTarget - 156 < -15 || directionalTarget - 156 > 15){
         turnPID = visionTrackPID.calculatePID( 0, directionalTarget - 156, 0);
-        chassis.move(turnSpeed * turnPID, -turnSpeed * turnPID);
+        move(turnSpeed * turnPID, -turnSpeed * turnPID);
         return 1;
     }
     else if(width <= widthMin){
-        chassis.move(0, 0);
+        move(0, 0);
         return 4;
     }
     else if(width < widthTarget){
         movePID = visionMovePID.calculatePID(0, directionalTarget - 156, 5);
         widthPID = visionWidthPID.calculatePID(width, widthTarget, 10);
-        chassis.move((moveSpeed * movePID) * widthPID, (moveSpeed * -movePID) * widthPID);
+        move((moveSpeed * movePID) * widthPID, (moveSpeed * -movePID) * widthPID);
         return 2;
     }
     else{
-        chassis.move(0, 0);
+        move(0, 0);
         return 3;
     }
     /*
@@ -283,6 +283,7 @@ int Chassis::rCalcSlew(int itarget, int istep){
     }
 }
 
+/*
 void lamaLib::fourBarTask(void *iparam) {
     while (true) {
         for (int i = 0; i < chassis.fourBarList.size(); i++) {
@@ -308,3 +309,4 @@ void Chassis::addFourBar(MotorGroup motors, double gearRatio, PIDGains pidValues
     FourBar fourBar(motors, gearRatio, pidValues);
     fourBarList.push_back(fourBar);
 }
+*/
