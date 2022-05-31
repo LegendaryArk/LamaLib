@@ -9,11 +9,11 @@ namespace lamaLib {
 /**
  * @brief The orientation of the inertial sensor along the x, y, and z axis, in degrees
  */
-typedef struct {
+struct Angles {
     double x;
     double y;
     double z;
-} Angles;
+};
 
 class Inertial : pros::IMU {
     public:

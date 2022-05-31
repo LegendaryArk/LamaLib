@@ -1,4 +1,4 @@
-#include "mathhelper.hpp"
+#include "MathHelper.hpp"
 
 double degToRad(double deg) {
     return deg * (M_PI / 180);
@@ -36,14 +36,16 @@ double mToFt(double m) {
 }
 
 double angleWrap180(double ang) {
-    if (fmod(ang, 360) < 0)
-        ang += 360;
-    return ang;
-}
-double angleWrap360(double ang) {
-    if (fmod(ang + 180, 360) < 0)
+	ang = fmod(ang + 180, 360);
+    if (ang < 0)
         ang += 360;
     return ang - 180;
+}
+double angleWrap360(double ang) {
+	ang = fmod(ang, 360);
+    if (ang < 0)
+        ang += 360;
+    return ang;
 }
 
 int sign(double n) {

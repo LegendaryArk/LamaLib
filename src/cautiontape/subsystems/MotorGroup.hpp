@@ -1,6 +1,6 @@
 #pragma once
 
-#include "motor.hpp"
+#include "Motor.hpp"
 #include <vector>
 
 using namespace std;
@@ -21,7 +21,7 @@ class MotorGroup {
      * @param ivel The desired velocity in rpm
      */
     void moveVelocity(int ivel);
-    void moveMotor(int ivel, double slope = 1, double yIntercept = 0, PIDValues pid = {0, 0, 0 , 1});
+    void moveMotor(int ivel, double slope = 1, double yIntercept = 0, PIDGains pid = {0, 0, 0 , 1});
     /**
      * @brief Sets all the motors to a specific voltage
      * 
@@ -48,7 +48,7 @@ class MotorGroup {
      * 
      * @param velPID The kp, ki, kd, and kf; default is 0
      */
-    void setVelocityPID(PIDValues velPID);
+    void setVelocityPID(PIDGains velPID);
 
     /**
      * @brief Sets the brake mode of the motors

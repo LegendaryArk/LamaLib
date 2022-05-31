@@ -1,4 +1,4 @@
-#include "motionprofiling.hpp"
+#include "MotionProfiling.hpp"
 
 using namespace std;
 using namespace lamaLib;

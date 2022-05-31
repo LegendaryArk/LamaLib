@@ -1,6 +1,4 @@
-#include "inertial.hpp"
-#include "pros/imu.h"
-#include "pros/rtos.h"
+#include "InertialSensor.hpp"
 
 using namespace lamaLib;
 

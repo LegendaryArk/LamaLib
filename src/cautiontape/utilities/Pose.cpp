@@ -1,4 +1,4 @@
-#include "pose.hpp"
+#include "Pose.hpp"
 
 using namespace lamaLib;
 

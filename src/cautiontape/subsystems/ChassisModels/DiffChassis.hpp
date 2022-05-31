@@ -1,30 +1,27 @@
 #pragma once
 
 #include "pros/adi.hpp"
-#include "motorgroup.hpp"
-#include "../controller/motionprofiling.hpp"
-#include "../controller/odometry.hpp"
-#include "../controller/pid.hpp"
-#include "../subsystems/inertial.hpp"
-#include "../subsystems/fourbar.hpp"
-#include "../utilities/chassisdata.hpp"
-#include "../utilities/mathhelper.hpp"
-#include "../utilities/pose.hpp"
+#include "../../controller/MotionProfiling.hpp"
+#include "../../controller/Odometry.hpp"
+#include "../../controller/PID.hpp"
+#include "../FourBar.hpp"
+#include "../Sensors/InertialSensor.hpp"
+#include "../MotorGroup.hpp"
+#include "../../utilities/MathHelper.hpp"
+#include "../../utilities/Pose.hpp"
 #include <cmath>
 #include <map>
 #include <string>
 
 namespace lamaLib {
 /**
- * @brief The encoder values of all 3 tracking wheels in ticks
+ * @brief The measurements of the tracking wheels in inches
+ * 
+ * Left and right are separate in the case that they are different
  */
-struct EncoderValues {
-    double left;
-    double right;
-    double rear;
-
-    EncoderValues operator+(EncoderValues rhs);
-    EncoderValues operator-(EncoderValues rhs);
+struct ChassisScales {
+    double wheelDiameter;
+	okapi::AbstractMotor::GearsetRatioPair gearset {okapi::AbstractMotor::gearset::green, 1};
 };
 
 /**
@@ -60,7 +57,7 @@ class Chassis {
      * @param igearRatio The external gear ratio of the chasssis
      * @param iinterval The interval between slew rate calculations
      */
-    Chassis(MotorGroup ileftMotors, MotorGroup irightMotors, double ileftWheelDiameter, double irightWheelDiameter, double irearWheelDiameter, Encoders iencoders, int iinterval, double igearRatio = 1);
+    Chassis(MotorGroup leftMotors, MotorGroup rightMotors, ChassisScales chassisScales, Encoders encoders, EncoderScales encoderScales, int iinterval);
 
     /**
      * @brief Moves the left and right motors when using the controller. The power that is given to the motors are according to the joyMap
@@ -90,7 +87,7 @@ class Chassis {
      * @param imaxVel The max velocity in m/s
      * @param pidVals The Kpk Ki, Kd, and Kf used for the PID; default is all 0
      */
-    void turnAbsolute(double itarget, double imaxVel, PIDValues pidVals = {0, 0, 0, 0});
+    void turnAbsolute(double itarget, double imaxVel, PIDGains pidVals = {0, 0, 0, 0});
 
     /**
      * @brief Turns the robot relative to the current heading
@@ -99,7 +96,7 @@ class Chassis {
      * @param imaxVel The max velocity in m/s
      * @param pidVals The Kp, Ki, Kd and Kf used for the PID, default is all 0
      */
-    void turnRelative(double itarget, double imaxVel, PIDValues pidVals = {0, 0, 0, 0});
+    void turnRelative(double itarget, double imaxVel, PIDGains pidVals = {0, 0, 0, 0});
 
     /**
      * @brief Turns the robot to face a given coordinate and moves to that point
@@ -112,7 +109,7 @@ class Chassis {
      * @param turnPID The Kp, Ki, Kd, and Kf used in the turn, default is all 0
      * @param reverse Whether the robot should move forward or backwards to the point. True = backwards, false = forwards
      */
-    void moveToPose(Pose itarget, double turnVel, vector<Pose> cutoffPoses, vector<MotionLimit> imaxes, vector<double> iends, PIDValues turnPID = {0, 0, 0, 0}, bool reverse = false, bool angleWrap = false);
+    void moveToPose(Pose itarget, double turnVel, vector<Pose> cutoffPoses, vector<MotionLimit> imaxes, vector<double> iends, PIDGains turnPID = {0, 0, 0, 0}, bool reverse = false, bool angleWrap = false);
 
     /**
      * @brief Gets the left motors
@@ -131,47 +128,19 @@ class Chassis {
     okapi::AbstractMotor::brakeMode getBrakeMode();
 
     /**
-     * @brief Gets the tracking wheels
+     * @brief Get the chassis scales of the robot
      * 
-     * @return The tracking wheels that are used in odom
+     * @return The wheel diameter and gear ratio of the robot
      */
-    Encoders getTrackingWheels();
+    ChassisScales getChassisScales();
     /**
-     * @brief Get the encoder tick counts of the tracking wheels
+     * @brief Set the chassis scales of the robot
      * 
-     * @return The encoder readings
+     * @param iscales The new wheel diameter and gear ratio of the robot
      */
-    EncoderValues getEncoders();
+    void setChassisScales(ChassisScales iscales);
 
-
-    // Move get and set pose to private and then create a setStartPose for setting the start position
-    /**
-     * @brief Get the current coordinates
-     * 
-     * @return The current position coordinates
-     */
-    Pose getPose();
-    /**
-     * @brief Set the pose to a new coordinate position
-     * 
-     * @param ipose The new coordinate position
-     */
-    void setPose(Pose ipose);
-
-    /**
-     * @brief Get the current tracking wheel measurements
-     * 
-     * @return The tracking wheel measurements
-     */
-    RobotScales getScales();
-    /**
-     * @brief Set the tracking wheel measurements with new measurements
-     * 
-     * @param iscales The new measurements of the tracking wheel
-     */
-    void setScales(RobotScales iscales);
-
-    RobotScales calibrateWheelDiameter(pros::Controller controller, double actualDist);
+    EncoderScales calibrateWheelDiameter(pros::Controller controller, double actualDist);
 
     /**
      * @brief Calibrate the distance from the tracking wheel to the center of the robot
@@ -183,10 +152,10 @@ class Chassis {
      * This process should only be done once unless the tracking wheel positions have changed
      * 
      * @param controller Used to determine when the calculations should be done; when the robot is in the correct orientation
-     * @param iinertial Used to do the initial turn
+     * @param inertial Used to do the initial turn
      * @return The new measurements; the only updated should be the radii; the measurements should already be updated
      */
-    RobotScales calibrateChassisDiameter(pros::Controller controller, Inertial iinertial);
+    EncoderScales calibrateChassisDiameter(pros::Controller controller, Inertial inertial);
 
     /**
      * @brief Pass in PID values for vision sensor tracking and movement.
@@ -195,7 +164,7 @@ class Chassis {
      * @param move 
      * @param width
      */
-    void setVisionPID(PIDValues track, PIDValues move, PIDValues width);
+    void setVisionPID(PIDGains track, PIDGains move, PIDGains width);
 
     /**
      * @brief Turn to an object, move to a certain width. Returns true when the object is within desired range.
@@ -246,42 +215,31 @@ class Chassis {
      * @brief Ends the odometry task
      */
     void endOdom();
+
     vector<FourBar> fourBarList;
-    void addFourBar(MotorGroup motors, double gearRatio, PIDValues pidValues);
+    void addFourBar(MotorGroup motors, double gearRatio, PIDGains pidValues);
     
     private:
     int counter;
     int interval;
     int previousOutputL = 0;
     int previousOutputR = 0;
-    PIDController visionTrackPID;
-    PIDController visionMovePID;
-    PIDController visionWidthPID;
-    MotorGroup leftMotors;
+
+    PIDController visionTrackPID {{0, 0, 0, 0}};
+    PIDController visionMovePID {{0, 0, 0, 0}};
+    PIDController visionWidthPID {{0, 0, 0, 0}};
+    
+	MotorGroup leftMotors;
     MotorGroup rightMotors;
 
     okapi::AbstractMotor::GearsetRatioPair gearset {okapi::AbstractMotor::gearset::green, 1};
 
-    /**
-     * 
-     * Info used for odometry
-     * 
-     */
-    Pose pose {0, 0, 0, 0};
+    Odometry odom;
 
-    Encoders encoders {nullptr, nullptr, {0, 0}, 0, 0, 0};
-    RobotScales scales;
-    pros::task_t odomTask {};
+	ChassisScales chassisScales;
+
     pros::task_t fbTsk {};
 };
 
-extern Chassis chassis;
-
-/**
- * @brief The main odometry loop
- * 
- * @param iparam 
- */
-void odometryMain(void *iparam);
 void fourBarTask(void *iparam);
 } // namespace lamaLib

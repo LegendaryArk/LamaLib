@@ -1,8 +1,8 @@
 #pragma once
 
 #include "api.h"
-#include "../utilities/pose.hpp"
-#include "../utilities/mathhelper.hpp"
+#include "../utilities/Pose.hpp"
+#include "../utilities/MathHelper.hpp"
 
 namespace lamaLib {
 /**
