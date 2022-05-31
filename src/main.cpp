@@ -1,6 +1,4 @@
 #include "main.h"
-#include "pros/llemu.hpp"
-#include "pros/rtos.hpp"
 
 // Inertial lamaLib::inertial(21);
 
