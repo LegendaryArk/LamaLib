@@ -5,7 +5,7 @@
 namespace lamaLib {
 class Pneumatic {
     public:
-    Pneumatic(pros::ADIDigitalOut pneumatic);
+    Pneumatic(pros::ADIDigitalOut pneumatic, bool initState = false);
 
     /**
      * @brief Sets the state of the pneumatic to either opened or closed
@@ -29,8 +29,8 @@ class Pneumatic {
     /**
      * @brief Gets the state of the pneumatic
      * 
-     * @return true 
-     * @return false 
+     * @return true for open
+     * @return false for closed
      */
     bool getState();
 

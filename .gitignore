@@ -15,3 +15,12 @@ temp.log
 temp.errors
 *.ini
 .d/
+
+#robot config files
+robot.hpp
+robot.cpp
+robotconfig.hpp
+routes.cpp
+routes.hpp
+main.h
+main.cpp

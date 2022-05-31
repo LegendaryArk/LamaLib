@@ -1,11 +1,12 @@
-#include "pneumatic.hpp"
+#include "Pneumatic.hpp"
 
 using namespace lamaLib;
 
-Pneumatic::Pneumatic(pros::ADIDigitalOut pneumatic) : pneumatic(pneumatic) {}
+Pneumatic::Pneumatic(pros::ADIDigitalOut pneumatic, bool initState) : pneumatic(pneumatic), state(initState) {}
 
 void Pneumatic::setState(bool istate) {
     pneumatic.set_value(istate);
+    state = istate;
 }
 void Pneumatic::open() {
     setState(true);
