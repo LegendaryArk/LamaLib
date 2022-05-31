@@ -13,9 +13,8 @@ double PIDController::calculatePID(double current, double target, double leeway)
 
     if (fabs(error) <= leeway) {
         count++;
-        if (count > 4) {
+        if (count > 4)
             return 0;
-        }
     } else {
         count = 0;
     }
