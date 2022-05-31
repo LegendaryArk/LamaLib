@@ -97,10 +97,10 @@ EncoderTicks Odometry::getEncoderTicks() {
 }
 
 void Odometry::startOdom() {
-	odomTask = {odometryMain, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Odometry"};
+	odomTask = pros::c::task_create(odometryMain, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Odoemtry");
 }
 void Odometry::endOdom() {
-	odomTask.remove();
+	pros::c::task_delete(odomTask);
 }
 
 void odometryMain(void* odometry) {

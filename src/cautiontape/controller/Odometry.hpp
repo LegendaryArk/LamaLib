@@ -127,7 +127,7 @@ class Odometry {
 	Encoders encoders;
 	EncoderScales scales;
 
-	pros::Task odomTask {nan};
+	pros::task_t odomTask;
 };
 
 /**
