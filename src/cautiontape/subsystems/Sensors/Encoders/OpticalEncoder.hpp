@@ -16,5 +16,7 @@ class OpticalEncoder : public pros::ADIEncoder, public Encoder {
 	 * @return The number of ticks
 	 */
 	double getTicks();
+
+	const int tpr = 360;
 };
 } // namespace lamaLib

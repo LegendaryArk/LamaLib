@@ -70,5 +70,7 @@ class Rotation : public pros::Rotation, public Encoder {
 	 * @param rate The new rate in ms
 	 */
 	void setDataRate(int rate);
+
+	const int tpr = 36000;
 };
 } // namespace lamaLib

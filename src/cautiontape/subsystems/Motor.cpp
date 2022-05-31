@@ -1,12 +1,15 @@
 #include "Motor.hpp"
+#include "okapi/api/device/motor/abstractMotor.hpp"
 
 using namespace std;
 using namespace lamaLib;
 
-Motor::Motor(int8_t port) : okapi::Motor(port) {}
-Motor::Motor(int8_t port, bool reverse, okapi::AbstractMotor::gearset igearset, okapi::AbstractMotor::encoderUnits encoderUnits) :
-okapi::Motor (port, reverse, igearset, encoderUnits) {
-    Motor::setBrakeMode(AbstractMotor::brakeMode::brake);
+Motor::Motor(int8_t port) : okapi::Motor(port) {
+	setBrakeMode(AbstractMotor::brakeMode::brake);
+}
+Motor::Motor(int8_t port, bool reverse, okapi::AbstractMotor::gearset igearset, okapi::AbstractMotor::encoderUnits encoderUnits)
+			: okapi::Motor (port, reverse, igearset, encoderUnits) {
+    setBrakeMode(AbstractMotor::brakeMode::brake);
 }
 
 void Motor::moveMotor(int ivelocity, double slope, double yIntercept, PIDGains pid) {

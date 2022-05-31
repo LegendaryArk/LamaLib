@@ -34,5 +34,9 @@ class Motor: public okapi::Motor, public Encoder {
 	 * @return The number of ticks
 	 */
 	double getTicks();
+
+	const double tpr = getGearing() == AbstractMotor::gearset::blue ? 300 : // Blue gearset tpr
+						getGearing() == AbstractMotor::gearset::green ? 600 : // Green gearset tpr
+																		1800; // Red gearset tpr
 };
 } // namespace lamaLib
