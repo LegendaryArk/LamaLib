@@ -2,7 +2,10 @@
 
 #include "controller/MotionProfiling.hpp"
 #include "controller/PID.hpp"
-#include "subsystems/Sensors/Inertial.hpp"
+#include "subsystems/Sensors/Encoders/Encoder.hpp"
+#include "subsystems/Sensors/Encoders/OpticalEncoder.hpp"
+#include "subsystems/Sensors/Encoders//RotationSensor.hpp"
+#include "subsystems/Sensors/InertialSensor.hpp"
 #include "subsystems/Sensors/VisionSensor.hpp"
 #include "subsystems/Motor.hpp"
 #include "subsystems/MotorGroup.hpp"

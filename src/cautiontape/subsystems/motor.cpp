@@ -24,3 +24,7 @@ void Motor::moveMotor(int ivelocity, double slope, double yIntercept, PIDGains p
     // cout << signal << "," << getActualVelocity() << "\n";
     // cout << volt << "\t" << signal << "\t" << getActualVelocity() << "\n";
 }
+
+double Motor::getTicks() {
+	return getEncoder()->get();
+}

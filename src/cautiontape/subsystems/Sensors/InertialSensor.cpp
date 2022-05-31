@@ -1,4 +1,4 @@
-#include "Inertial.hpp"
+#include "InertialSensor.hpp"
 
 using namespace lamaLib;
 

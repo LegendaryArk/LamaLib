@@ -5,14 +5,14 @@
 #include "pros/vision.hpp"
 
 namespace lamaLib {
-class VisionSensor : pros::Vision {
+class Vision : pros::Vision {
     public:
     /**
     * @brief The vision sensor is a low quality camera that can see "blobs" of colour specified through colour signatures, calibrated with the V5 Vision Utlitiy
     *
     * @param vPort The port of the vision sensor
     **/
-    VisionSensor(int vPort);
+    Vision(int vPort);
 
     /**
      * @brief Sets signatures in vision sensor memory to the signatures in the brain memory.
