@@ -3,8 +3,8 @@
 
 using namespace lamaLib;
 
-GPS::GPS(int gpsPort)
-	: pros::Gps(gpsPort) {}
+GPS::GPS(int gpsPort, Pose initialPose, double offsetX, double offsetY)
+	: pros::Gps(gpsPort, initialPose.x, initialPose.y, initialPose.theta, offsetX, offsetY) {}
 GPS::GPS(pros::Gps gps)
 	: pros::Gps(gps) {}
 
