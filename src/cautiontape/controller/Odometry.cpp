@@ -93,7 +93,7 @@ void Odometry::setEncoderScales(EncoderScales newScales) {
 }
 
 EncoderTicks Odometry::getEncoderTicks() {
-	return {encoders.left.get(), encoders.right.get(), encoders.rear.get()};
+	return {encoders.left->getTicks(), encoders.right->getTicks(), encoders.rear->getTicks()};
 }
 
 void Odometry::startOdom() {

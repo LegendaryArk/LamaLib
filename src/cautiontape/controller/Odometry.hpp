@@ -1,9 +1,12 @@
 #pragma once
 
 #include "okapi/api.hpp"
+#include "../subsystems/Sensors/Encoders/Encoder.hpp"
 #include "../utilities/MathHelper.hpp"
 #include "../utilities/Pose.hpp"
 #include "pros/rtos.h"
+
+using namespace std;
 
 namespace lamaLib {
 /**
@@ -20,9 +23,9 @@ struct OdomValues {
  * @brief Tracking wheels that are used in odom and their TPR
  */
 struct Encoders {
-    okapi::ADIEncoder left;
-    okapi::ADIEncoder right;
-    okapi::ADIEncoder rear {1, 1};
+    shared_ptr<Encoder> left;
+    shared_ptr<Encoder> right;
+    shared_ptr<Encoder> rear;
 };
 
 struct EncoderScales {
