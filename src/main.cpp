@@ -114,19 +114,19 @@ void autonomous() {
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-	Motor topLeft(1, false, okapi::AbstractMotor::gearset::blue);
-	Motor topRight(10, true, okapi::AbstractMotor::gearset::blue);
-	Motor bottomLeft(11, false, okapi::AbstractMotor::gearset::blue);
-	Motor bottomRight(20, true, okapi::AbstractMotor::gearset::blue);
+	Motor topLeft(20, true, okapi::AbstractMotor::gearset::blue);
+	Motor topRight(11, false, okapi::AbstractMotor::gearset::blue);
+	Motor bottomLeft(10, true, okapi::AbstractMotor::gearset::blue);
+	Motor bottomRight(3, false, okapi::AbstractMotor::gearset::blue);
 	
 	while (true) {
-		double ch3 = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-		double ch4 = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
-		double ch1 = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+		double forward = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) * 6;
+		double strafe = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X) * 6;
+		double turn = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X) * 6;
 
-		topLeft.moveVelocity(ch3 + ch1 + ch4);
-		topRight.moveVelocity(ch3 - ch1 + ch4);
-		bottomLeft.moveVelocity(ch3 + ch1 - ch4);
-		bottomRight.moveVelocity(ch3 - ch1 + ch4);
+		topLeft.moveVelocity(forward + turn + strafe);
+		topRight.moveVelocity(forward - turn - strafe);
+		bottomLeft.moveVelocity(forward + turn - strafe);
+		bottomRight.moveVelocity(forward + strafe - turn);
 	}
 }
