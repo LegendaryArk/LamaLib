@@ -74,7 +74,7 @@ void Odometry::updatePose(EncoderTicks deltaReadings) {
 
     if (delta.left != delta.right) {
         localOffsetX = 2 * sin(delta.theta / 2) * (delta.rear / delta.theta + scales.rearRadius);
-        localOffsetY = 2 * sin(delta.theta / 2) * (delta.right / delta.theta + (delta.left > delta.right ? scales.rightRadius : scales.leftRadius));
+        localOffsetY = 2 * sin(delta.theta / 2) * (delta.right / delta.theta + scales.leftRadius);
     }
 
     // Polar coordinates
